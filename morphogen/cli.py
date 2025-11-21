@@ -309,9 +309,9 @@ def cmd_mlir(args):
 
 def cmd_version(args):
     """Show version information."""
-    from kairo import __version__
-    print(f"Creative Computation DSL v{__version__}")
-    print("A typed, semantics-first DSL for expressive, deterministic simulations")
+    from morphogen import __version__
+    print(f"Morphogen v{__version__}")
+    print("Universal deterministic computation platform unifying audio, physics, circuits, and optimization")
 
 
 if __name__ == "__main__":
