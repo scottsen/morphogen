@@ -1,0 +1,130 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "morphogen"
+version = "0.11.0"
+description = "A language of creative determinism for simulation, sound, and visual form"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Scott Sen"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy>=1.20.0",
+    "scipy>=1.7.0",
+    "lark>=1.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",  # Parallel testing
+    "pytest-benchmark>=4.0.0",  # Performance benchmarks
+    "hypothesis>=6.0.0",  # Property-based testing
+    "black>=22.0.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+]
+mlir = [
+    "mlir-python-bindings>=17.0.0",
+]
+viz = [
+    "matplotlib>=3.5.0",
+    "pillow>=9.0.0",
+]
+audio = [
+    "sounddevice>=0.4.0",    # Real-time audio playback/recording
+    "soundfile>=0.12.0",     # WAV/FLAC file I/O
+    "scipy>=1.7.0",          # Fallback for WAV support
+]
+video = [
+    "imageio>=2.9.0",        # Video export (MP4, GIF)
+    "imageio-ffmpeg>=0.4.0", # FFMPEG backend for MP4
+]
+io = [
+    "sounddevice>=0.4.0",
+    "soundfile>=0.12.0",
+    "scipy>=1.7.0",
+    "imageio>=2.9.0",
+    "imageio-ffmpeg>=0.4.0",
+]
+
+[project.scripts]
+morphogen = "morphogen.cli:main"
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--strict-markers",
+    "--tb=short",
+    # Coverage options (uncomment when coverage is desired)
+    # "--cov=morphogen",
+    # "--cov-report=html",
+    # "--cov-report=term-missing",
+    # "--cov-fail-under=80",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "benchmark: marks tests as performance benchmarks",
+    "determinism: marks tests that verify deterministic behavior",
+]
+
+[tool.coverage.run]
+source = ["morphogen"]
+omit = [
+    "*/tests/*",
+    "*/examples/*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "\\.\\.\\.",
+]
+precision = 2
+show_missing = true

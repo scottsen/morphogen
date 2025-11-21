@@ -1,0 +1,23 @@
+# Kairo v0.3.1 Example: Lambdas with Closures and Flow
+# Demonstrates: lambda expressions, closures, higher-order functions, substeps
+
+fn apply_twice(f, x) {
+    temp = f(x)
+    result = f(temp)
+    return result
+}
+
+@state position = 0.0
+@state velocity = 0.0
+
+flow(dt=1.0, steps=5, substeps=2) {
+    # Lambda with closure capturing velocity
+    update_pos = |p| p + velocity * dt
+
+    # Update velocity with if/else
+    acceleration = if position < 10.0 then 2.0 else -2.0
+    velocity = velocity + acceleration * dt
+
+    # Update position using lambda
+    position = update_pos(position)
+}

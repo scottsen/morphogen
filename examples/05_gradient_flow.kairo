@@ -1,0 +1,76 @@
+# 05_gradient_flow.kairo
+# Kairo Example: Gradient Flow - Advection and Mixing
+#
+# Description: Watch color gradients flow and mix under the influence
+# of a swirling velocity field, creating mesmerizing fluid-like patterns.
+#
+# Demonstrates:
+#   - Advection operation (semi-Lagrangian)
+#   - Vector field creation and manipulation
+#   - Multi-channel field visualization
+#   - Smooth continuous motion
+#
+# Expected Output: Colorful gradients that swirl and mix, creating
+# smooth flowing patterns reminiscent of paint mixing in water
+#
+# Parameters you can experiment with:
+#   - ROTATION_SPEED: How fast the field rotates (try 0.5 to 3.0)
+#   - dt: Time step size (try 0.05 to 0.2)
+#   - steps: Simulation duration (try 200 to 1000)
+#
+# Author: Kairo Team
+# Date: 2025-11-07
+
+use field, visual
+
+# Rotation speed for velocity field
+const ROTATION_SPEED : f32 = 1.5
+
+# Scalar field to advect (starts as horizontal gradient)
+@state color_field : Field2D<f32> = field.alloc((128, 128), fill_value=0.0)
+
+# Velocity field (2-channel: vx, vy)
+@state velocity : Field2D<Vec2> = field.alloc((128, 128), fill_value=0.0)
+
+# Initialize color field with gradient
+fn init_gradient() {
+    color_field = color_field.map(|value, x, y| {
+        # Create diagonal gradient
+        return (x + y) / 256.0
+    })
+}
+
+# Create swirling velocity field (rotational flow)
+fn create_velocity_field() {
+    velocity = velocity.map(|value, x, y| {
+        # Center coordinates
+        cx = 64.0
+        cy = 64.0
+
+        # Distance from center
+        dx = x - cx
+        dy = y - cy
+
+        # Tangential velocity (perpendicular to radius)
+        vx = -dy * ROTATION_SPEED * 0.1
+        vy = dx * ROTATION_SPEED * 0.1
+
+        return Vec2(vx, vy)
+    })
+}
+
+# Initialize fields
+init_gradient()
+create_velocity_field()
+
+# Main simulation loop
+flow(dt=0.1, steps=400) {
+    # Advect the color field by the velocity field
+    color_field = advect(color_field, velocity, dt)
+
+    # Add slight diffusion to create smooth mixing
+    color_field = diffuse(color_field, rate=0.02, dt, iterations=5)
+
+    # Visualize with coolwarm palette
+    output colorize(color_field, palette="coolwarm", min=0.0, max=1.0)
+}

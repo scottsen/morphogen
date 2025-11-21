@@ -1,0 +1,88 @@
+# Example 1: RC Low-Pass Filter
+# Demonstrates basic passive circuit simulation
+
+circuit RC_LowPass {
+    description: "Simple RC low-pass filter with 1.59kHz cutoff"
+
+    # Parameters
+    params:
+        R: f32<Ω> = 1000        # 1kΩ resistor
+        C: f32<F> = 100e-9      # 100nF capacitor
+
+    # Components
+    components:
+        r1 = resistor(R=R)
+        c1 = capacitor(C=C)
+        vin = voltage_source(V=1V, type="ac")  # 1V AC source for frequency response
+
+    # Nets (connections)
+    nets:
+        input: net(name="vin")
+        output: net(name="vout")
+        ground: net(name="gnd", type="ground")
+
+    # Connection topology (using auto-anchors)
+    connections:
+        vin.port["p"].connect(input)
+        vin.port["n"].connect(ground)
+        input.connect(r1.port["p"])
+        r1.port["n"].connect(output)
+        output.connect(c1.port["p"])
+        c1.port["n"].connect(ground)
+
+    # Analysis
+    analysis:
+        # DC operating point
+        dc_op: dc_operating_point()
+
+        # AC frequency sweep (Bode plot)
+        ac: ac_sweep(
+            freq_start=10Hz,
+            freq_end=100kHz,
+            points=100,
+            sweep_type="log"
+        )
+
+        # Transient analysis (step response)
+        tran: transient(
+            duration=10ms,
+            timestep=1µs,
+            method="trapezoidal",
+            input=voltage_pulse(V_low=0V, V_high=1V, period=20ms, duty_cycle=0.5)
+        )
+
+    # Derived properties (auto-computed)
+    properties:
+        cutoff_freq: f32<Hz> = 1 / (2 * π * R * C)  # ≈ 1.59kHz
+        time_constant: f32<s> = R * C                # τ = 100µs
+
+    # Assertions (validation)
+    assertions:
+        # At cutoff frequency, gain should be -3dB
+        assert abs(ac.magnitude_db.at(cutoff_freq) - (-3dB)) < 0.1dB
+
+        # At 10x cutoff, gain should be ≈ -20dB
+        assert abs(ac.magnitude_db.at(10 * cutoff_freq) - (-20dB)) < 1dB
+
+        # Phase at cutoff should be -45°
+        assert abs(ac.phase_deg.at(cutoff_freq) - (-45deg)) < 2deg
+
+        # Step response should reach 63% at τ
+        assert abs(tran.net["vout"].voltage.at(time_constant) - 0.63V) < 0.01V
+
+    # Visualization
+    plots:
+        - type: bode
+          data: ac
+          title: "RC Filter Frequency Response"
+
+        - type: waveform
+          data: tran
+          signals: ["input", "output"]
+          title: "Step Response"
+
+    # Export
+    export:
+        - spice: "rc_filter.cir"
+        - yaml: "rc_filter.kairo.yaml"
+}

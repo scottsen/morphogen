@@ -1,0 +1,39 @@
+# Kairo v0.7.0 Requirements
+# Real MLIR Integration Dependencies
+
+# Core Kairo Dependencies (existing)
+numpy>=1.24.0
+scipy>=1.7.0
+
+# MLIR Python Bindings (v0.7.0 NEW)
+# Installation: pip install mlir -f https://github.com/makslevental/mlir-wheels/releases/expanded_assets/latest
+# Note: This requires a large download (~500MB+). For development, you may build from source.
+# Build from source: https://mlir.llvm.org/docs/Bindings/Python/
+#
+# For now, this is documented but not auto-installed to allow flexibility in setup.
+# Developers should install manually using one of these methods:
+#
+# Method 1 (Pre-built wheels - recommended for quick start):
+#   pip install mlir -f https://github.com/makslevental/mlir-wheels/releases/expanded_assets/latest
+#
+# Method 2 (Build from source - for customization):
+#   git clone https://github.com/llvm/llvm-project.git
+#   cd llvm-project
+#   mkdir build && cd build
+#   cmake -G Ninja ../llvm \
+#     -DLLVM_ENABLE_PROJECTS=mlir \
+#     -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+#     -DLLVM_TARGETS_TO_BUILD="X86;NVPTX;AMDGPU" \
+#     -DCMAKE_BUILD_TYPE=Release
+#   ninja
+#   export PYTHONPATH=$(pwd)/tools/mlir/python_packages/mlir_core
+#
+# mlir>=18.0.0  # Uncomment after installation
+
+# Optional: Testing and Development
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Optional: Performance comparison
+# numba>=0.57.0  # For benchmarking against Numba JIT
+# torch>=2.0.0  # For torch-mlir integration (future)

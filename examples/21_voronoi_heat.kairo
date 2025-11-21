@@ -1,0 +1,148 @@
+# 21_voronoi_heat.kairo
+# Kairo Example: Voronoi Heat Diffusion
+#
+# Description: Demonstrates geometry + field cross-domain integration.
+# Creates a Voronoi diagram from random seed points, then simulates
+# heat diffusion with different temperatures in each Voronoi cell.
+#
+# Demonstrates:
+#   - geometry + field cross-domain integration
+#   - Voronoi diagram generation from point sets
+#   - Spatial field queries using geometric containment
+#   - Heat diffusion across geometric regions
+#   - Geometric distance calculations
+#
+# Expected Output: A colorful Voronoi pattern where each cell has a
+# different temperature that diffuses into neighboring cells, creating
+# beautiful color gradients at cell boundaries
+#
+# Parameters you can experiment with:
+#   - NUM_SEEDS: Number of Voronoi seed points (try 5 to 20)
+#   - DIFFUSION_RATE: Heat diffusion speed (try 0.05 to 0.3)
+#   - GRID_SIZE: Field resolution (try 128 to 512)
+#
+# Author: Kairo Team
+# Date: 2025-11-18
+
+use geometry, field, visual
+
+# Configuration
+const NUM_SEEDS : i32 = 10
+const GRID_SIZE : i32 = 256
+const DIFFUSION_RATE : f32 = 0.1
+
+# Generate random seed points for Voronoi diagram
+@state seed_points : [[f32; 2]; 10] = [
+    [64.0, 64.0],
+    [192.0, 64.0],
+    [64.0, 192.0],
+    [192.0, 192.0],
+    [128.0, 128.0],
+    [32.0, 128.0],
+    [224.0, 128.0],
+    [128.0, 32.0],
+    [128.0, 224.0],
+    [96.0, 160.0]
+]
+
+# Temperature for each seed (creates interesting gradients)
+const seed_temps : [f32; 10] = [
+    100.0,  # Hot
+    20.0,   # Cool
+    80.0,   # Warm
+    40.0,   # Cool
+    90.0,   # Hot
+    30.0,   # Cool
+    70.0,   # Warm
+    50.0,   # Medium
+    60.0,   # Medium
+    85.0    # Warm
+]
+
+# Allocate temperature field
+@state temp : Field2D<f32> = field.alloc((GRID_SIZE, GRID_SIZE), fill_value=0.0)
+
+# Initialize temperature field based on Voronoi cells
+fn init_voronoi_field() {
+    temp = temp.map(|value, x, y| {
+        # Find closest seed point (determines which Voronoi cell this pixel belongs to)
+        min_dist = 999999.0
+        closest_seed = 0
+
+        i = 0
+        while i < NUM_SEEDS {
+            seed_x = seed_points[i][0]
+            seed_y = seed_points[i][1]
+
+            # Calculate Euclidean distance to seed
+            dx = x - seed_x
+            dy = y - seed_y
+            dist = sqrt(dx * dx + dy * dy)
+
+            if dist < min_dist then {
+                min_dist = dist
+                closest_seed = i
+            }
+
+            i = i + 1
+        }
+
+        # Return temperature for this cell's seed
+        return seed_temps[closest_seed]
+    })
+}
+
+# Create geometric circles at seed points for visualization
+fn create_seed_circles() -> [Circle; 10] {
+    circles = []
+
+    i = 0
+    while i < NUM_SEEDS {
+        c = circle(
+            center=[seed_points[i][0], seed_points[i][1]],
+            radius=3.0
+        )
+        circles.push(c)
+        i = i + 1
+    }
+
+    return circles
+}
+
+# Initialize the field
+init_voronoi_field()
+
+# Main simulation loop
+flow(dt=0.05, steps=400) {
+    # Apply heat diffusion across Voronoi cells
+    temp = diffuse(temp, rate=DIFFUSION_RATE, dt, iterations=5)
+
+    # Create visualization overlay with seed points
+    # First, colorize the temperature field
+    temp_visual = colorize(temp, palette="thermal", min=20.0, max=100.0)
+
+    # Mark seed points with bright circles
+    output_field = temp_visual.map(|value, x, y| {
+        # Check if we're close to any seed point
+        i = 0
+        while i < NUM_SEEDS {
+            seed_x = seed_points[i][0]
+            seed_y = seed_points[i][1]
+
+            dx = x - seed_x
+            dy = y - seed_y
+            dist = sqrt(dx * dx + dy * dy)
+
+            # Draw small bright circle at seed
+            if dist < 4.0 then {
+                return 1.0  # Bright white marker
+            }
+
+            i = i + 1
+        }
+
+        return value
+    })
+
+    output output_field
+}

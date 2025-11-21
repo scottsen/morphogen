@@ -1,0 +1,27 @@
+# Evolutionary Fluid Hybrid Example
+# Combines fluid dynamics with evolutionary agent-based simulation
+
+set profile = medium
+set dt = adaptive_dt(cfl=0.5, max_dt=0.02, min_dt=0.002)
+
+@double_buffer vel, temp : Field2D<f32>
+agents = step.state(agent.alloc(Particle, count=2000))
+
+# Fluid dynamics
+vel = field.advect(vel, vel, dt)
+vel = field.project(vel, method="cg", iter=40)
+
+# Reaction-diffusion for temperature
+temp = field.diffuse(temp, rate=κ, dt)
+temp = field.react(temp, vel, Params{k:0.3})
+
+# Agent evolution
+agents = agent.sample_field(agents, temp, grad=true)
+agents = agent.mutate(agents, fn=mutate_energy, rate=0.05)
+agents = agent.reproduce(agents, template=default, rate=0.02)
+
+# Visualization
+visual.output( visual.layer([
+  visual.colorize(temp, palette="fire"),
+  visual.points(agents, color="white")
+]) )

@@ -1,0 +1,77 @@
+# 10_heat_equation.kairo
+# Kairo Example: Heat Equation (Complete)
+#
+# Description: Full heat diffusion simulation with hot and cold regions,
+# demonstrating realistic thermal physics with sources and sinks.
+#
+# Demonstrates:
+#   - Diffusion with multiple thermal sources
+#   - Realistic physical parameters with units
+#   - Boundary conditions (heat sources at edges)
+#   - Multiple field operations
+#   - Steady-state convergence
+#
+# Expected Output: Heat map showing temperature distribution with hot region
+# at top, cold region at bottom, and smooth gradient in between
+#
+# Parameters you can experiment with:
+#   - KAPPA: Thermal diffusivity (try 0.05 to 0.2)
+#   - HOT_TEMP: Temperature of heat source (try 300.0 to 400.0)
+#   - COLD_TEMP: Temperature of cold sink (try 200.0 to 280.0)
+#
+# Physics: This solves the heat equation:
+#   ∂T/∂t = κ ∇²T
+# where T is temperature, κ is thermal diffusivity, ∇² is the Laplacian
+#
+# Author: Kairo Team
+# Date: 2025-11-07
+
+use field, visual
+
+# Physical parameters
+const KAPPA : f32 = 0.1           # Thermal diffusivity [m²/s]
+const HOT_TEMP : f32 = 350.0      # Hot source temperature [K]
+const COLD_TEMP : f32 = 250.0     # Cold sink temperature [K]
+const AMBIENT_TEMP : f32 = 300.0  # Initial/ambient temperature [K]
+
+# Temperature field with initial conditions
+@state temp : Field2D<f32> = field.alloc((256, 256), fill_value=0.0)
+
+# Initialize with ambient temperature
+fn init_temperature() {
+    temp = temp.map(|value, x, y| AMBIENT_TEMP)
+}
+
+# Apply heat source at top
+fn apply_heat_source() {
+    # Set top rows to hot temperature
+    temp = temp.map(|value, x, y| {
+        if y < 20 then HOT_TEMP else value
+    })
+}
+
+# Apply cold sink at bottom
+fn apply_cold_sink() {
+    # Set bottom rows to cold temperature
+    temp = temp.map(|value, x, y| {
+        if y > 235 then COLD_TEMP else value
+    })
+}
+
+# Initialize field
+init_temperature()
+
+# Main simulation loop
+flow(dt=0.01, steps=1000) {
+    # Apply boundary conditions (sources/sinks)
+    apply_heat_source()
+    apply_cold_sink()
+
+    # Diffuse temperature
+    # Using implicit solver (Jacobi iteration) for stability
+    temp = diffuse(temp, rate=KAPPA, dt, iterations=20)
+
+    # Visualize with fire palette
+    # Color range from cold (black/red) to hot (yellow/white)
+    output colorize(temp, palette="fire", min=COLD_TEMP, max=HOT_TEMP)
+}

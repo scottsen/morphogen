@@ -1,0 +1,22 @@
+# Kairo v0.3.1 Example: Velocity Calculation with Functions
+# Demonstrates: functions with physical units, if/else expressions
+
+fn calculate_velocity(distance: f32[m], time: f32[s]) -> f32[m/s] {
+    return distance / time
+}
+
+fn classify_speed(velocity: f32[m/s]) -> f32 {
+    result = if velocity > 10.0 then 3.0 else if velocity > 5.0 then 2.0 else 1.0
+    return result
+}
+
+@state total_distance = 0.0
+@state time_elapsed = 0.0
+
+flow(dt=0.1, steps=10) {
+    total_distance = total_distance + 1.5  # Move 1.5m per step
+    time_elapsed = time_elapsed + dt
+
+    vel = calculate_velocity(total_distance, time_elapsed)
+    speed_class = classify_speed(vel)
+}

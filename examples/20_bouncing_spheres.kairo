@@ -1,0 +1,202 @@
+# 20_bouncing_spheres.kairo
+# Kairo Example: Bouncing Spheres with Collision Detection
+#
+# Description: Demonstrates cross-domain integration between geometry
+# and rigidbody physics. Spheres bounce inside a box with realistic
+# collision detection using geometric primitives.
+#
+# Demonstrates:
+#   - geometry + rigidbody cross-domain integration
+#   - 3D geometric primitives (sphere, box3d)
+#   - Collision detection using bounding boxes
+#   - Physics-driven animation
+#   - Visual rendering of 3D scenes
+#
+# Expected Output: Multiple spheres bouncing realistically inside a box,
+# with proper collision detection and response
+#
+# Parameters you can experiment with:
+#   - NUM_SPHERES: Number of bouncing spheres (try 3 to 10)
+#   - GRAVITY: Gravitational acceleration (try 5.0 to 20.0)
+#   - ELASTICITY: Bounciness coefficient (try 0.5 to 0.95)
+#   - BOX_SIZE: Size of the containing box (try 20.0 to 50.0)
+#
+# Author: Kairo Team
+# Date: 2025-11-18
+
+use geometry, rigidbody, visual
+
+# Physical constants
+const GRAVITY : f32 = 9.8
+const ELASTICITY : f32 = 0.8
+const NUM_SPHERES : i32 = 5
+const BOX_SIZE : f32 = 30.0
+
+# Create container box
+container = box3d(
+    center=[0.0, 0.0, 0.0],
+    width=BOX_SIZE,
+    height=BOX_SIZE,
+    depth=BOX_SIZE
+)
+
+# Get box bounds for collision detection
+bounds = bounding_box(shape=container)
+
+# Initialize sphere positions and velocities
+@state sphere_positions : [f32; 15] = [
+    # Sphere 1
+    -5.0, 10.0, 0.0,
+    # Sphere 2
+    5.0, 8.0, 3.0,
+    # Sphere 3
+    0.0, 12.0, -4.0,
+    # Sphere 4
+    -3.0, 6.0, 5.0,
+    # Sphere 5
+    4.0, 14.0, -2.0
+]
+
+@state sphere_velocities : [f32; 15] = [
+    # All spheres start with small random velocities
+    2.0, -1.0, 1.5,
+    -1.5, -2.0, -1.0,
+    1.0, -1.5, 2.0,
+    -2.0, -1.0, -1.5,
+    1.5, -2.5, 1.0
+]
+
+# Sphere properties
+const SPHERE_RADIUS : f32 = 1.5
+
+# Helper function to check sphere-box collision
+fn check_box_collision(pos_x: f32, pos_y: f32, pos_z: f32) -> (bool, f32, f32, f32) {
+    # Check collision with box walls
+    half_size = BOX_SIZE / 2.0
+
+    # Calculate collision normal
+    nx = 0.0
+    ny = 0.0
+    nz = 0.0
+    collided = false
+
+    # X-axis walls
+    if pos_x - SPHERE_RADIUS < -half_size then {
+        nx = 1.0
+        collided = true
+    } else if pos_x + SPHERE_RADIUS > half_size then {
+        nx = -1.0
+        collided = true
+    }
+
+    # Y-axis walls (floor and ceiling)
+    if pos_y - SPHERE_RADIUS < -half_size then {
+        ny = 1.0
+        collided = true
+    } else if pos_y + SPHERE_RADIUS > half_size then {
+        ny = -1.0
+        collided = true
+    }
+
+    # Z-axis walls
+    if pos_z - SPHERE_RADIUS < -half_size then {
+        nz = 1.0
+        collided = true
+    } else if pos_z + SPHERE_RADIUS > half_size then {
+        nz = -1.0
+        collided = true
+    }
+
+    return (collided, nx, ny, nz)
+}
+
+# Main physics simulation loop
+flow(dt=0.016, steps=600) {
+    # Update each sphere
+    i = 0
+    while i < NUM_SPHERES {
+        idx = i * 3
+
+        # Get current position and velocity
+        px = sphere_positions[idx]
+        py = sphere_positions[idx + 1]
+        pz = sphere_positions[idx + 2]
+
+        vx = sphere_velocities[idx]
+        vy = sphere_velocities[idx + 1]
+        vz = sphere_velocities[idx + 2]
+
+        # Apply gravity
+        vy = vy - GRAVITY * dt
+
+        # Update position
+        px = px + vx * dt
+        py = py + vy * dt
+        pz = pz + vz * dt
+
+        # Check collision with box walls
+        (collided, nx, ny, nz) = check_box_collision(px, py, pz)
+
+        if collided then {
+            # Reflect velocity based on collision normal
+            if nx != 0.0 then {
+                vx = -vx * ELASTICITY
+                # Push sphere out of wall
+                half_size = BOX_SIZE / 2.0
+                if px < 0.0 then {
+                    px = -half_size + SPHERE_RADIUS
+                } else {
+                    px = half_size - SPHERE_RADIUS
+                }
+            }
+
+            if ny != 0.0 then {
+                vy = -vy * ELASTICITY
+                # Push sphere out of floor/ceiling
+                half_size = BOX_SIZE / 2.0
+                if py < 0.0 then {
+                    py = -half_size + SPHERE_RADIUS
+                } else {
+                    py = half_size - SPHERE_RADIUS
+                }
+            }
+
+            if nz != 0.0 then {
+                vz = -vz * ELASTICITY
+                # Push sphere out of wall
+                half_size = BOX_SIZE / 2.0
+                if pz < 0.0 then {
+                    pz = -half_size + SPHERE_RADIUS
+                } else {
+                    pz = half_size - SPHERE_RADIUS
+                }
+            }
+        }
+
+        # Update arrays
+        sphere_positions[idx] = px
+        sphere_positions[idx + 1] = py
+        sphere_positions[idx + 2] = pz
+
+        sphere_velocities[idx] = vx
+        sphere_velocities[idx + 1] = vy
+        sphere_velocities[idx + 2] = vz
+
+        i = i + 1
+    }
+
+    # Render the scene
+    # Create sphere geometries at current positions
+    sphere1 = sphere(center=[sphere_positions[0], sphere_positions[1], sphere_positions[2]], radius=SPHERE_RADIUS)
+    sphere2 = sphere(center=[sphere_positions[3], sphere_positions[4], sphere_positions[5]], radius=SPHERE_RADIUS)
+    sphere3 = sphere(center=[sphere_positions[6], sphere_positions[7], sphere_positions[8]], radius=SPHERE_RADIUS)
+    sphere4 = sphere(center=[sphere_positions[9], sphere_positions[10], sphere_positions[11]], radius=SPHERE_RADIUS)
+    sphere5 = sphere(center=[sphere_positions[12], sphere_positions[13], sphere_positions[14]], radius=SPHERE_RADIUS)
+
+    # Output visualization (in a real implementation, this would render the 3D scene)
+    output render_3d(
+        objects=[container, sphere1, sphere2, sphere3, sphere4, sphere5],
+        camera_pos=[BOX_SIZE * 1.5, BOX_SIZE * 0.8, BOX_SIZE * 1.5],
+        camera_target=[0.0, 0.0, 0.0]
+    )
+}

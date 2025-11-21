@@ -1,0 +1,180 @@
+# Example 4: PCB Trace Inductance Co-Simulation
+# Demonstrates circuit + geometry domain integration
+
+circuit PCB_TraceInductance {
+    description: "High-speed digital driver with PCB trace parasitic extraction"
+
+    # Parameters
+    params:
+        rise_time: f32<s> = 1e-9     # 1ns rise time
+        drive_strength: f32<A> = 25e-3  # 25mA drive current
+        trace_length: f32<mm> = 50   # 50mm trace
+        trace_width: f32<mm> = 0.254 # 10 mil (0.254mm)
+
+    # PCB Geometry (cross-domain: GeometryDomain)
+    pcb_geometry:
+        # Define PCB board
+        board = GeometryDomain.rectangle(
+            width=100mm,
+            height=60mm,
+            thickness=1.6mm,  # Standard FR4
+            material="fr4"
+        )
+
+        # Define trace route
+        trace = GeometryDomain.pcb_trace(
+            start=board.anchor["edge_left"].at(y=30mm),
+            end=board.anchor["edge_right"].at(y=30mm),
+            width=trace_width,
+            layer="top_copper",
+            clearance=0.2mm  # 8 mil clearance
+        )
+
+        # Ground plane (reference)
+        ground_plane = GeometryDomain.rectangle(
+            width=100mm,
+            height=60mm,
+            layer="bottom_copper",
+            net="ground"
+        )
+
+    # Parasitic extraction (cross-domain: Circuit ← Geometry)
+    parasitic_extraction:
+        # Compute trace inductance (FastHenry approximation)
+        L_trace = CircuitDomain.compute_trace_inductance(
+            trace=trace,
+            reference_plane=ground_plane,
+            method="fasthenry"  # Fast approximation
+        )
+
+        # Compute trace capacitance (FastCap approximation)
+        C_trace = CircuitDomain.compute_trace_capacitance(
+            trace=trace,
+            reference_plane=ground_plane,
+            method="fastcap"
+        )
+
+        # Compute trace resistance (DC resistance + skin effect)
+        R_trace = CircuitDomain.compute_trace_resistance(
+            trace=trace,
+            frequency=100MHz,  # For skin effect
+            copper_conductivity=5.96e7  # S/m
+        )
+
+        # Expected values for 50mm, 10mil trace, 1.6mm dielectric:
+        # L ≈ 25nH, C ≈ 5pF, R ≈ 0.2Ω, Z0 ≈ 70Ω
+
+    # Circuit components
+    components:
+        # Digital driver (push-pull CMOS)
+        driver = digital_driver(
+            rise_time=rise_time,
+            fall_time=rise_time,
+            drive_strength=drive_strength,
+            logic_high=3.3V,
+            logic_low=0V
+        )
+
+        # Transmission line model (from parasitic extraction)
+        trace_model = transmission_line(
+            L=L_trace,
+            C=C_trace,
+            R=R_trace,
+            length=trace_length,
+            num_sections=10  # Lumped element approximation
+        )
+
+        # Load capacitance (receiver input)
+        c_load = capacitor(C=5pF)
+
+        # Termination resistor (optional)
+        r_term = resistor(R=50Ω)  # Series termination
+
+    # Nets
+    nets:
+        driver_out, trace_in, trace_out, load
+        ground: net(name="gnd", type="ground")
+
+    # Connections
+    connections:
+        driver.output.connect(driver_out)
+        driver_out.connect(r_term.port["p"])
+        r_term.port["n"].connect(trace_in)
+        trace_in.connect(trace_model.port["in"])
+        trace_model.port["out"].connect(trace_out)
+        trace_out.connect(c_load.port["p"])
+        c_load.port["n"].connect(ground)
+
+    # Analysis
+    analysis:
+        # Transient simulation (eye diagram)
+        tran: transient(
+            duration=100ns,
+            timestep=10ps,  # 100x oversampling (1ns rise / 100 = 10ps)
+            input=digital_pattern(
+                frequency=100MHz,
+                pattern="01010101_10101010"  # Alternating bits
+            ),
+            method="backward_euler"
+        )
+
+    # Signal integrity metrics
+    signal_integrity:
+        # Eye diagram
+        eye = SignalIntegrity.eye_diagram(
+            signal=tran.net["trace_out"].voltage,
+            bit_rate=100MHz,
+            ui_samples=100  # Samples per unit interval
+        )
+
+        # Overshoot / undershoot
+        overshoot = (tran.net["trace_out"].voltage.max() - 3.3V) / 3.3V
+        undershoot = abs(tran.net["trace_out"].voltage.min()) / 3.3V
+
+        # Rise time (10% to 90%)
+        rise_time_measured = SignalIntegrity.rise_time(
+            signal=tran.net["trace_out"].voltage,
+            threshold_low=0.1,
+            threshold_high=0.9
+        )
+
+        # Impedance (characteristic)
+        Z0 = sqrt(L_trace / C_trace)  # Should be ≈ 50-70Ω
+
+    # Assertions
+    assertions:
+        # Overshoot should be < 10%
+        assert overshoot < 0.10
+
+        # Undershoot should be < 10%
+        assert undershoot < 0.10
+
+        # Characteristic impedance should be 50-100Ω
+        assert Z0 > 50Ω && Z0 < 100Ω
+
+        # Rise time degradation should be < 2x
+        assert rise_time_measured < 2 * rise_time
+
+    # Plots
+    plots:
+        - type: waveform
+          data: tran
+          signals: ["driver_out", "trace_out"]
+          title: "Signal Integrity: Driver vs. Load"
+          time_range: [0ns, 50ns]
+
+        - type: eye_diagram
+          data: eye
+          title: "Eye Diagram at Load (100MHz)"
+
+        - type: geometry_3d
+          data: [board, trace, ground_plane]
+          title: "PCB Layout (3D View)"
+
+    # Export
+    export:
+        - spice: "pcb_trace.cir"
+        - touchstone: "trace.s2p"  # S-parameters
+        - kicad: "pcb_layout.kicad_pcb"
+        - yaml: "pcb_trace.kairo.yaml"
+}

@@ -1,0 +1,32 @@
+# FM Synthesis Example
+# Frequency modulation audio synthesis with ADSR envelope
+
+set profile = low
+set sample_rate = signal.sample_rate()
+
+# Parameters
+@param carrier_freq : f32[Hz] = 440.0 @range(20, 2000)
+@param mod_freq : f32[Hz] = 220.0 @range(1, 1000)
+@param mod_index : f32 = 5.0 @range(0, 20)
+@param attack : f32 = 0.01 @range(0.001, 1.0)
+@param decay : f32 = 0.1 @range(0.001, 2.0)
+@param sustain : f32 = 0.7 @range(0, 1.0)
+@param release : f32 = 0.3 @range(0.001, 5.0)
+
+step {
+  # Modulator oscillator
+  modulator = signal.osc(freq=mod_freq, shape="sin")
+
+  # Scale modulator by index
+  mod_signal = signal.map(modulator, fn=scale(mod_index))
+
+  # Carrier frequency modulated by modulator
+  carrier = signal.osc(freq=carrier_freq + mod_signal, shape="sin")
+
+  # Apply ADSR envelope
+  envelope = signal.env(attack, decay, sustain, release)
+  output_signal = signal.map(carrier, fn=multiply(envelope))
+
+  # Output to audio
+  io.output(output_signal, target="audio", format="f32")
+}

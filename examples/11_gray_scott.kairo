@@ -1,0 +1,97 @@
+# 11_gray_scott.kairo
+# Kairo Example: Gray-Scott Reaction-Diffusion
+#
+# Description: Mesmerizing organic patterns emerge from simple chemical
+# reaction rules. This is one of the most visually stunning examples of
+# emergent complexity from simple mathematics.
+#
+# Demonstrates:
+#   - Two coupled PDEs (partial differential equations)
+#   - Laplacian operator for diffusion
+#   - Parameter-driven pattern formation
+#   - Emergent complexity and self-organization
+#
+# Expected Output: Beautiful organic patterns that evolve over time:
+# spots, stripes, spirals, or maze-like structures depending on F and K values
+#
+# Parameters you can experiment with:
+#   - F (feed rate): 0.055-0.065 for spots/stripes, 0.035-0.065 for complex patterns
+#   - K (kill rate): 0.060-0.065 for spots, 0.055-0.070 for variety
+#   - Du, Dv: Diffusion rates (keep Du ~ 2*Dv for stable patterns)
+#
+# Recommended parameter sets:
+#   - Spots: F=0.055, K=0.062
+#   - Stripes: F=0.035, K=0.065
+#   - Spirals: F=0.014, K=0.054
+#   - Coral: F=0.062, K=0.061
+#
+# Author: Kairo Team
+# Date: 2025-11-07
+
+use field, visual
+
+# Gray-Scott parameters
+# These create beautiful spot/stripe patterns
+const Du : f32 = 0.16        # Diffusion rate for U
+const Dv : f32 = 0.08        # Diffusion rate for V
+const F : f32 = 0.060        # Feed rate
+const K : f32 = 0.062        # Kill rate
+
+# State fields: U and V chemical concentrations
+@state u : Field2D<f32> = field.alloc((256, 256), fill_value=1.0)
+@state v : Field2D<f32> = field.alloc((256, 256), fill_value=0.0)
+
+# Initialize with small random perturbation in center
+fn init_perturbation() {
+    # Create random seed pattern in center region
+    cx = 128
+    cy = 128
+    radius = 20.0
+
+    # Add random perturbations in center
+    u = u.map(|value, x, y| {
+        dx = x - cx
+        dy = y - cy
+        dist = sqrt(dx * dx + dy * dy)
+
+        # Inside perturbation region, set to 0.5 (from 1.0)
+        return if dist < radius then 0.5 else 1.0
+    })
+
+    v = v.map(|value, x, y| {
+        dx = x - cx
+        dy = y - cy
+        dist = sqrt(dx * dx + dy * dy)
+
+        # Inside perturbation region, set to 0.25 (from 0.0)
+        # Add some randomness for initial pattern seed
+        rand_offset = (x * 13 + y * 17) % 100 / 400.0  # Pseudo-random
+        return if dist < radius then 0.25 + rand_offset else 0.0
+    })
+}
+
+# Initialize fields
+init_perturbation()
+
+# Main simulation loop
+flow(dt=1.0, steps=10000) {
+    # Gray-Scott reaction: U + 2V → 3V, V → P
+    # The reaction term: U * V * V
+    uvv = u * v * v
+
+    # Rate of change for U
+    # du/dt = Du * ∇²u - uvv + F(1 - u)
+    du_dt = Du * laplacian(u) - uvv + F * (1.0 - u)
+
+    # Rate of change for V
+    # dv/dt = Dv * ∇²v + uvv - (F + K)v
+    dv_dt = Dv * laplacian(v) + uvv - (F + K) * v
+
+    # Euler integration
+    u = u + du_dt * dt
+    v = v + dv_dt * dt
+
+    # Visualize V concentration (shows the pattern best)
+    # Use viridis palette for beautiful gradient colors
+    output colorize(v, palette="viridis", min=0.0, max=1.0)
+}

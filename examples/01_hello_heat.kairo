@@ -1,0 +1,58 @@
+# 01_hello_heat.kairo
+# Kairo Example: Hello Heat - Your First Kairo Program
+#
+# Description: Watch heat diffuse from a hot center in this simple,
+# visually satisfying introduction to field-based computation.
+#
+# Demonstrates:
+#   - Field allocation and initialization
+#   - Diffusion operation
+#   - Visual output with colorize
+#   - Flow blocks with dt and steps
+#
+# Expected Output: Colorful heat diffusion pattern spreading from center,
+# creating smooth gradients from hot (white/yellow) to cool (black/red)
+#
+# Parameters you can experiment with:
+#   - DIFFUSION_RATE: How fast heat spreads (try 0.05 to 0.2)
+#   - steps: Number of simulation steps (try 100 to 500)
+#   - dt: Timestep size (try 0.05 to 0.2)
+#
+# Author: Kairo Team
+# Date: 2025-11-07
+
+use field, visual
+
+# Diffusion rate constant
+const DIFFUSION_RATE : f32 = 0.1
+
+# Allocate temperature field
+@state temp : Field2D<f32> = field.alloc((128, 128), fill_value=0.0)
+
+# Initialize with hot spot in center
+# Set center pixel to high temperature
+fn init_hot_spot() {
+    # Create a small hot region in the center
+    cx = 64
+    cy = 64
+    radius = 10.0
+
+    temp = temp.map(|value, x, y| {
+        dx = x - cx
+        dy = y - cy
+        dist = sqrt(dx * dx + dy * dy)
+        return if dist < radius then 100.0 else 0.0
+    })
+}
+
+# Initialize the field
+init_hot_spot()
+
+# Main simulation loop
+flow(dt=0.1, steps=200) {
+    # Diffuse the temperature field
+    temp = diffuse(temp, rate=DIFFUSION_RATE, dt, iterations=10)
+
+    # Visualize with fire palette (black -> red -> orange -> yellow -> white)
+    output colorize(temp, palette="fire", min=0.0, max=100.0)
+}

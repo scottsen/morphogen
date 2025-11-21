@@ -1,0 +1,122 @@
+# Example 2: Op-Amp Inverting Amplifier
+# Demonstrates nonlinear component modeling (op-amp)
+
+circuit OpAmpInvertingAmplifier {
+    description: "Inverting amplifier with gain = -10"
+
+    # Parameters
+    params:
+        gain: f32 = -10
+        Rin: f32<Ω> = 10000      # 10kΩ input resistor
+        bandwidth: f32<Hz> = 1MHz # Desired bandwidth
+
+    # Computed parameters
+    computed:
+        Rfb: f32<Ω> = Rin * abs(gain)  # Feedback resistor = 100kΩ
+
+    # Components
+    components:
+        opamp = op_amp(
+            model="tl072",
+            gain=1e6,              # Open-loop gain
+            bandwidth=1MHz,
+            slew_rate=13V/µs
+        )
+
+        r_in = resistor(R=Rin)
+        r_fb = resistor(R=Rfb)
+
+        # Power supply
+        vcc = voltage_source(V=15V, type="dc")
+        vee = voltage_source(V=-15V, type="dc")
+
+        # Input signal
+        vin = voltage_source(V=0.1V, type="ac")
+
+    # Nets
+    nets:
+        input: net(name="vin")
+        output: net(name="vout")
+        vcc_rail: net(name="vcc")
+        vee_rail: net(name="vee")
+        ground: net(name="gnd", type="ground")
+
+    # Connections (using auto-anchors)
+    connections:
+        # Input
+        vin.port["p"].connect(input)
+        vin.port["n"].connect(ground)
+
+        # Power
+        vcc.port["p"].connect(vcc_rail)
+        vcc.port["n"].connect(ground)
+        vee.port["p"].connect(ground)
+        vee.port["n"].connect(vee_rail)
+
+        # Op-amp circuit
+        input.connect(r_in.port["p"])
+        r_in.port["n"].connect(opamp.port["in-"])
+        opamp.port["in+"].connect(ground)
+        opamp.port["in-"].connect(r_fb.port["p"])
+        r_fb.port["n"].connect(opamp.port["out"])
+        opamp.port["out"].connect(output)
+
+        opamp.port["vcc"].connect(vcc_rail)
+        opamp.port["vee"].connect(vee_rail)
+
+    # Analysis
+    analysis:
+        # DC operating point
+        dc_op: dc_operating_point()
+
+        # AC sweep
+        ac: ac_sweep(
+            freq_start=1Hz,
+            freq_end=10MHz,
+            points=200,
+            sweep_type="log"
+        )
+
+        # Transient (sine wave input)
+        tran: transient(
+            duration=2ms,
+            timestep=1µs,
+            input=voltage_sine(V_amplitude=0.1V, freq=1kHz, phase=0deg)
+        )
+
+    # Derived properties
+    properties:
+        ideal_gain_db: f32 = 20 * log10(abs(gain))        # ≈ 20dB
+        -3db_bandwidth: f32<Hz> = bandwidth / abs(gain)    # ≈ 100kHz
+
+    # Assertions
+    assertions:
+        # At 1kHz, gain should be close to ideal
+        assert abs(ac.magnitude_db.at(1kHz) - ideal_gain_db) < 0.5dB
+
+        # Phase inversion (≈ 180°)
+        assert abs(ac.phase_deg.at(1kHz) - 180deg) < 5deg
+
+        # Output should not clip (< ±13V with ±15V rails)
+        assert tran.net["vout"].voltage.max() < 13V
+        assert tran.net["vout"].voltage.min() > -13V
+
+        # DC offset at output should be near zero
+        assert abs(dc_op.net["vout"].voltage) < 10mV
+
+    # Plots
+    plots:
+        - type: bode
+          data: ac
+          title: "Inverting Amplifier Frequency Response"
+
+        - type: waveform
+          data: tran
+          signals: ["input", "output"]
+          title: "Transient Response (1kHz sine)"
+
+    # Export
+    export:
+        - spice: "opamp_inverting.cir"
+        - schematic: "opamp_inverting.svg"
+}

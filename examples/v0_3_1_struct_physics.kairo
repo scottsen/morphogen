@@ -1,0 +1,82 @@
+# Kairo v0.3.1 Example: Structs in Physics Simulation
+# Demonstrates: struct definitions, literals, field access, functions, and temporal flow
+
+# Define a 2D vector struct
+struct Vector2D {
+    x: f32[m]
+    y: f32[m]
+}
+
+# Define a particle struct with nested Vector2D
+struct Particle {
+    position: Vector2D
+    velocity: Vector2D
+    mass: f32[kg]
+}
+
+# Function to add two vectors
+fn add_vectors(a: Vector2D, b: Vector2D) -> Vector2D {
+    return Vector2D {
+        x: a.x + b.x,
+        y: a.y + b.y
+    }
+}
+
+# Function to scale a vector by a scalar
+fn scale_vector(v: Vector2D, scale: f32) -> Vector2D {
+    return Vector2D {
+        x: v.x * scale,
+        y: v.y * scale
+    }
+}
+
+# Physics update function: applies force and updates particle
+fn update_particle(p: Particle, force: Vector2D, dt: f32[s]) -> Particle {
+    # Calculate acceleration: F = ma => a = F/m
+    # Note: In real code, we'd handle units properly
+    ax = force.x / p.mass
+    ay = force.y / p.mass
+
+    acceleration = Vector2D {
+        x: ax,
+        y: ay
+    }
+
+    # Update velocity: v = v + a*dt
+    dv = scale_vector(acceleration, dt)
+    new_velocity = add_vectors(p.velocity, dv)
+
+    # Update position: x = x + v*dt
+    dx = scale_vector(new_velocity, dt)
+    new_position = add_vectors(p.position, dx)
+
+    # Return updated particle
+    return Particle {
+        position: new_position,
+        velocity: new_velocity,
+        mass: p.mass
+    }
+}
+
+# Initialize particle at origin with initial velocity
+@state particle = Particle {
+    position: Vector2D { x: 0.0, y: 10.0 },
+    velocity: Vector2D { x: 5.0, y: 0.0 },
+    mass: 1.0
+}
+
+# Simulate particle motion with gravity
+flow(dt=0.01, steps=100) {
+    # Apply gravity force (pointing down)
+    gravity = Vector2D { x: 0.0, y: -9.8 }
+
+    # Update particle physics
+    particle = update_particle(particle, gravity, dt)
+
+    # Bounce off ground (y = 0)
+    # If particle hits ground, reverse and dampen vertical velocity
+    particle = if particle.position.y < 0.0 then Particle { position: Vector2D { x: particle.position.x, y: 0.0 }, velocity: Vector2D { x: particle.velocity.x, y: -particle.velocity.y * 0.8 }, mass: particle.mass } else particle
+}
+
+# Final state accessible after flow
+# particle.position.x and particle.position.y contain final position

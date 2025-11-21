@@ -1,0 +1,139 @@
+# Kairo Flappy Bird Training Configuration
+# ==========================================
+#
+# This configuration file documents all parameters for the Flappy Bird
+# neuroevolution demo. While Kairo doesn't currently parse YAML configs,
+# this serves as documentation and a future API design reference.
+
+# === SIMULATION PARAMETERS ===
+simulation:
+  timestep: 0.016              # Physics timestep in seconds (~60 FPS)
+  max_steps: 1000              # Maximum steps per episode
+  seed: 42                     # Random seed for reproducibility
+  determinism: strict          # Determinism level: strict/repro/live
+
+# === GAME PHYSICS ===
+game:
+  gravity: 1.5                 # Gravity strength (positive = downward)
+  flap_strength: 0.35          # Upward impulse when flapping
+  pipe_speed: 0.5              # Horizontal pipe movement speed
+  pipe_spacing: 0.4            # Distance between pipes
+  pipe_gap_size: 0.25          # Height of gap to fly through
+  pipe_width: 0.1              # Width of pipes
+  bird_size: 0.03              # Collision radius of bird
+  n_pipes: 3                   # Number of pipes in scene
+
+# === NEURAL NETWORK CONTROLLER ===
+controller:
+  type: neural_network         # Controller type
+  architecture:
+    layers: [4, 8, 1]          # Layer sizes [input, hidden..., output]
+    activations:               # Activation functions per layer
+      - tanh                   # Hidden layer activation
+      - sigmoid                # Output layer activation
+  initialization:
+    method: xavier             # Weight init: xavier/he/normal/zeros
+    seed: 42                   # Seed for reproducible init
+  inference:
+    threshold: 0.5             # Flap if output > threshold
+
+# === GENETIC ALGORITHM ===
+training:
+  algorithm: genetic           # Training algorithm type
+  population:
+    size: 128                  # Number of individuals per generation
+    initial_diversity: 0.5     # Initial genome variance
+  generations: 50              # Number of evolutionary cycles
+  fitness:
+    frame_reward: 1.0          # Reward per frame survived
+    pipe_reward: 10.0          # Bonus reward per pipe passed
+  selection:
+    method: tournament         # Selection: tournament/roulette/rank
+    tournament_size: 3         # Number of candidates per tournament
+  elitism:
+    n_elite: 4                 # Top N individuals preserved unchanged
+  crossover:
+    method: uniform            # Crossover: uniform/single_point/blend
+    rate: 1.0                  # Probability of crossover (vs. clone)
+  mutation:
+    rate: 0.10                 # Probability of mutating each gene
+    scale: 0.30                # Standard deviation of mutation noise
+    adaptive: false            # Adjust mutation rate over time
+
+# === VISUALIZATION & RENDERING ===
+render:
+  enabled: true                # Enable visualization
+  backend: matplotlib          # Rendering backend
+  window_size: [800, 600]      # Window dimensions [width, height]
+  fps: 30                      # Target framerate for rendering
+  track_best: true             # Highlight best agent
+  show_sensors: false          # Draw sensor observations
+  show_network: false          # Draw neural network activations
+  save_frames: false           # Save frames to disk
+  output_format: png           # Frame format: png/jpg/gif/mp4
+
+# === TELEMETRY & LOGGING ===
+telemetry:
+  enabled: true                # Enable telemetry collection
+  log_interval: 1              # Log every N generations
+  metrics:
+    - best_fitness             # Track best fitness per generation
+    - mean_fitness             # Track population mean fitness
+    - diversity                # Track genetic diversity
+    - survival_time            # Track average survival time
+    - pipes_passed             # Track average pipes passed
+  plots:
+    fitness_curves: true       # Plot fitness over generations
+    diversity_curve: true      # Plot diversity over generations
+    trajectory: true           # Plot best agent trajectory
+  save_checkpoints: true       # Save population snapshots
+  checkpoint_interval: 10      # Save every N generations
+  save_best_genome: true       # Save best genome to file
+  replay_log: false            # Save full replay data
+
+# === ADVANCED OPTIONS ===
+advanced:
+  parallel:
+    enabled: true              # Use parallel evaluation
+    batch_size: 128            # Birds simulated simultaneously
+    num_workers: 1             # Number of parallel workers (CPU)
+  gpu:
+    enabled: false             # Use GPU acceleration (MLIR compilation)
+    device: cuda:0             # GPU device ID
+  profiling:
+    enabled: false             # Enable performance profiling
+    output_file: profile.json  # Profiling output path
+
+# === OUTPUT PATHS ===
+output:
+  base_dir: ./results          # Base directory for outputs
+  run_name: flappy_bird_run_01 # Name for this training run
+  save_genome: best_genome.npy # Best genome filename
+  save_plots: training_plots/  # Directory for plots
+  save_checkpoints: checkpoints/ # Directory for checkpoints
+
+# === EXPERIMENT VARIANTS ===
+# Uncomment sections below to try different experiments:
+
+# Harder difficulty (narrower gaps, faster pipes)
+# game:
+#   pipe_gap_size: 0.18
+#   pipe_speed: 0.7
+
+# Deeper network (more capacity)
+# controller:
+#   architecture:
+#     layers: [4, 16, 8, 1]
+#     activations: [tanh, tanh, sigmoid]
+
+# Larger population (more diversity)
+# training:
+#   population:
+#     size: 256
+#   generations: 100
+
+# Higher mutation (more exploration)
+# training:
+#   mutation:
+#     rate: 0.20
+#     scale: 0.50

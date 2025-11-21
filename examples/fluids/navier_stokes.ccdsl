@@ -1,0 +1,39 @@
+# Incompressible Navier-Stokes fluid simulation
+# Classic smoke/fluid dynamics with advection-diffusion-projection
+
+set profile = high
+set dt = 0.016  # 60 fps
+
+# State variables
+@double_buffer velocity : Field2D<Vec2[m/s]>
+@double_buffer density : Field2D<f32>
+
+# Physical parameters
+@param viscosity : f32 = 0.0001 @range(0, 0.01) @doc "Kinematic viscosity"
+@param diffusion : f32 = 0.00001 @range(0, 0.001) @doc "Density diffusion"
+
+step {
+  # Add external forces (buoyancy, user interaction, etc.)
+  velocity = field.combine(velocity, density, fn=add_buoyancy)
+
+  # Advect velocity through itself
+  velocity = field.advect(velocity, velocity, dt, method="maccormack")
+
+  # Viscous diffusion
+  velocity = field.diffuse(velocity, rate=viscosity, dt, method="cg", iter=20)
+
+  # Enforce incompressibility
+  velocity = field.project(velocity, method="multigrid", tol=1e-4, iter=5)
+
+  # Apply boundary conditions
+  velocity = field.boundary(velocity, spec="noSlip")
+
+  # Advect and diffuse density
+  density = field.advect(density, velocity, dt, method="maccormack")
+  density = field.diffuse(density, rate=diffusion, dt, method="jacobi", iter=20)
+
+  # Render
+  visual.output(
+    visual.colorize(density, palette="viridis")
+  )
+}

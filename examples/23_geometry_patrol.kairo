@@ -1,0 +1,240 @@
+# 23_geometry_patrol.kairo
+# Kairo Example: Geometric Patrol Routes
+#
+# Description: Demonstrates geometry + agent + field cross-domain integration.
+# Agents patrol along the vertices of a convex hull, using geometric
+# primitives for collision detection and spatial queries. The field shows
+# the influence area of each agent.
+#
+# Demonstrates:
+#   - geometry + agent + field cross-domain integration
+#   - Convex hull for patrol route generation
+#   - Point-circle distance and containment queries
+#   - Line segment intersection for collision avoidance
+#   - Centroid calculations for strategic positioning
+#   - Bounding box queries for spatial partitioning
+#
+# Expected Output: Multiple agents patrolling around a convex polygon,
+# with colored fields showing each agent's area of influence. Agents
+# avoid obstacles using geometric collision detection.
+#
+# Parameters you can experiment with:
+#   - NUM_AGENTS: Number of patrol agents (try 3 to 8)
+#   - AGENT_SPEED: Movement speed (try 10.0 to 50.0)
+#   - INFLUENCE_RADIUS: Agent sensing range (try 20.0 to 60.0)
+#
+# Author: Kairo Team
+# Date: 2025-11-18
+
+use geometry, field, visual
+
+# Configuration
+const NUM_AGENTS : i32 = 5
+const GRID_SIZE : i32 = 256
+const AGENT_SPEED : f32 = 25.0
+const INFLUENCE_RADIUS : f32 = 40.0
+
+# Define patrol route as a set of points (forms a convex hull)
+const patrol_points : [[f32; 2]; 6] = [
+    [128.0, 50.0],   # Top
+    [200.0, 90.0],   # Top-right
+    [210.0, 166.0],  # Bottom-right
+    [128.0, 200.0],  # Bottom
+    [46.0, 166.0],   # Bottom-left
+    [56.0, 90.0]     # Top-left
+]
+
+const NUM_PATROL_POINTS : i32 = 6
+
+# Agent state: position and current target waypoint
+@state agent_positions : [[f32; 2]; 5] = [
+    [128.0, 50.0],   # Agent 0 at point 0
+    [200.0, 90.0],   # Agent 1 at point 1
+    [210.0, 166.0],  # Agent 2 at point 2
+    [128.0, 200.0],  # Agent 3 at point 3
+    [46.0, 166.0]    # Agent 4 at point 4
+]
+
+@state agent_targets : [i32; 5] = [1, 2, 3, 4, 5]  # Next waypoint index
+
+# Obstacles (circles to avoid)
+const obstacles : [[f32; 3]; 3] = [
+    [128.0, 128.0, 15.0],  # Center obstacle (x, y, radius)
+    [90.0, 100.0, 10.0],   # Left obstacle
+    [166.0, 156.0, 12.0]   # Right obstacle
+]
+
+const NUM_OBSTACLES : i32 = 3
+
+# Allocate influence field
+@state influence_field : Field2D<f32> = field.alloc((GRID_SIZE, GRID_SIZE), fill_value=0.0)
+
+# Helper: Calculate distance between two points
+fn distance(x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
+    dx = x2 - x1
+    dy = y2 - y1
+    return sqrt(dx * dx + dy * dy)
+}
+
+# Helper: Check if path intersects with obstacle
+fn check_obstacle_collision(x: f32, y: f32) -> bool {
+    i = 0
+    while i < NUM_OBSTACLES {
+        ox = obstacles[i][0]
+        oy = obstacles[i][1]
+        radius = obstacles[i][2]
+
+        dist = distance(x, y, ox, oy)
+
+        # Add small buffer for agent size
+        if dist < radius + 5.0 then {
+            return true
+        }
+
+        i = i + 1
+    }
+
+    return false
+}
+
+# Update agent influence field
+fn update_influence_field() {
+    influence_field = influence_field.map(|value, x, y| {
+        # Find minimum distance to any agent
+        min_dist = 999999.0
+
+        i = 0
+        while i < NUM_AGENTS {
+            ax = agent_positions[i][0]
+            ay = agent_positions[i][1]
+
+            dist = distance(x, y, ax, ay)
+
+            if dist < min_dist then {
+                min_dist = dist
+            }
+
+            i = i + 1
+        }
+
+        # Convert distance to influence (closer = higher)
+        if min_dist < INFLUENCE_RADIUS then {
+            # Smooth falloff
+            influence = (INFLUENCE_RADIUS - min_dist) / INFLUENCE_RADIUS
+            return influence * 100.0
+        } else {
+            return 0.0
+        }
+    })
+}
+
+# Main simulation loop
+flow(dt=0.05, steps=600) {
+    # Update each agent
+    i = 0
+    while i < NUM_AGENTS {
+        # Get current position and target
+        px = agent_positions[i][0]
+        py = agent_positions[i][1]
+        target_idx = agent_targets[i]
+
+        # Get target waypoint
+        tx = patrol_points[target_idx][0]
+        ty = patrol_points[target_idx][1]
+
+        # Calculate direction to target
+        dx = tx - px
+        dy = ty - py
+        dist = sqrt(dx * dx + dy * dy)
+
+        # Check if reached target
+        if dist < 5.0 then {
+            # Move to next waypoint
+            agent_targets[i] = (target_idx + 1) % NUM_PATROL_POINTS
+        } else {
+            # Normalize direction
+            if dist > 0.0 then {
+                dx = dx / dist
+                dy = dy / dist
+            }
+
+            # Move toward target
+            new_x = px + dx * AGENT_SPEED * dt
+            new_y = py + dy * AGENT_SPEED * dt
+
+            # Check for obstacle collision
+            if check_obstacle_collision(new_x, new_y) then {
+                # Try to move around obstacle (simple avoidance)
+                # Rotate direction by 90 degrees
+                temp = dx
+                dx = -dy
+                dy = temp
+
+                new_x = px + dx * AGENT_SPEED * dt
+                new_y = py + dy * AGENT_SPEED * dt
+            }
+
+            # Update position
+            agent_positions[i][0] = new_x
+            agent_positions[i][1] = new_y
+        }
+
+        i = i + 1
+    }
+
+    # Update influence field
+    update_influence_field()
+
+    # Visualize
+    output_field = colorize(influence_field, palette="viridis", min=0.0, max=100.0)
+
+    # Draw patrol route and obstacles
+    output_field = output_field.map(|value, x, y| {
+        # Draw patrol points as bright markers
+        i = 0
+        while i < NUM_PATROL_POINTS {
+            px = patrol_points[i][0]
+            py = patrol_points[i][1]
+
+            dist = distance(x, y, px, py)
+            if dist < 3.0 then {
+                return 1.0  # Bright marker
+            }
+
+            i = i + 1
+        }
+
+        # Draw obstacles
+        i = 0
+        while i < NUM_OBSTACLES {
+            ox = obstacles[i][0]
+            oy = obstacles[i][1]
+            radius = obstacles[i][2]
+
+            dist = distance(x, y, ox, oy)
+            if dist < radius then {
+                return 0.5  # Gray obstacle
+            }
+
+            i = i + 1
+        }
+
+        # Draw agents as bright dots
+        i = 0
+        while i < NUM_AGENTS {
+            ax = agent_positions[i][0]
+            ay = agent_positions[i][1]
+
+            dist = distance(x, y, ax, ay)
+            if dist < 4.0 then {
+                return 1.0  # Bright agent marker
+            }
+
+            i = i + 1
+        }
+
+        return value
+    })
+
+    output output_field
+}

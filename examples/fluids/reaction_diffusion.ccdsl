@@ -1,0 +1,62 @@
+# Gray-Scott Reaction-Diffusion System
+# Generates organic patterns through chemical reactions
+
+set profile = medium
+set dt = 1.0
+
+# Chemical concentrations
+@double_buffer u : Field2D<f32>
+@double_buffer v : Field2D<f32>
+
+# Parameters for different patterns
+# Mitosis: f=0.0367, k=0.0649
+# Coral: f=0.0545, k=0.062
+# Fingerprint: f=0.055, k=0.062
+@param feed_rate : f32 = 0.055 @range(0, 0.1)
+@param kill_rate : f32 = 0.062 @range(0, 0.1)
+@param diffusion_u : f32 = 0.16 @range(0, 0.3)
+@param diffusion_v : f32 = 0.08 @range(0, 0.3)
+
+# Initialize with random noise
+u = step.state(field.random(shape=[512, 512], seed=42))
+v = step.state(field.random(shape=[512, 512], seed=43))
+
+step {
+  # Compute Laplacians
+  lap_u = field.laplacian(u)
+  lap_v = field.laplacian(v)
+
+  # Reaction term
+  uvv = field.combine(u, v, fn=multiply_v_squared)
+
+  # Update u: u + (diffusion_u * lap_u - uvv + feed_rate * (1 - u)) * dt
+  u = field.integrate(
+    field.combine(
+      field.combine(lap_u, uvv, fn=reaction_u),
+      u,
+      fn=apply_feed
+    ),
+    rate=dt,
+    dt=1.0
+  )
+
+  # Update v: v + (diffusion_v * lap_v + uvv - (feed_rate + kill_rate) * v) * dt
+  v = field.integrate(
+    field.combine(
+      field.combine(lap_v, uvv, fn=reaction_v),
+      v,
+      fn=apply_kill
+    ),
+    rate=dt,
+    dt=1.0
+  )
+
+  # Apply boundary conditions
+  u = field.boundary(u, spec="periodic")
+  v = field.boundary(v, spec="periodic")
+
+  # Visualize
+  visual.output(
+    visual.colorize(v, palette="magma")
+  )
+}

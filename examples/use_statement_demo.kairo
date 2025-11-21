@@ -1,0 +1,26 @@
+# Demonstration of the USE statement feature
+# This shows how to import and use domain operators in .kairo programs
+
+use graph
+
+# Create an empty undirected graph
+let network = graph.create_empty(directed=false)
+
+# Add vertices
+network = graph.add_vertex(network, id=0, label="A")
+network = graph.add_vertex(network, id=1, label="B")
+network = graph.add_vertex(network, id=2, label="C")
+network = graph.add_vertex(network, id=3, label="D")
+
+# Add edges with weights
+network = graph.add_edge(network, 0, 1, weight=1.0)
+network = graph.add_edge(network, 1, 2, weight=2.0)
+network = graph.add_edge(network, 2, 3, weight=1.5)
+network = graph.add_edge(network, 0, 3, weight=4.0)
+
+# Find shortest path
+let path = graph.shortest_path(network, source=0, target=3)
+
+# Calculate network metrics
+let degree_dist = graph.degree_distribution(network)
+let clustering = graph.clustering_coefficient(network)

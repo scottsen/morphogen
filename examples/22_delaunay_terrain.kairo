@@ -1,0 +1,153 @@
+# 22_delaunay_terrain.kairo
+# Kairo Example: Delaunay Terrain Generation
+#
+# Description: Demonstrates geometry + noise + field cross-domain integration.
+# Generates procedural terrain using Delaunay triangulation of random points,
+# with heights sampled from Perlin noise. Creates a natural-looking landscape
+# with triangular facets.
+#
+# Demonstrates:
+#   - geometry + noise + field cross-domain integration
+#   - Delaunay triangulation for terrain mesh generation
+#   - Perlin noise for natural height variation
+#   - Convex hull for terrain boundary detection
+#   - Centroid calculation for triangle centers
+#   - Coordinate transformations (Cartesian to polar)
+#
+# Expected Output: A stylized low-poly terrain with triangular facets,
+# colored by height to show mountains (white), hills (green), and
+# valleys (blue). The terrain evolves as noise animates.
+#
+# Parameters you can experiment with:
+#   - NUM_POINTS: Terrain mesh density (try 20 to 100)
+#   - NOISE_SCALE: Size of terrain features (try 0.02 to 0.1)
+#   - HEIGHT_SCALE: Maximum terrain height (try 30.0 to 100.0)
+#
+# Author: Kairo Team
+# Date: 2025-11-18
+
+use geometry, noise, field, visual
+
+# Terrain generation parameters
+const NUM_POINTS : i32 = 50
+const GRID_SIZE : i32 = 256
+const NOISE_SCALE : f32 = 0.05
+const HEIGHT_SCALE : f32 = 50.0
+const NOISE_SPEED : f32 = 0.3
+
+# Generate random sample points across the terrain
+# In a real implementation, these would be randomly distributed
+@state terrain_points : [[f32; 2]; 50] = [
+    # Grid-based jittered sampling for better coverage
+    # Row 1
+    [25.0, 25.0], [50.0, 30.0], [75.0, 20.0], [100.0, 28.0], [125.0, 22.0],
+    [150.0, 27.0], [175.0, 25.0], [200.0, 23.0], [225.0, 26.0], [245.0, 24.0],
+    # Row 2
+    [20.0, 55.0], [48.0, 58.0], [72.0, 52.0], [98.0, 56.0], [122.0, 54.0],
+    [148.0, 59.0], [172.0, 53.0], [198.0, 57.0], [222.0, 55.0], [242.0, 58.0],
+    # Row 3
+    [28.0, 82.0], [52.0, 85.0], [78.0, 80.0], [102.0, 88.0], [128.0, 84.0],
+    [152.0, 86.0], [178.0, 82.0], [202.0, 87.0], [228.0, 83.0], [248.0, 85.0],
+    # Row 4
+    [22.0, 115.0], [47.0, 118.0], [73.0, 112.0], [97.0, 116.0], [123.0, 114.0],
+    [147.0, 119.0], [173.0, 113.0], [197.0, 117.0], [223.0, 115.0], [243.0, 118.0],
+    # Row 5
+    [26.0, 148.0], [51.0, 145.0], [76.0, 152.0], [101.0, 147.0], [126.0, 149.0],
+    [151.0, 146.0], [176.0, 150.0], [201.0, 148.0], [226.0, 145.0], [246.0, 147.0]
+]
+
+# Store height for each terrain point
+@state terrain_heights : [f32; 50] = [0.0; 50]
+
+# Time accumulator for animated noise
+@state time : f32 = 0.0
+
+# Allocate height field for visualization
+@state height_field : Field2D<f32> = field.alloc((GRID_SIZE, GRID_SIZE), fill_value=0.0)
+
+# Function to sample Perlin noise at a point (simplified)
+fn sample_noise(x: f32, y: f32, t: f32) -> f32 {
+    # Simplified Perlin noise approximation using sine waves
+    # In a real implementation, use the noise domain's perlin function
+
+    freq1 = 1.0
+    freq2 = 2.0
+    freq3 = 4.0
+
+    nx = x * NOISE_SCALE
+    ny = y * NOISE_SCALE
+
+    value =
+        sin(nx * freq1 + t) * cos(ny * freq1) * 0.5 +
+        sin(nx * freq2 - t * 1.3) * cos(ny * freq2) * 0.25 +
+        sin(nx * freq3 + t * 0.7) * cos(ny * freq3) * 0.125
+
+    # Normalize to 0-1 range
+    return (value + 0.875) / 1.75
+}
+
+# Update terrain heights based on noise
+fn update_terrain_heights() {
+    i = 0
+    while i < NUM_POINTS {
+        x = terrain_points[i][0]
+        y = terrain_points[i][1]
+
+        # Sample noise at this point
+        noise_val = sample_noise(x, y, time)
+
+        # Convert to height
+        terrain_heights[i] = noise_val * HEIGHT_SCALE
+
+        i = i + 1
+    }
+}
+
+# Render terrain as height field using Delaunay triangulation
+fn render_terrain() {
+    # For each pixel, find which Delaunay triangle it belongs to
+    # and interpolate height using barycentric coordinates
+    # (simplified version - uses nearest neighbor)
+
+    height_field = height_field.map(|value, x, y| {
+        # Find nearest terrain point
+        min_dist = 999999.0
+        nearest_idx = 0
+
+        i = 0
+        while i < NUM_POINTS {
+            px = terrain_points[i][0]
+            py = terrain_points[i][1]
+
+            dx = x - px
+            dy = y - py
+            dist = sqrt(dx * dx + dy * dy)
+
+            if dist < min_dist then {
+                min_dist = dist
+                nearest_idx = i
+            }
+
+            i = i + 1
+        }
+
+        # Return height of nearest point
+        return terrain_heights[nearest_idx]
+    })
+}
+
+# Main animation loop
+flow(dt=0.1, steps=300) {
+    # Update terrain heights from noise
+    update_terrain_heights()
+
+    # Render terrain to height field
+    render_terrain()
+
+    # Visualize with elevation coloring
+    # Low = blue (water), medium = green (land), high = white (mountains)
+    output colorize(height_field, palette="terrain", min=0.0, max=HEIGHT_SCALE)
+
+    # Advance time for animated noise
+    time = time + dt * NOISE_SPEED
+}

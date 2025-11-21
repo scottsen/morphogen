@@ -1,0 +1,25 @@
+# Kairo v0.3.1 Example: Recursive Functions
+# Demonstrates: recursive function definitions, if/else expressions
+
+fn factorial(n: f32) -> f32 {
+    result = if n <= 1.0 then 1.0 else n * factorial(n - 1.0)
+    return result
+}
+
+fn fibonacci(n: f32) -> f32 {
+    result = if n <= 1.0 then n else fibonacci(n - 1.0) + fibonacci(n - 2.0)
+    return result
+}
+
+# Calculate factorial(5) = 120
+fact5 = factorial(5.0)
+
+# Calculate fibonacci(7) = 13
+fib7 = fibonacci(7.0)
+
+@state counter = 1.0
+
+flow(dt=0.1, steps=5) {
+    f = factorial(counter)
+    counter = counter + 1.0
+}

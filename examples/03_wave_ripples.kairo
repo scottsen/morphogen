@@ -1,0 +1,90 @@
+# 03_wave_ripples.kairo
+# Kairo Example: Wave Ripples
+#
+# Description: Simple wave equation simulation - like dropping a stone in water.
+# Watch concentric circular waves spread outward with beautiful interference patterns.
+#
+# Demonstrates:
+#   - Two-field wave equation (displacement + velocity)
+#   - Laplacian operator for wave propagation
+#   - Physical simulation with damping
+#   - Temporal dynamics and energy conservation
+#
+# Expected Output: Concentric circular waves spreading from center,
+# with realistic reflection at boundaries and gradual damping
+#
+# Parameters you can experiment with:
+#   - WAVE_SPEED: How fast waves propagate (try 0.3 to 1.0)
+#   - DAMPING: Energy loss per step (try 0.990 to 0.999)
+#   - INIT_AMPLITUDE: Initial disturbance strength (try 0.5 to 2.0)
+#
+# Physics: This implements the 2D wave equation:
+#   ∂²u/∂t² = c² ∇²u
+# where u is displacement, c is wave speed, ∇² is the Laplacian
+#
+# Author: Kairo Team
+# Date: 2025-11-07
+
+use field, visual
+
+# Wave equation parameters
+const WAVE_SPEED : f32 = 0.5      # Wave propagation speed (c)
+const DAMPING : f32 = 0.995       # Energy damping factor (< 1.0)
+const INIT_AMPLITUDE : f32 = 1.0  # Initial disturbance strength
+
+# State: two fields for wave equation
+# u: displacement field
+# v: velocity field (du/dt)
+@state u : Field2D<f32> = field.alloc((128, 128), fill_value=0.0)
+@state v : Field2D<f32> = field.alloc((128, 128), fill_value=0.0)
+
+# Initialize with central disturbance
+fn init_wave() {
+    # Create Gaussian bump in center
+    cx = 64
+    cy = 64
+    sigma = 5.0  # Width of initial disturbance
+
+    u = u.map(|value, x, y| {
+        dx = x - cx
+        dy = y - cy
+        dist_sq = dx * dx + dy * dy
+
+        # Gaussian profile
+        return INIT_AMPLITUDE * exp(-dist_sq / (2.0 * sigma * sigma))
+    })
+}
+
+# Initialize the wave
+init_wave()
+
+# Main simulation loop
+flow(dt=0.1, steps=300) {
+    # Wave equation: ∂²u/∂t² = c² ∇²u
+    #
+    # We use two fields:
+    #   u = displacement
+    #   v = velocity (∂u/∂t)
+    #
+    # Then:
+    #   ∂v/∂t = c² ∇²u
+    #   ∂u/∂t = v
+
+    # Calculate Laplacian of displacement
+    lap = laplacian(u)
+
+    # Update velocity: v += c² * ∇²u * dt
+    c_squared = WAVE_SPEED * WAVE_SPEED
+    v = v + lap * c_squared * dt
+
+    # Update displacement: u += v * dt
+    u = u + v * dt
+
+    # Apply damping to prevent infinite oscillation
+    # Simulates energy loss to environment
+    v = v * DAMPING
+
+    # Visualize displacement field
+    # Use coolwarm palette (blue for negative, white for zero, red for positive)
+    output colorize(u, palette="coolwarm", min=-1.0, max=1.0)
+}

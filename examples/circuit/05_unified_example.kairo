@@ -1,0 +1,310 @@
+# Example 5: Unified Circuit + PCB + Audio + EM Simulation
+# Demonstrates the unique capability Kairo provides: multi-domain integration
+
+system GuitarAmpComplete {
+    description: "Complete guitar amplifier: PCB + circuit + audio + EM + thermal"
+
+    # Global parameters
+    params:
+        power_output: f32<W> = 15    # 15W output
+        gain: f32 = 50               # Preamp gain
+        tone_bass: f32 = 0.5
+        tone_mid: f32 = 0.5
+        tone_treble: f32 = 0.5
+
+    # ====== GEOMETRY DOMAIN: PCB Layout ======
+    pcb_geometry:
+        # PCB board (FR4, 2-layer)
+        board = GeometryDomain.pcb_board(
+            width=150mm,
+            height=100mm,
+            thickness=1.6mm,
+            layers=2,
+            material="fr4"
+        )
+
+        # Component placement (auto-layout or manual)
+        component_placement:
+            - id: tube_v1
+              type: "12ax7"
+              location: board.anchor["center"].offset(-40mm, 0)
+
+            - id: opamp_u1
+              type: "tl072"
+              location: board.anchor["center"].offset(0, 20mm)
+
+            - id: power_transistors
+              type: "tip41c"  # Complementary pair
+              location: board.anchor["center"].offset(40mm, 0)
+              heatsink: true
+
+        # Trace routing (auto-router with constraints)
+        traces:
+            - net: "signal_input"
+              width: 0.254mm  # 10 mil
+              impedance_target: 50Ω
+              route: auto
+
+            - net: "power_output"
+              width: 1.27mm   # 50 mil (high current)
+              current_rating: 3A
+              route: manual
+              path: [...]
+
+            - net: "ground"
+              type: "pour"
+              layer: "bottom_copper"
+
+    # ====== CIRCUIT DOMAIN: Schematic ======
+    circuit_schematic:
+        # Preamp stage (tube)
+        preamp = CircuitDomain.triode_stage(
+            tube_model="12ax7",
+            bias_voltage=-1.5V,
+            plate_load=100kΩ,
+            cathode_bypass=25µF
+        )
+
+        # Tone stack (Fender-style)
+        tone_stack = CircuitDomain.tone_control_fender(
+            bass=tone_bass,
+            mid=tone_mid,
+            treble=tone_treble
+        )
+
+        # Phase inverter (long-tail pair)
+        phase_inverter = CircuitDomain.long_tail_pair(
+            tube_model="12ax7",
+            bias_voltage=-2V
+        )
+
+        # Power amp (push-pull Class AB)
+        power_amp = CircuitDomain.class_ab_amplifier(
+            transistors="tip41c_tip42c",  # Complementary pair
+            power=power_output,
+            bias_current=50mA,
+            feedback=0.1  # 10% negative feedback
+        )
+
+        # Output transformer (for tube amps) or direct-coupled
+        output_stage = CircuitDomain.output_transformer(
+            turns_ratio=25,  # 8Ω speaker → 5kΩ impedance
+            primary_inductance=100H,
+            leakage_inductance=5H
+        )
+
+        # Speaker load
+        speaker = CircuitDomain.speaker_model(
+            impedance=8Ω,
+            resonance_freq=80Hz,
+            Qts=0.4,
+            Le=0.5mH,  # Voice coil inductance
+            Re=6.5Ω,   # Voice coil resistance
+            model="eminence_12inch"
+        )
+
+    # ====== PARASITIC EXTRACTION: Geometry → Circuit ======
+    parasitic_extraction:
+        # Extract parasitics from PCB traces
+        parasitics = CircuitDomain.extract_parasitics(
+            pcb=board,
+            traces=traces,
+            method="fasthenry_fastcap",
+            frequency_range=[20Hz, 20kHz]  # Audio range
+        )
+
+        # Add parasitics to circuit
+        circuit_schematic.add_parasitics(parasitics)
+
+    # ====== AUDIO DOMAIN: Input Signal ======
+    audio_input:
+        # Load guitar sample
+        guitar = AudioDomain.load_sample(
+            file="guitar_solo.wav",
+            sample_rate=96kHz
+        )
+
+    # ====== CIRCUIT SIMULATION: Transient Analysis ======
+    circuit_simulation:
+        # Transient simulation with audio input
+        output = CircuitDomain.transient(
+            circuit=circuit_schematic,
+            input=guitar,
+            sample_rate=192kHz,  # 2x oversampling for tube harmonics
+            duration=guitar.duration,
+            method="backward_euler",
+            include_parasitics=true
+        )
+
+    # ====== PHYSICS DOMAIN: Thermal Coupling ======
+    thermal_analysis:
+        # Power dissipation in power transistors
+        power_loss = circuit_schematic.component["power_transistors"].power_dissipation
+
+        # Heatsink thermal model
+        heatsink = PhysicsDomain.thermal_model(
+            material="aluminum",
+            geometry=heatsink_geometry,
+            fins=10,
+            ambient_temp=25°C
+        )
+
+        # Add heat source at transistor location
+        PhysicsDomain.add_heat_source(
+            model=heatsink,
+            power=power_loss,
+            location=component_placement["power_transistors"].location
+        )
+
+        # Solve thermal distribution
+        temp_distribution = PhysicsDomain.steady_state_heat(heatsink)
+
+        # Feed temperature back to circuit (temp-dependent beta, Vbe)
+        circuit_schematic.component["power_transistors"].temperature =
+            temp_distribution.at(component_placement["power_transistors"].location)
+
+        # Re-run circuit simulation with thermal coupling
+        output_thermal = CircuitDomain.transient(
+            circuit=circuit_schematic,
+            input=guitar,
+            sample_rate=192kHz,
+            thermal_coupling=true
+        )
+
+    # ====== EM DOMAIN: Field Simulation (Optional) ======
+    em_simulation:
+        # Full-wave EM simulation (for RF/EMI analysis)
+        em_fields = PhysicsDomain.electromagnetic_solve(
+            geometry=board,
+            traces=traces,
+            frequency=1MHz,  # Check for RF emissions
+            method="fdtd"  # Finite-difference time-domain
+        )
+
+        # Mutual inductance between traces
+        mutual_inductance = em_fields.mutual_inductance(
+            trace1="signal_input",
+            trace2="power_output"
+        )
+
+        # Add mutual inductance to circuit
+        circuit_schematic.add_mutual_inductance(mutual_inductance)
+
+    # ====== AUDIO DOMAIN: Post-Processing ======
+    audio_output:
+        # Downsample to 48kHz
+        output_48k = AudioDomain.resample(
+            signal=output_thermal,
+            target_rate=48kHz
+        )
+
+        # Optional: Add cabinet simulation (IR convolution)
+        cabinet = AudioDomain.convolution_reverb(
+            input=output_48k,
+            impulse_response="marshall_4x12.wav",
+            mix=1.0
+        )
+
+        # Optional: Add room reverb
+        room = AudioDomain.reverb(
+            input=cabinet,
+            mix=0.2,
+            room_size=0.6
+        )
+
+        final = room
+
+    # ====== PATTERN DOMAIN: Modulation (Optional) ======
+    pattern_modulation:
+        # Tremolo effect (amplitude modulation)
+        tremolo = PatternDomain.sine(freq=5Hz, amplitude=0.3, offset=0.7)
+
+        # Apply tremolo to output
+        final_with_tremolo = final * tremolo
+
+    # ====== ANALYSIS & METRICS ======
+    analysis:
+        # Harmonic distortion
+        spectrum = AudioDomain.fft(final, window="hann")
+        thd = spectrum.total_harmonic_distortion(fundamental=440Hz)
+
+        # Frequency response (circuit)
+        freq_response = CircuitDomain.ac_sweep(
+            circuit=circuit_schematic,
+            freq_start=20Hz,
+            freq_end=20kHz,
+            points=200
+        )
+
+        # Thermal check
+        max_temp = temp_distribution.max()
+
+        # Signal integrity (PCB)
+        signal_integrity = SignalIntegrity.check(
+            circuit=circuit_schematic,
+            critical_nets=["signal_input", "power_output"]
+        )
+
+    # ====== ASSERTIONS ======
+    assertions:
+        # Output power should match spec (±20%)
+        output_power = final.rms_power(load=8Ω)
+        assert output_power > 0.8 * power_output && output_power < 1.2 * power_output
+
+        # THD should be in typical tube amp range (1-5%)
+        assert thd > 0.01 && thd < 0.10
+
+        # Transistor temperature should be safe (< 125°C)
+        assert max_temp < 125°C
+
+        # Frequency response: ±3dB from 80Hz to 8kHz
+        assert freq_response.magnitude_db.at(80Hz) > -3dB
+        assert freq_response.magnitude_db.at(8kHz) > -3dB
+
+    # ====== VISUALIZATION ======
+    plots:
+        - type: waveform
+          data: [guitar, output_48k, final]
+          title: "Audio Signal Chain"
+          time_range: [0s, 1s]
+
+        - type: spectrum
+          data: spectrum
+          title: "Harmonic Distortion Spectrum"
+
+        - type: bode
+          data: freq_response
+          title: "Amplifier Frequency Response"
+
+        - type: thermal_map
+          data: temp_distribution
+          title: "Thermal Distribution (Heatsink)"
+
+        - type: geometry_3d
+          data: [board, traces, component_placement]
+          title: "PCB Layout (3D View)"
+
+        - type: em_field
+          data: em_fields
+          title: "E-Field Distribution (1MHz)"
+
+    # ====== EXPORT ======
+    export:
+        # Circuit
+        - spice: "guitar_amp.cir"
+        - schematic: "guitar_amp.svg"
+
+        # PCB
+        - kicad: "guitar_amp.kicad_pcb"
+        - gerber: "guitar_amp_gerbers/"
+
+        # Audio
+        - audio: "guitar_amp_output.wav"
+
+        # Simulation data
+        - yaml: "guitar_amp.kairo.yaml"
+        - csv: "simulation_results.csv"
+
+        # Documentation
+        - report: "guitar_amp_report.pdf"
+}

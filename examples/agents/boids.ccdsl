@@ -1,0 +1,53 @@
+# Boids flocking simulation
+# Classic emergent behavior with separation, alignment, and cohesion
+
+type Boid = {
+  id: u64,
+  pos: Vec2[m],
+  vel: Vec2[m/s],
+  color: i32
+}
+
+set profile = medium
+set dt = 0.016
+
+@param separation_weight : f32 = 1.5
+@param alignment_weight : f32 = 1.0
+@param cohesion_weight : f32 = 1.0
+@param max_speed : f32[m/s] = 2.0
+@param perception_radius : f32[m] = 0.5
+
+# Initialize boids
+boids = step.state(agent.alloc(Boid, count=1000))
+
+step {
+  # Calculate separation force (avoid crowding)
+  separation = agent.force_sum(boids, rule=separate, method="grid")
+
+  # Calculate alignment force (steer towards average heading)
+  alignment = agent.force_sum(boids, rule=align, method="grid")
+
+  # Calculate cohesion force (steer towards center of mass)
+  cohesion = agent.force_sum(boids, rule=cohere, method="grid")
+
+  # Combine forces
+  total_force = field.combine(
+    field.combine(separation, alignment, fn=weighted_sum),
+    cohesion,
+    fn=weighted_sum
+  )
+
+  # Update boid positions and velocities
+  boids = agent.integrate(boids, total_force, dt, method="verlet")
+
+  # Clamp velocities
+  boids = agent.map(boids, fn=clamp_velocity)
+
+  # Wrap around boundaries
+  boids = agent.map(boids, fn=wrap_periodic)
+
+  # Render
+  visual.output(
+    visual.points(boids, color="rainbow")
+  )
+}

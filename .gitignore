@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+.venv*/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter
+.ipynb_checkpoints
+
+# Output files
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.wav
+*.mp3
+*.gif
+*.flac
+!mvp_test_output.png
+!examples/output_*.png
+
+# Generated showcase outputs (test artifacts)
+examples/outputs/
+
+# Temporary files
+*.tmp
+*.log
+CODEBASE_ANALYSIS.md
+QUICK_REFERENCE.txt

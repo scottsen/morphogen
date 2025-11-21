@@ -1,0 +1,193 @@
+# Example 3: Guitar Pedal (Tube Screamer-style Overdrive)
+# Demonstrates circuit → audio domain integration
+
+circuit GuitarPedalOverdrive {
+    description: "Tube Screamer-style overdrive with asymmetric clipping"
+
+    # User controls
+    params:
+        drive: f32 = 0.7         # 0.0 to 1.0 (distortion amount)
+        tone: f32 = 0.5          # 0.0 to 1.0 (treble cut)
+        level: f32 = 0.8         # 0.0 to 1.0 (output volume)
+
+    # Computed parameters
+    computed:
+        # Drive pot controls feedback resistor
+        r_drive: f32<Ω> = 500Ω + drive * 4500Ω  # 500Ω to 5kΩ
+
+        # Tone pot controls treble rolloff
+        r_tone_high: f32<Ω> = tone * 220kΩ
+        r_tone_low: f32<Ω> = (1 - tone) * 220kΩ
+
+        # Level pot controls output attenuation
+        output_gain: f32 = level
+
+    # Components
+    components:
+        # Input buffer (unity gain)
+        input_buffer = opamp_non_inverting_amp(
+            opamp_model="jrc4558",  # Classic Tube Screamer op-amp
+            gain=1.0,
+            Rin=10kΩ
+        )
+
+        # Clipping stage (asymmetric diodes)
+        r_clip = resistor(R=51kΩ)
+        r_drive_pot = resistor(R=r_drive)
+
+        # Asymmetric clipping (creates odd harmonics)
+        d1 = diode(Is=1e-12A, n=1.0)        # Silicon (0.7V forward)
+        d2 = diode(Is=1e-12A, n=1.0)
+        d3 = diode(Is=1e-12A, n=1.0)        # Two diodes in series (1.4V)
+
+        # Clipping amp (non-inverting with variable gain)
+        clip_amp = op_amp(model="jrc4558")
+        r_in_clip = resistor(R=10kΩ)
+        r_fb_clip = resistor(R=r_drive)
+
+        # Tone control (active low-pass filter)
+        tone_control = rc_filter(
+            R=r_tone_high,
+            C=0.22µF,
+            type="lpf"
+        )
+
+        # Output buffer
+        output_buffer = opamp_non_inverting_amp(
+            opamp_model="jrc4558",
+            gain=output_gain * 5,   # Max gain of 5x
+            Rin=10kΩ
+        )
+
+        # Power (9V battery or adapter)
+        vcc = voltage_source(V=9V, type="dc")
+
+    # Nets
+    nets:
+        input, output, ground
+        vcc_rail, bias  # 4.5V bias (Vcc/2)
+        clip_in, clip_out
+        tone_in, tone_out
+
+    # Connections
+    connections:
+        # Input coupling
+        input.connect(input_buffer.input)
+
+        # Bias voltage divider (4.5V)
+        bias.voltage = vcc_rail.voltage / 2
+
+        # Clipping stage
+        input_buffer.output.connect(clip_in)
+        clip_in.connect(r_in_clip.port["p"])
+        r_in_clip.port["n"].connect(clip_amp.port["in-"])
+        clip_amp.port["in+"].connect(bias)
+
+        # Asymmetric diode clipping in feedback loop
+        clip_amp.port["in-"].connect(r_fb_clip.port["p"])
+        r_fb_clip.port["n"].connect(clip_amp.port["out"])
+
+        # Diodes (asymmetric: 1 vs 2 in series)
+        clip_amp.port["in-"].connect(d1.port["cathode"])
+        d1.port["anode"].connect(clip_amp.port["out"])
+
+        clip_amp.port["in-"].connect(d2.port["anode"])
+        d2.port["cathode"].connect(d3.port["anode"])
+        d3.port["cathode"].connect(clip_amp.port["out"])
+
+        clip_amp.port["out"].connect(clip_out)
+
+        # Tone control
+        clip_out.connect(tone_control.input)
+        tone_control.output.connect(tone_out)
+
+        # Output buffer
+        tone_out.connect(output_buffer.input)
+        output_buffer.output.connect(output)
+
+        # Power
+        vcc.port["p"].connect(vcc_rail)
+        vcc.port["n"].connect(ground)
+        input_buffer.vcc.connect(vcc_rail)
+        clip_amp.port["vcc"].connect(vcc_rail)
+        output_buffer.vcc.connect(vcc_rail)
+
+    # Cross-domain: Audio input
+    audio_input:
+        # Load guitar sample
+        guitar = AudioDomain.load_sample(
+            file="guitar_riff.wav",
+            sample_rate=96kHz
+        )
+
+    # Analysis: Circuit simulation with audio input
+    analysis:
+        # Transient simulation (4x oversampling for harmonic accuracy)
+        tran: transient(
+            circuit=self,
+            input=guitar,
+            sample_rate=384kHz,     # 4x oversampling (96kHz * 4)
+            duration=guitar.duration,
+            method="backward_euler"  # Stable for stiff nonlinear systems
+        )
+
+    # Cross-domain: Audio post-processing
+    audio_output:
+        # Downsample to 48kHz
+        output_48k = AudioDomain.resample(
+            signal=tran.net["output"].voltage,
+            target_rate=48kHz,
+            filter="sinc"  # High-quality resampling
+        )
+
+        # Optional: Add reverb (like a spring reverb tank)
+        reverb = AudioDomain.reverb(
+            input=output_48k,
+            mix=0.15,
+            room_size=0.3,
+            damping=0.5
+        )
+
+        # Final output
+        final = reverb
+
+    # Harmonic analysis
+    harmonic_analysis:
+        # FFT of output to see harmonic distortion
+        spectrum = AudioDomain.fft(
+            signal=output_48k,
+            window="hann"
+        )
+
+        # Total harmonic distortion (THD)
+        thd = spectrum.total_harmonic_distortion(fundamental=440Hz)
+
+    # Assertions
+    assertions:
+        # Output should not clip rails
+        assert tran.net["output"].voltage.max() < 8V
+        assert tran.net["output"].voltage.min() > 1V  # Biased at 4.5V
+
+        # THD should be in typical range for overdrive (5-20%)
+        assert thd > 0.05 && thd < 0.30
+
+    # Plots
+    plots:
+        - type: waveform
+          data: tran
+          signals: ["input", "clip_out", "output"]
+          title: "Overdrive Signal Chain"
+          time_range: [0s, 0.1s]
+
+        - type: spectrum
+          data: spectrum
+          title: "Harmonic Distortion Spectrum"
+          freq_range: [20Hz, 20kHz]
+
+    # Export
+    export:
+        - audio: "pedal_output.wav"
+        - spice: "tube_screamer.cir"
+        - schematic: "tube_screamer.svg"
+        - yaml: "tube_screamer.kairo.yaml"
+}

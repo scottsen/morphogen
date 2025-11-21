@@ -1,0 +1,49 @@
+# Kairo v0.3.1 Complete Demo
+# Demonstrates: All v0.3.1 features working together
+
+# Function with conditional logic
+fn clamp(value: f32, min: f32, max: f32) -> f32 {
+    temp1 = if value < min then min else value
+    temp2 = if temp1 > max then max else temp1
+    return temp2
+}
+
+# Function composing other functions
+fn safe_divide(a: f32, b: f32) -> f32 {
+    result = if b == 0.0 then 0.0 else a / b
+    return result
+}
+
+# Higher-order function
+fn apply_function(f, x: f32, y: f32) -> f32 {
+    return f(x, y)
+}
+
+# Initialize state variables
+@state position = 0.0
+@state velocity = 5.0
+@state energy = 100.0
+
+# Main simulation loop with substeps
+flow(dt=0.1, steps=10, substeps=2) {
+    # Create lambdas for different computations
+    compute_force = |pos| if pos > 5.0 then -10.0 else 10.0
+    compute_damping = |vel| vel * 0.99
+
+    # Calculate forces
+    force = compute_force(position)
+    acceleration = safe_divide(force, 1.0)  # mass = 1.0
+
+    # Update velocity and apply damping
+    velocity = velocity + acceleration * dt
+    velocity = compute_damping(velocity)
+
+    # Update position with clamping
+    position = position + velocity * dt
+    position = clamp(position, 0.0, 10.0)
+
+    # Update energy
+    kinetic = 0.5 * velocity * velocity
+    potential = position * 9.8
+    energy = kinetic + potential
+}

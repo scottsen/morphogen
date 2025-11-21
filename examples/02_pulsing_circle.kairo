@@ -1,0 +1,71 @@
+# 02_pulsing_circle.kairo
+# Kairo Example: Pulsing Circle
+#
+# Description: Animated visualization showing a circle that smoothly grows
+# and shrinks, demonstrating lambda expressions and time-based animation.
+#
+# Demonstrates:
+#   - Field map operations with lambdas
+#   - Coordinate-based field generation
+#   - Time-based animation with trigonometric functions
+#   - Visual palettes
+#
+# Expected Output: A circular region that pulses in and out rhythmically,
+# creating a hypnotic, meditative animation
+#
+# Parameters you can experiment with:
+#   - BASE_RADIUS: Center radius of circle (try 15.0 to 40.0)
+#   - PULSE_AMPLITUDE: How much the radius changes (try 5.0 to 20.0)
+#   - PULSE_SPEED: How fast it pulses (try 1.0 to 5.0)
+#   - GRID_SIZE: Resolution of the field (try 64 to 256)
+#
+# Author: Kairo Team
+# Date: 2025-11-07
+
+use field, visual
+
+# Animation parameters
+const BASE_RADIUS : f32 = 20.0
+const PULSE_AMPLITUDE : f32 = 10.0
+const PULSE_SPEED : f32 = 2.0
+const GRID_SIZE : i32 = 128
+
+# Time accumulator
+@state time : f32 = 0.0
+
+# Main simulation loop
+flow(dt=0.05, steps=200) {
+    # Calculate current radius using sine wave
+    radius = BASE_RADIUS + PULSE_AMPLITUDE * sin(time * PULSE_SPEED)
+
+    # Center of the field
+    cx = GRID_SIZE / 2
+    cy = GRID_SIZE / 2
+
+    # Create circular field using map with coordinates
+    # Lambda receives (value, x, y) and returns new value
+    field = field.alloc((GRID_SIZE, GRID_SIZE), fill_value=0.0).map(|value, x, y| {
+        # Calculate distance from center
+        dx = x - cx
+        dy = y - cy
+        dist = sqrt(dx * dx + dy * dy)
+
+        # Return 1.0 inside circle, 0.0 outside
+        # Add smooth falloff at edge for anti-aliasing
+        edge_width = 2.0
+        if dist < radius - edge_width then
+            return 1.0
+        else if dist < radius + edge_width then
+            # Smooth interpolation at edge
+            t = (radius + edge_width - dist) / (2.0 * edge_width)
+            return t
+        else
+            return 0.0
+    })
+
+    # Visualize with viridis palette (purple to yellow gradient)
+    output colorize(field, palette="viridis", min=0.0, max=1.0)
+
+    # Update time
+    time = time + dt
+}
