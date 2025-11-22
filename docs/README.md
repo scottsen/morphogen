@@ -4,6 +4,34 @@ Welcome to the Morphogen documentation! This guide will help you navigate the do
 
 > 💡 **First time here?** Start with the main [README.md](../README.md) to understand Morphogen's vision and what makes it unique. Then come back here for detailed technical documentation.
 
+---
+
+## 🆕 New to Morphogen? Start Here
+
+**Choose your path:**
+
+### 🚀 Quick Start (15 minutes)
+1. [Installation](getting-started.md#installation) (5 min)
+2. [Your first program](getting-started.md#your-first-program) (5 min)
+3. [Run an example](../examples/) (5 min)
+
+### 🎓 Learning Path (2-3 hours)
+1. Read [Why Morphogen Exists](../README.md#why-morphogen-exists) (10 min)
+2. Try [Complete Examples](getting-started.md#complete-examples) (30 min)
+3. Understand [Core Concepts](getting-started.md#core-concepts) (30 min)
+4. Explore [Domain Catalog](DOMAINS.md) - pick 2-3 domains (30 min)
+5. Read [Architecture Overview](architecture/overview.md) (30 min)
+
+### 🔬 Deep Dive (Advanced)
+1. [Philosophy](philosophy/) - Why Morphogen is designed this way
+2. [Architecture](architecture/) - How it's implemented
+3. [Specifications](specifications/) - Technical details
+4. [ADRs](adr/) - Design decisions
+
+**Not sure where to start?** See ["Finding What You Need"](#finding-what-you-need) below
+
+---
+
 ## Quick Start
 
 - **New to Morphogen?** Start with [Getting Started](getting-started.md) for installation and your first program
@@ -120,6 +148,9 @@ Planning and progress tracking
 - [Testing Strategy](roadmap/testing-strategy.md)
 
 ### 📊 [Planning](planning/)
+
+> 📁 **Note:** This directory contains internal development planning documents. External contributors may want to start with [Architecture](#-architecture) and [Specifications](#-specifications) instead.
+
 Strategic planning documents and execution plans
 - [Q4 2025 Execution Plan](planning/EXECUTION_PLAN_Q4_2025.md)
 - [Project Review and Next Steps](planning/PROJECT_REVIEW_AND_NEXT_STEPS.md)
@@ -127,6 +158,9 @@ Strategic planning documents and execution plans
 - [Showcase Output Strategy](planning/SHOWCASE_OUTPUT_STRATEGY.md)
 
 ### 🔬 [Analysis](analysis/)
+
+> 📁 **Note:** This directory contains internal analysis documents. External contributors may find [Domain Implementation Guide](guides/domain-implementation.md) more useful for getting started.
+
 Technical analysis and integration guides
 - [Domain Validation Report](analysis/DOMAIN_VALIDATION_REPORT.md) — Implementation vs documentation alignment
 - [Kairo Rename Analysis](analysis/KAIRO_RENAME_ANALYSIS.md) — Comprehensive rename impact analysis

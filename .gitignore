@@ -73,3 +73,4 @@ examples/outputs/
 *.log
 CODEBASE_ANALYSIS.md
 QUICK_REFERENCE.txt
+claude.md
