@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "profile": "repro",
+  "sample_rate": 48000,
+  "nodes": [
+    {
+      "id": "osc1",
+      "op": "sine",
+      "params": {
+        "freq": "440Hz",
+        "phase": 0.0
+      },
+      "rate": "audio",
+      "outputs": [
+        {
+          "name": "out",
+          "type": "Sig"
+        }
+      ]
+    },
+    {
+      "id": "lpf1",
+      "op": "lpf",
+      "params": {
+        "cutoff": "2kHz",
+        "q": 0.707
+      },
+      "rate": "audio",
+      "outputs": [
+        {
+          "name": "out",
+          "type": "Sig"
+        }
+      ]
+    },
+    {
+      "id": "env1",
+      "op": "adsr",
+      "params": {
+        "attack": "0.01s",
+        "decay": "0.1s",
+        "sustain": 0.7,
+        "release": "0.3s"
+      },
+      "rate": "control",
+      "outputs": [
+        {
+          "name": "out",
+          "type": "Ctl"
+        }
+      ]
+    },
+    {
+      "id": "mul1",
+      "op": "multiply",
+      "params": {},
+      "rate": "audio",
+      "outputs": [
+        {
+          "name": "out",
+          "type": "Sig"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "osc1:out",
+      "to": "lpf1:in",
+      "type": "Sig"
+    },
+    {
+      "from": "lpf1:out",
+      "to": "mul1:in1",
+      "type": "Sig"
+    },
+    {
+      "from": "env1:out",
+      "to": "mul1:in2",
+      "type": "Ctl"
+    }
+  ],
+  "outputs": {
+    "mono": [
+      "mul1:out"
+    ]
+  },
+  "seed": 1337,
+  "metadata": {
+    "source": "example script",
+    "description": "Simple subtractive synth with ADSR envelope",
+    "author": "Morphogen"
+  }
+}
