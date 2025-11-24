@@ -457,11 +457,12 @@ class AudioOperations:
     @operator(
         domain="audio",
         category=OpCategory.TRANSFORM,
-        signature="(signal: AudioBuffer, cutoff: AudioBuffer, q: float) -> AudioBuffer",
+        signature="(signal: AudioBuffer, cutoff: AudioBuffer, q: float, filter_state: Optional[AudioBuffer]) -> AudioBuffer",
         deterministic=True,
         doc="Voltage-controlled lowpass filter with time-varying cutoff"
     )
-    def vcf_lowpass(signal: AudioBuffer, cutoff: AudioBuffer, q: float = 0.707) -> AudioBuffer:
+    def vcf_lowpass(signal: AudioBuffer, cutoff: AudioBuffer, q: float = 0.707,
+                    filter_state: Optional[AudioBuffer] = None) -> AudioBuffer:
         """Apply voltage-controlled lowpass filter with modulated cutoff.
 
         This filter accepts cutoff frequency as an AudioBuffer, enabling
@@ -473,6 +474,7 @@ class AudioOperations:
             signal: Input audio buffer
             cutoff: Cutoff frequency modulation as AudioBuffer (in Hz)
             q: Quality factor (resonance), typically 0.5 to 10.0
+            filter_state: Optional filter state for continuity across hops
 
         Returns:
             Filtered audio buffer
@@ -494,6 +496,7 @@ class AudioOperations:
             - Filter coefficients recomputed per-sample for smooth modulation
             - State maintained across coefficient changes for continuity
             - Cutoff values clamped to valid range: [20Hz, nyquist/2]
+            - filter_state parameter enables seamless continuation across buffer hops
         """
         # Ensure cutoff buffer length matches signal
         if len(cutoff.data) != len(signal.data):
@@ -511,10 +514,17 @@ class AudioOperations:
         nyquist = signal.sample_rate / 2.0
         cutoff_clamped = np.clip(cutoff_resampled, 20.0, nyquist * 0.95)
 
+        # Extract initial state if provided
+        initial_state = filter_state.data[:2] if filter_state is not None else None
+
         # Apply time-varying biquad filter
-        filtered = AudioOperations._apply_time_varying_lowpass(
-            signal.data, cutoff_clamped, q, signal.sample_rate
+        filtered, final_state = AudioOperations._apply_time_varying_lowpass(
+            signal.data, cutoff_clamped, q, signal.sample_rate, initial_state
         )
+
+        # Update filter state with final state
+        if filter_state is not None:
+            filter_state.data[:2] = final_state
 
         return AudioBuffer(data=filtered, sample_rate=signal.sample_rate)
 
@@ -522,11 +532,12 @@ class AudioOperations:
     @operator(
         domain="audio",
         category=OpCategory.TRANSFORM,
-        signature="(signal: AudioBuffer, cutoff: AudioBuffer, q: float) -> AudioBuffer",
+        signature="(signal: AudioBuffer, cutoff: AudioBuffer, q: float, filter_state: Optional[AudioBuffer]) -> AudioBuffer",
         deterministic=True,
         doc="Voltage-controlled highpass filter with time-varying cutoff"
     )
-    def vcf_highpass(signal: AudioBuffer, cutoff: AudioBuffer, q: float = 0.707) -> AudioBuffer:
+    def vcf_highpass(signal: AudioBuffer, cutoff: AudioBuffer, q: float = 0.707,
+                     filter_state: Optional[AudioBuffer] = None) -> AudioBuffer:
         """Apply voltage-controlled highpass filter with modulated cutoff.
 
         This filter accepts cutoff frequency as an AudioBuffer, enabling
@@ -538,6 +549,7 @@ class AudioOperations:
             signal: Input audio buffer
             cutoff: Cutoff frequency modulation as AudioBuffer (in Hz)
             q: Quality factor (resonance), typically 0.5 to 10.0
+            filter_state: Optional filter state for continuity across hops
 
         Returns:
             Filtered audio buffer
@@ -560,6 +572,7 @@ class AudioOperations:
             - State maintained across coefficient changes for continuity
             - Cutoff values clamped to valid range: [20Hz, nyquist/2]
             - Attenuates frequencies below cutoff, passes above
+            - filter_state parameter enables seamless continuation across buffer hops
         """
         # Ensure cutoff buffer length matches signal
         if len(cutoff.data) != len(signal.data):
@@ -576,10 +589,17 @@ class AudioOperations:
         nyquist = signal.sample_rate / 2.0
         cutoff_clamped = np.clip(cutoff_resampled, 20.0, nyquist * 0.95)
 
+        # Extract initial state if provided
+        initial_state = filter_state.data[:2] if filter_state is not None else None
+
         # Apply time-varying biquad filter
-        filtered = AudioOperations._apply_time_varying_highpass(
-            signal.data, cutoff_clamped, q, signal.sample_rate
+        filtered, final_state = AudioOperations._apply_time_varying_highpass(
+            signal.data, cutoff_clamped, q, signal.sample_rate, initial_state
         )
+
+        # Update filter state with final state
+        if filter_state is not None:
+            filter_state.data[:2] = final_state
 
         return AudioBuffer(data=filtered, sample_rate=signal.sample_rate)
 
@@ -587,11 +607,12 @@ class AudioOperations:
     @operator(
         domain="audio",
         category=OpCategory.TRANSFORM,
-        signature="(signal: AudioBuffer, center_freq: AudioBuffer, q: float) -> AudioBuffer",
+        signature="(signal: AudioBuffer, center_freq: AudioBuffer, q: float, filter_state: Optional[AudioBuffer]) -> AudioBuffer",
         deterministic=True,
         doc="Voltage-controlled bandpass filter with time-varying center frequency"
     )
-    def vcf_bandpass(signal: AudioBuffer, center_freq: AudioBuffer, q: float = 1.0) -> AudioBuffer:
+    def vcf_bandpass(signal: AudioBuffer, center_freq: AudioBuffer, q: float = 1.0,
+                     filter_state: Optional[AudioBuffer] = None) -> AudioBuffer:
         """Apply voltage-controlled bandpass filter with modulated center frequency.
 
         This filter accepts center frequency as an AudioBuffer, enabling
@@ -604,6 +625,7 @@ class AudioOperations:
             center_freq: Center frequency modulation as AudioBuffer (in Hz)
             q: Quality factor (bandwidth control), typically 0.5 to 10.0
                Higher Q = narrower bandwidth, lower Q = wider bandwidth
+            filter_state: Optional filter state for continuity across hops
 
         Returns:
             Filtered audio buffer
@@ -627,6 +649,7 @@ class AudioOperations:
             - Passes frequencies near center, attenuates above and below
             - Q controls bandwidth: Q=1 is wide, Q=10 is narrow
             - Useful for formant synthesis, vowel sounds, wah effects
+            - filter_state parameter enables seamless continuation across buffer hops
         """
         # Ensure center_freq buffer length matches signal
         if len(center_freq.data) != len(signal.data):
@@ -643,10 +666,17 @@ class AudioOperations:
         nyquist = signal.sample_rate / 2.0
         center_clamped = np.clip(center_resampled, 20.0, nyquist * 0.95)
 
+        # Extract initial state if provided
+        initial_state = filter_state.data[:2] if filter_state is not None else None
+
         # Apply time-varying biquad filter
-        filtered = AudioOperations._apply_time_varying_bandpass(
-            signal.data, center_clamped, q, signal.sample_rate
+        filtered, final_state = AudioOperations._apply_time_varying_bandpass(
+            signal.data, center_clamped, q, signal.sample_rate, initial_state
         )
+
+        # Update filter state with final state
+        if filter_state is not None:
+            filter_state.data[:2] = final_state
 
         return AudioBuffer(data=filtered, sample_rate=signal.sample_rate)
 
@@ -1698,8 +1728,9 @@ class AudioOperations:
         signal: np.ndarray,
         cutoff_array: np.ndarray,
         q: float,
-        sample_rate: int
-    ) -> np.ndarray:
+        sample_rate: int,
+        initial_state: Optional[np.ndarray] = None
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Apply biquad lowpass filter with time-varying cutoff.
 
         This implements a sample-by-sample biquad filter where the cutoff
@@ -1711,19 +1742,21 @@ class AudioOperations:
             cutoff_array: Array of cutoff frequencies (one per sample) in Hz
             q: Quality factor (resonance)
             sample_rate: Sample rate in Hz
+            initial_state: Optional initial state [z1, z2] for continuity across hops
 
         Returns:
-            Filtered signal array
+            Tuple of (filtered signal array, final state [z1, z2])
 
         Implementation notes:
             - Uses Direct Form II for state continuity
             - Coefficients recomputed per-sample for smooth modulation
             - State vector preserved across coefficient changes
             - Normalized coefficients to avoid numerical issues
+            - State can be preserved across buffer hops for seamless continuation
         """
         output = np.zeros_like(signal)
         # Biquad state (2 elements for 2nd-order filter)
-        state = np.zeros(2)
+        state = initial_state.copy() if initial_state is not None else np.zeros(2)
 
         for i in range(len(signal)):
             # Compute filter coefficients for current cutoff
@@ -1754,15 +1787,16 @@ class AudioOperations:
             state[1] = state[0]
             state[0] = w
 
-        return output
+        return output, state
 
     @staticmethod
     def _apply_time_varying_highpass(
         signal: np.ndarray,
         cutoff_array: np.ndarray,
         q: float,
-        sample_rate: int
-    ) -> np.ndarray:
+        sample_rate: int,
+        initial_state: Optional[np.ndarray] = None
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Apply biquad highpass filter with time-varying cutoff.
 
         This implements a sample-by-sample biquad filter where the cutoff
@@ -1774,19 +1808,21 @@ class AudioOperations:
             cutoff_array: Array of cutoff frequencies (one per sample) in Hz
             q: Quality factor (resonance)
             sample_rate: Sample rate in Hz
+            initial_state: Optional initial state [z1, z2] for continuity across hops
 
         Returns:
-            Filtered signal array
+            Tuple of (filtered signal array, final state [z1, z2])
 
         Implementation notes:
             - Uses Direct Form II for state continuity
             - Coefficients recomputed per-sample for smooth modulation
             - State vector preserved across coefficient changes
             - Normalized coefficients to avoid numerical issues
+            - State can be preserved across buffer hops for seamless continuation
         """
         output = np.zeros_like(signal)
         # Biquad state (2 elements for 2nd-order filter)
-        state = np.zeros(2)
+        state = initial_state.copy() if initial_state is not None else np.zeros(2)
 
         for i in range(len(signal)):
             # Compute filter coefficients for current cutoff
@@ -1817,15 +1853,16 @@ class AudioOperations:
             state[1] = state[0]
             state[0] = w
 
-        return output
+        return output, state
 
     @staticmethod
     def _apply_time_varying_bandpass(
         signal: np.ndarray,
         cutoff_array: np.ndarray,
         q: float,
-        sample_rate: int
-    ) -> np.ndarray:
+        sample_rate: int,
+        initial_state: Optional[np.ndarray] = None
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Apply biquad bandpass filter with time-varying center frequency.
 
         This implements a sample-by-sample biquad filter where the center
@@ -1837,9 +1874,10 @@ class AudioOperations:
             cutoff_array: Array of center frequencies (one per sample) in Hz
             q: Quality factor (bandwidth control, higher Q = narrower band)
             sample_rate: Sample rate in Hz
+            initial_state: Optional initial state [z1, z2] for continuity across hops
 
         Returns:
-            Filtered signal array
+            Tuple of (filtered signal array, final state [z1, z2])
 
         Implementation notes:
             - Uses Direct Form II for state continuity
@@ -1847,10 +1885,11 @@ class AudioOperations:
             - State vector preserved across coefficient changes
             - Normalized coefficients to avoid numerical issues
             - Q controls bandwidth: Q=1 is wide, Q=10 is narrow
+            - State can be preserved across buffer hops for seamless continuation
         """
         output = np.zeros_like(signal)
         # Biquad state (2 elements for 2nd-order filter)
-        state = np.zeros(2)
+        state = initial_state.copy() if initial_state is not None else np.zeros(2)
 
         for i in range(len(signal)):
             # Compute filter coefficients for current center frequency
@@ -1881,7 +1920,7 @@ class AudioOperations:
             state[1] = state[0]
             state[0] = w
 
-        return output
+        return output, state
 
     # ========================================================================
     # AUDIO I/O (v0.6.0)
