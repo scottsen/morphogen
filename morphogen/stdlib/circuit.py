@@ -16,6 +16,13 @@ from scipy.sparse import linalg as sp_linalg
 
 from morphogen.core.operator import operator, OpCategory
 
+# Import AudioBuffer for circuit-audio coupling
+try:
+    from morphogen.stdlib.audio import AudioBuffer
+    AUDIO_AVAILABLE = True
+except ImportError:
+    AUDIO_AVAILABLE = False
+
 
 class ComponentType(Enum):
     """Types of circuit components."""
@@ -24,6 +31,7 @@ class ComponentType(Enum):
     INDUCTOR = "inductor"
     VOLTAGE_SOURCE = "voltage_source"
     CURRENT_SOURCE = "current_source"
+    OPAMP = "opamp"
     GROUND = "ground"
 
 
@@ -33,16 +41,22 @@ class Component:
 
     Attributes:
         comp_type: Type of component
-        node1: First node index (or positive terminal)
-        node2: Second node index (or negative terminal)
-        value: Component value (resistance, capacitance, inductance, voltage, current)
+        node1: First node index (or positive terminal / opamp in+)
+        node2: Second node index (or negative terminal / opamp in-)
+        value: Component value (resistance, capacitance, inductance, voltage, current, or opamp gain)
         name: Component identifier
+        node3: Third node (opamp output)
+        node4: Fourth node (opamp vcc - optional)
+        node5: Fifth node (opamp vee - optional)
     """
     comp_type: ComponentType
     node1: int
     node2: int
     value: float
     name: str = ""
+    node3: Optional[int] = None  # For op-amps (output node)
+    node4: Optional[int] = None  # For op-amps (vcc - optional)
+    node5: Optional[int] = None  # For op-amps (vee - optional)
 
     def __post_init__(self):
         if not self.name:
@@ -226,24 +240,78 @@ class CircuitOperations:
         return circuit
 
     @staticmethod
+    @operator(
+        domain="circuit",
+        category=OpCategory.MUTATE,
+        signature="(circuit: Circuit, node_in_pos: int, node_in_neg: int, node_out: int, gain: float, name: str) -> Circuit",
+        deterministic=True,
+        doc="Add an operational amplifier to the circuit"
+    )
+    def add_opamp(circuit: Circuit, node_in_pos: int, node_in_neg: int,
+                  node_out: int, gain: float = 100000.0, name: str = "") -> Circuit:
+        """Add an ideal operational amplifier to the circuit.
+
+        This implements a voltage-controlled voltage source:
+        V_out = gain * (V_in+ - V_in-)
+
+        For ideal op-amp behavior, use very high gain (default: 100,000).
+        For real op-amps in feedback circuits, the feedback network
+        will determine the actual circuit gain.
+
+        Args:
+            circuit: Circuit to modify
+            node_in_pos: Non-inverting input node (in+)
+            node_in_neg: Inverting input node (in-)
+            node_out: Output node
+            gain: Open-loop gain (default: 100,000 for ideal op-amp)
+            name: Component name
+
+        Returns:
+            Modified circuit
+
+        Example:
+            # Inverting amplifier with gain = -10
+            c = circuit.create(num_nodes=5)
+            c = circuit.add_voltage_source(c, 1, 0, 1.0, "Vin")
+            c = circuit.add_resistor(c, 1, 2, 10000.0, "Rin")  # 10k input
+            c = circuit.add_opamp(c, 0, 2, 3, name="U1")  # in+ grounded
+            c = circuit.add_resistor(c, 2, 3, 100000.0, "Rfb")  # 100k feedback
+            # Gain = -Rfb/Rin = -100k/10k = -10
+        """
+        comp = Component(
+            comp_type=ComponentType.OPAMP,
+            node1=node_in_pos,
+            node2=node_in_neg,
+            value=gain,
+            name=name,
+            node3=node_out
+        )
+        circuit.components.append(comp)
+        return circuit
+
+    @staticmethod
     def _build_mna_matrices_dc(circuit: Circuit) -> Tuple[np.ndarray, np.ndarray]:
         """Build Modified Nodal Analysis matrices for DC analysis.
 
         Returns:
             Tuple of (A_matrix, b_vector) where A*x = b
         """
-        # Count voltage sources to determine matrix size
+        # Count voltage sources and op-amps to determine matrix size
+        # Both add extra variables (branch currents)
         num_vsources = sum(1 for c in circuit.components
                           if c.comp_type == ComponentType.VOLTAGE_SOURCE)
+        num_opamps = sum(1 for c in circuit.components
+                        if c.comp_type == ComponentType.OPAMP)
 
-        # Matrix size: (num_nodes - 1) + num_vsources
+        # Matrix size: (num_nodes - 1) + num_vsources + num_opamps
         # We exclude ground (node 0) from the equations
-        n = circuit.num_nodes - 1 + num_vsources
+        n = circuit.num_nodes - 1 + num_vsources + num_opamps
 
         A = np.zeros((n, n))
         b = np.zeros(n)
 
         vsource_idx = 0
+        opamp_idx = 0
 
         for comp in circuit.components:
             if comp.comp_type == ComponentType.RESISTOR:
@@ -291,6 +359,35 @@ class CircuitOperations:
 
                 b[vsource_row] = comp.value
                 vsource_idx += 1
+
+            elif comp.comp_type == ComponentType.OPAMP:
+                # Op-amp stamp (voltage-controlled voltage source)
+                # V_out = gain * (V_in+ - V_in-)
+                n_in_pos = comp.node1  # Non-inverting input
+                n_in_neg = comp.node2  # Inverting input
+                n_out = comp.node3     # Output
+                gain = comp.value
+
+                opamp_row = circuit.num_nodes - 1 + num_vsources + opamp_idx
+
+                # Add equations for op-amp output current (like voltage source)
+                if n_out != 0:
+                    A[n_out-1, opamp_row] += 1
+                    A[opamp_row, n_out-1] += 1
+
+                # Controlled voltage equation: V_out = gain * (V_in+ - V_in-)
+                # Rearranged: V_out - gain*V_in+ + gain*V_in- = 0
+                if n_out != 0:
+                    A[opamp_row, n_out-1] += 1
+
+                if n_in_pos != 0:
+                    A[opamp_row, n_in_pos-1] -= gain
+
+                if n_in_neg != 0:
+                    A[opamp_row, n_in_neg-1] += gain
+
+                # b[opamp_row] = 0 (already zero-initialized)
+                opamp_idx += 1
 
         return A, b
 
@@ -649,6 +746,86 @@ class CircuitOperations:
     @staticmethod
     @operator(
         domain="circuit",
+        category=OpCategory.TRANSFORM,
+        signature="(circuit: Circuit, audio_in: AudioBuffer, input_node: int, output_node: int, input_component: str) -> AudioBuffer",
+        deterministic=True,
+        doc="Process audio through a circuit (guitar pedals, filters, effects)"
+    )
+    def process_audio(circuit: Circuit, audio_in, input_node: int,
+                     output_node: int, input_component: str = "Vin") -> 'AudioBuffer':
+        """Process audio signal through the circuit.
+
+        This is the killer feature for circuit-audio integration!
+        Use this to implement guitar pedals, analog filters, and audio effects.
+
+        The circuit must have:
+        - A voltage source (input_component) that will be modulated by the audio
+        - An output node where the processed signal is read
+
+        Args:
+            circuit: Circuit to process audio through
+            audio_in: Input audio buffer
+            input_node: Node where input voltage source is connected (positive terminal)
+            output_node: Node to read output from
+            input_component: Name of voltage source to modulate with input audio
+
+        Returns:
+            Processed audio buffer at the same sample rate
+
+        Example:
+            # Guitar distortion pedal
+            c = circuit.create(num_nodes=5, dt=1.0/48000)
+            c = circuit.add_voltage_source(c, 1, 0, 0.0, "Vin")  # Will be modulated
+            c = circuit.add_resistor(c, 1, 2, 10000.0, "R1")
+            c = circuit.add_opamp(c, 0, 2, 3, gain=100.0, name="U1")  # Overdrive
+            c = circuit.add_resistor(c, 2, 3, 100000.0, "Rfb")
+
+            # Process guitar signal
+            output = circuit.process_audio(c, guitar_in, 1, 3, "Vin")
+        """
+        if not AUDIO_AVAILABLE:
+            raise ImportError("AudioBuffer not available. Cannot process audio through circuits.")
+
+        # Get audio data
+        audio_data = audio_in.data
+        sample_rate = audio_in.sample_rate
+        num_samples = len(audio_data)
+
+        # Set circuit dt to match sample period
+        circuit.dt = 1.0 / sample_rate
+
+        # Prepare output buffer
+        output_data = np.zeros_like(audio_data)
+
+        # Find the input voltage source component
+        input_source = None
+        for comp in circuit.components:
+            if comp.name == input_component:
+                input_source = comp
+                break
+
+        if input_source is None:
+            raise ValueError(f"Input component '{input_component}' not found in circuit")
+
+        # Process each sample
+        for i in range(num_samples):
+            # Set input voltage from audio sample
+            input_source.value = float(audio_data[i])
+
+            # Run one transient step (backward Euler integration)
+            # This is a simplified single-step DC analysis with reactive components
+            circuit = CircuitOperations.dc_analysis(circuit)
+
+            # Read output voltage
+            output_data[i] = CircuitOperations.get_node_voltage(circuit, output_node)
+
+        # Create output AudioBuffer
+        from morphogen.stdlib.audio import AudioBuffer
+        return AudioBuffer(output_data, sample_rate)
+
+    @staticmethod
+    @operator(
+        domain="circuit",
         category=OpCategory.QUERY,
         signature="(circuit: Circuit, node: int) -> float",
         deterministic=True,
@@ -790,9 +967,11 @@ add_capacitor = CircuitOperations.add_capacitor
 add_inductor = CircuitOperations.add_inductor
 add_voltage_source = CircuitOperations.add_voltage_source
 add_current_source = CircuitOperations.add_current_source
+add_opamp = CircuitOperations.add_opamp
 dc_analysis = CircuitOperations.dc_analysis
 ac_analysis = CircuitOperations.ac_analysis
 transient_analysis = CircuitOperations.transient_analysis
+process_audio = CircuitOperations.process_audio
 get_node_voltage = CircuitOperations.get_node_voltage
 get_branch_current = CircuitOperations.get_branch_current
 get_power = CircuitOperations.get_power
