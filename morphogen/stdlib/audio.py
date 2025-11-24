@@ -518,6 +518,138 @@ class AudioOperations:
 
         return AudioBuffer(data=filtered, sample_rate=signal.sample_rate)
 
+    @staticmethod
+    @operator(
+        domain="audio",
+        category=OpCategory.TRANSFORM,
+        signature="(signal: AudioBuffer, cutoff: AudioBuffer, q: float) -> AudioBuffer",
+        deterministic=True,
+        doc="Voltage-controlled highpass filter with time-varying cutoff"
+    )
+    def vcf_highpass(signal: AudioBuffer, cutoff: AudioBuffer, q: float = 0.707) -> AudioBuffer:
+        """Apply voltage-controlled highpass filter with modulated cutoff.
+
+        This filter accepts cutoff frequency as an AudioBuffer, enabling
+        control-rate modulation (e.g., ADSR envelope controlling filter cutoff).
+        The cutoff buffer is automatically resampled to match the signal rate
+        by the scheduler.
+
+        Args:
+            signal: Input audio buffer
+            cutoff: Cutoff frequency modulation as AudioBuffer (in Hz)
+            q: Quality factor (resonance), typically 0.5 to 10.0
+
+        Returns:
+            Filtered audio buffer
+
+        Example:
+            # Highpass filter with envelope sweep
+            signal = audio.saw(freq=110.0, duration=2.0, sample_rate=48000)
+            env = audio.adsr(attack=0.01, decay=0.5, sustain=0.3, release=0.8,
+                           duration=2.0, sample_rate=1000)
+            # Scale envelope to cutoff range: 100Hz to 2000Hz
+            cutoff_mod = AudioBuffer(
+                data=100.0 + env.data * 1900.0,
+                sample_rate=env.sample_rate
+            )
+            filtered = audio.vcf_highpass(signal, cutoff_mod, q=2.0)
+
+        Notes:
+            - Cutoff buffer is linearly resampled to signal rate by scheduler
+            - Filter coefficients recomputed per-sample for smooth modulation
+            - State maintained across coefficient changes for continuity
+            - Cutoff values clamped to valid range: [20Hz, nyquist/2]
+            - Attenuates frequencies below cutoff, passes above
+        """
+        # Ensure cutoff buffer length matches signal
+        if len(cutoff.data) != len(signal.data):
+            # Resample cutoff to match signal length
+            cutoff_resampled = np.interp(
+                np.linspace(0, len(cutoff.data) - 1, len(signal.data)),
+                np.arange(len(cutoff.data)),
+                cutoff.data
+            )
+        else:
+            cutoff_resampled = cutoff.data
+
+        # Clamp cutoff to valid range
+        nyquist = signal.sample_rate / 2.0
+        cutoff_clamped = np.clip(cutoff_resampled, 20.0, nyquist * 0.95)
+
+        # Apply time-varying biquad filter
+        filtered = AudioOperations._apply_time_varying_highpass(
+            signal.data, cutoff_clamped, q, signal.sample_rate
+        )
+
+        return AudioBuffer(data=filtered, sample_rate=signal.sample_rate)
+
+    @staticmethod
+    @operator(
+        domain="audio",
+        category=OpCategory.TRANSFORM,
+        signature="(signal: AudioBuffer, center_freq: AudioBuffer, q: float) -> AudioBuffer",
+        deterministic=True,
+        doc="Voltage-controlled bandpass filter with time-varying center frequency"
+    )
+    def vcf_bandpass(signal: AudioBuffer, center_freq: AudioBuffer, q: float = 1.0) -> AudioBuffer:
+        """Apply voltage-controlled bandpass filter with modulated center frequency.
+
+        This filter accepts center frequency as an AudioBuffer, enabling
+        control-rate modulation (e.g., LFO controlling filter center frequency).
+        The center_freq buffer is automatically resampled to match the signal rate
+        by the scheduler.
+
+        Args:
+            signal: Input audio buffer
+            center_freq: Center frequency modulation as AudioBuffer (in Hz)
+            q: Quality factor (bandwidth control), typically 0.5 to 10.0
+               Higher Q = narrower bandwidth, lower Q = wider bandwidth
+
+        Returns:
+            Filtered audio buffer
+
+        Example:
+            # Bandpass filter with LFO sweep (vowel formant effect)
+            signal = audio.saw(freq=110.0, duration=2.0, sample_rate=48000)
+            lfo = audio.sine(freq=0.5, duration=2.0, sample_rate=1000)
+            # Scale LFO to center freq range: 500Hz to 1500Hz
+            center_mod = AudioBuffer(
+                data=1000.0 + lfo.data * 500.0,
+                sample_rate=lfo.sample_rate
+            )
+            filtered = audio.vcf_bandpass(signal, center_mod, q=5.0)
+
+        Notes:
+            - Center_freq buffer is linearly resampled to signal rate by scheduler
+            - Filter coefficients recomputed per-sample for smooth modulation
+            - State maintained across coefficient changes for continuity
+            - Center frequency values clamped to valid range: [20Hz, nyquist/2]
+            - Passes frequencies near center, attenuates above and below
+            - Q controls bandwidth: Q=1 is wide, Q=10 is narrow
+            - Useful for formant synthesis, vowel sounds, wah effects
+        """
+        # Ensure center_freq buffer length matches signal
+        if len(center_freq.data) != len(signal.data):
+            # Resample center_freq to match signal length
+            center_resampled = np.interp(
+                np.linspace(0, len(center_freq.data) - 1, len(signal.data)),
+                np.arange(len(center_freq.data)),
+                center_freq.data
+            )
+        else:
+            center_resampled = center_freq.data
+
+        # Clamp center frequency to valid range
+        nyquist = signal.sample_rate / 2.0
+        center_clamped = np.clip(center_resampled, 20.0, nyquist * 0.95)
+
+        # Apply time-varying biquad filter
+        filtered = AudioOperations._apply_time_varying_bandpass(
+            signal.data, center_clamped, q, signal.sample_rate
+        )
+
+        return AudioBuffer(data=filtered, sample_rate=signal.sample_rate)
+
     # ========================================================================
     # ENVELOPES (Section 5.3)
     # ========================================================================
@@ -1603,6 +1735,133 @@ class AudioOperations:
             b0 = (1.0 - np.cos(w0)) / 2.0
             b1 = 1.0 - np.cos(w0)
             b2 = (1.0 - np.cos(w0)) / 2.0
+            a0 = 1.0 + alpha
+            a1 = -2.0 * np.cos(w0)
+            a2 = 1.0 - alpha
+
+            # Normalize by a0
+            b0, b1, b2 = b0/a0, b1/a0, b2/a0
+            a1, a2 = a1/a0, a2/a0
+
+            # Direct Form II implementation
+            # w[n] = x[n] - a1*w[n-1] - a2*w[n-2]
+            w = signal[i] - a1*state[0] - a2*state[1]
+
+            # y[n] = b0*w[n] + b1*w[n-1] + b2*w[n-2]
+            output[i] = b0*w + b1*state[0] + b2*state[1]
+
+            # Update state: shift w into state buffer
+            state[1] = state[0]
+            state[0] = w
+
+        return output
+
+    @staticmethod
+    def _apply_time_varying_highpass(
+        signal: np.ndarray,
+        cutoff_array: np.ndarray,
+        q: float,
+        sample_rate: int
+    ) -> np.ndarray:
+        """Apply biquad highpass filter with time-varying cutoff.
+
+        This implements a sample-by-sample biquad filter where the cutoff
+        frequency changes over time. Filter coefficients are recomputed
+        for each sample, and the filter state is maintained for continuity.
+
+        Args:
+            signal: Input signal array
+            cutoff_array: Array of cutoff frequencies (one per sample) in Hz
+            q: Quality factor (resonance)
+            sample_rate: Sample rate in Hz
+
+        Returns:
+            Filtered signal array
+
+        Implementation notes:
+            - Uses Direct Form II for state continuity
+            - Coefficients recomputed per-sample for smooth modulation
+            - State vector preserved across coefficient changes
+            - Normalized coefficients to avoid numerical issues
+        """
+        output = np.zeros_like(signal)
+        # Biquad state (2 elements for 2nd-order filter)
+        state = np.zeros(2)
+
+        for i in range(len(signal)):
+            # Compute filter coefficients for current cutoff
+            cutoff = cutoff_array[i]
+            w0 = 2.0 * np.pi * cutoff / sample_rate
+            alpha = np.sin(w0) / (2.0 * q)
+
+            # Biquad highpass coefficients
+            b0 = (1.0 + np.cos(w0)) / 2.0
+            b1 = -(1.0 + np.cos(w0))
+            b2 = (1.0 + np.cos(w0)) / 2.0
+            a0 = 1.0 + alpha
+            a1 = -2.0 * np.cos(w0)
+            a2 = 1.0 - alpha
+
+            # Normalize by a0
+            b0, b1, b2 = b0/a0, b1/a0, b2/a0
+            a1, a2 = a1/a0, a2/a0
+
+            # Direct Form II implementation
+            # w[n] = x[n] - a1*w[n-1] - a2*w[n-2]
+            w = signal[i] - a1*state[0] - a2*state[1]
+
+            # y[n] = b0*w[n] + b1*w[n-1] + b2*w[n-2]
+            output[i] = b0*w + b1*state[0] + b2*state[1]
+
+            # Update state: shift w into state buffer
+            state[1] = state[0]
+            state[0] = w
+
+        return output
+
+    @staticmethod
+    def _apply_time_varying_bandpass(
+        signal: np.ndarray,
+        cutoff_array: np.ndarray,
+        q: float,
+        sample_rate: int
+    ) -> np.ndarray:
+        """Apply biquad bandpass filter with time-varying center frequency.
+
+        This implements a sample-by-sample biquad filter where the center
+        frequency changes over time. Filter coefficients are recomputed
+        for each sample, and the filter state is maintained for continuity.
+
+        Args:
+            signal: Input signal array
+            cutoff_array: Array of center frequencies (one per sample) in Hz
+            q: Quality factor (bandwidth control, higher Q = narrower band)
+            sample_rate: Sample rate in Hz
+
+        Returns:
+            Filtered signal array
+
+        Implementation notes:
+            - Uses Direct Form II for state continuity
+            - Coefficients recomputed per-sample for smooth modulation
+            - State vector preserved across coefficient changes
+            - Normalized coefficients to avoid numerical issues
+            - Q controls bandwidth: Q=1 is wide, Q=10 is narrow
+        """
+        output = np.zeros_like(signal)
+        # Biquad state (2 elements for 2nd-order filter)
+        state = np.zeros(2)
+
+        for i in range(len(signal)):
+            # Compute filter coefficients for current center frequency
+            cutoff = cutoff_array[i]
+            w0 = 2.0 * np.pi * cutoff / sample_rate
+            alpha = np.sin(w0) / (2.0 * q)
+
+            # Biquad bandpass coefficients (constant 0 dB peak gain)
+            b0 = alpha
+            b1 = 0.0
+            b2 = -alpha
             a0 = 1.0 + alpha
             a1 = -2.0 * np.cos(w0)
             a2 = 1.0 - alpha
@@ -2720,6 +2979,9 @@ lowpass = AudioOperations.lowpass
 highpass = AudioOperations.highpass
 bandpass = AudioOperations.bandpass
 notch = AudioOperations.notch
+vcf_lowpass = AudioOperations.vcf_lowpass
+vcf_highpass = AudioOperations.vcf_highpass
+vcf_bandpass = AudioOperations.vcf_bandpass
 eq3 = AudioOperations.eq3
 adsr = AudioOperations.adsr
 ar = AudioOperations.ar
