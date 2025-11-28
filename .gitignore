@@ -1,3 +1,43 @@
+# ============================================================
+# TIA Session Artifacts (belong in ~/src/tia/projects/morphogen/)
+# ============================================================
+
+# Session documentation patterns
+*_SUMMARY.md
+*_COMPLETE.md
+*_ANALYSIS.md
+*_ASSESSMENT_*.md
+*_PLAN.md
+*_PROGRESS.md
+*_REPORT.md
+*_STATUS_REPORT.md
+*_IMPLEMENTATION_*.md
+*_FINDINGS.md
+*_RESULTS.md
+*_SESSION_*.md
+
+# Internal planning docs
+NEXT_STEPS.md
+INTERNAL_*.md
+MEETING_*.md
+DRAFT_*.md
+
+# TIA directories (never commit these)
+.tia/
+.beth/
+analysis/
+research/
+sessions/
+internal/
+planning/
+
+# TIA project metadata
+project.yaml
+
+# ============================================================
+# Development Environment
+# ============================================================
+
 # Python
 __pycache__/
 *.py[cod]
@@ -73,5 +113,6 @@ examples/outputs/
 *.log
 CODEBASE_ANALYSIS.md
 QUICK_REFERENCE.txt
-claude.md
 *.backup
+
+# Note: claude.md is NOT ignored (project-specific AI instructions are kept)
