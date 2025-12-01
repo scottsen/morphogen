@@ -8,7 +8,7 @@ version = "0.11.0"
 description = "A language of creative determinism for simulation, sound, and visual form"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = {text = "Apache-2.0"}
 authors = [
     {name = "Scott Sen"}
 ]
@@ -16,6 +16,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Multimedia :: Graphics",
     "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis",
