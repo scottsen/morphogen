@@ -45,6 +45,37 @@ import morphogen
 
 ---
 
+## [2.0.0] - 2025-12-01
+
+### 🔒 BREAKING: License Change to Apache 2.0
+
+**License Migration:** MIT → Apache 2.0
+
+**What Changed:**
+- License upgraded from MIT to Apache 2.0
+- Copyright updated to "Semantic Infrastructure Lab Contributors"
+- Added CITATION.cff for academic citation
+- Package metadata (pyproject.toml) updated
+- README badge and license section updated
+
+**Why Apache 2.0?**
+- ✅ Patent protection for contributors and users
+- ✅ Aligns Morphogen with SIL ecosystem standard
+- ✅ Better fit for research/production hybrid
+- ✅ Clear contributor license terms
+
+**Compatibility:**
+- Apache 2.0 is fully compatible with MIT
+- All usage rights preserved (commercial, modification, distribution)
+- Only adds patent protection grant
+
+**SIL Ecosystem Integration:**
+- Morphogen is now officially part of the Semantic Infrastructure Lab
+- Unified licensing with Pantheon, SUP, BrowserBridge, GenesisGraph
+- Visit https://github.com/scottsen/SIL for the ecosystem
+
+---
+
 ## [Unreleased]
 
 ### 🐛 Bug Fixes - 2025-11-23
