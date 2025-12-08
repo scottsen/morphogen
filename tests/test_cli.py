@@ -673,23 +673,18 @@ class TestCmdVersion:
         """Test version command output."""
         args = Mock()
 
-        # Note: CLI imports from 'morphogen' but it doesn't exist, so we patch both possibilities
+        # Morphogen is the current module name (renamed from kairo/Creative Computation DSL)
         try:
             import morphogen
-            patch_target = 'kairo.__version__'
-        except ImportError:
             patch_target = 'morphogen.__version__'
+        except ImportError:
+            pytest.skip("morphogen module not importable")
 
         with patch(patch_target, '0.2.2'):
-            try:
-                cmd_version(args)
-                captured = capsys.readouterr()
-                assert 'v0.2.2' in captured.out
-                assert 'Creative Computation DSL' in captured.out
-            except ModuleNotFoundError:
-                # If kairo module doesn't exist, the test should fail gracefully
-                # This indicates a bug in the CLI that should be fixed
-                pytest.skip("CLI references non-existent 'morphogen' module")
+            cmd_version(args)
+            captured = capsys.readouterr()
+            assert 'v0.2.2' in captured.out
+            assert 'Morphogen' in captured.out or 'Creative Computation DSL' in captured.out
 
 
 class TestEdgeCases:

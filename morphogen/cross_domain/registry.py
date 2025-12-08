@@ -3,6 +3,9 @@ Cross-Domain Transform Registry
 
 Maintains a global registry of all available cross-domain transformations.
 Supports discovery, validation, and automatic selection of transforms.
+
+Built-in transforms are automatically registered when this module is imported.
+No explicit initialization required for normal usage.
 """
 
 from typing import Dict, List, Optional, Tuple, Type
@@ -29,6 +32,7 @@ class CrossDomainRegistry:
 
     _registry: Dict[Tuple[str, str], Type[DomainInterface]] = {}
     _metadata: Dict[Tuple[str, str], Dict] = {}
+    _builtins_registered: bool = False
 
     @classmethod
     def register(
@@ -134,6 +138,7 @@ class CrossDomainRegistry:
         """Clear all registered transforms (useful for testing)."""
         cls._registry.clear()
         cls._metadata.clear()
+        cls._builtins_registered = False
 
     @classmethod
     def visualize(cls) -> str:
@@ -187,7 +192,16 @@ def register_transform(
 # ============================================================================
 
 def register_builtin_transforms():
-    """Register all built-in cross-domain transforms."""
+    """Register all built-in cross-domain transforms.
+
+    Idempotent: Safe to call multiple times. Only registers once.
+    Transforms are auto-registered on module import, but explicit calls
+    are harmless (useful for ensuring initialization).
+    """
+    # Guard: Only register once
+    if CrossDomainRegistry._builtins_registered:
+        return
+
     from .interface import (
         FieldToAgentInterface,
         AgentToFieldInterface,
@@ -205,6 +219,8 @@ def register_builtin_transforms():
         PolarToCartesianInterface,
         GraphToVisualInterface,
         CellularToFieldInterface,
+        FluidToAcousticsInterface,
+        AcousticsToAudioInterface,
     )
 
     # Original Phase 1 transforms
@@ -426,6 +442,44 @@ def register_builtin_transforms():
             ]
         }
     )
+
+    # Phase 3 transforms - Fluid-Acoustics-Audio Pipeline
+    CrossDomainRegistry.register(
+        "fluid", "acoustics",
+        FluidToAcousticsInterface,
+        metadata={
+            "description": (
+                "Fluid → Acoustics: Couple fluid pressure to "
+                "acoustic wave propagation"
+            ),
+            "use_cases": [
+                "CFD pressure fields → acoustic wave equation",
+                "Turbulent flow → aeroacoustic sound",
+                "Vortex shedding → acoustic radiation",
+                "Fluid-structure interaction → sound generation"
+            ]
+        }
+    )
+
+    CrossDomainRegistry.register(
+        "acoustics", "audio",
+        AcousticsToAudioInterface,
+        metadata={
+            "description": (
+                "Acoustics → Audio: Sample acoustic field at "
+                "microphones and synthesize audio"
+            ),
+            "use_cases": [
+                "Acoustic pressure → audio waveform",
+                "Virtual microphone sampling",
+                "Spatial audio from acoustic fields",
+                "CFD aeroacoustics → audio rendering"
+            ]
+        }
+    )
+
+    # Mark builtins as registered
+    CrossDomainRegistry._builtins_registered = True
 
 
 # Auto-register on import

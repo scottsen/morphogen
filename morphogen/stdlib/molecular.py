@@ -17,6 +17,8 @@ from typing import List, Optional, Tuple, Dict, Union
 from enum import Enum
 import warnings
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Core Types
@@ -127,6 +129,13 @@ class ForceField:
 # Loading & Conversion Operators
 # ============================================================================
 
+@operator(
+    domain="molecular",
+    category=OpCategory.CONSTRUCT,
+    signature="(smiles: str, generate_3d: bool) -> Molecule",
+    deterministic=True,
+    doc="Load molecule from SMILES string"
+)
 def load_smiles(smiles: str, generate_3d: bool = True) -> Molecule:
     """Load molecule from SMILES string.
 
@@ -170,6 +179,13 @@ def load_smiles(smiles: str, generate_3d: bool = True) -> Molecule:
     return Molecule(atoms, bonds, positions)
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.CONSTRUCT,
+    signature="(filepath: str) -> Molecule",
+    deterministic=True,
+    doc="Load molecule from XYZ file"
+)
 def load_xyz(filepath: str) -> Molecule:
     """Load molecule from XYZ file.
 
@@ -203,6 +219,13 @@ def load_xyz(filepath: str) -> Molecule:
     return Molecule(atoms, bonds, positions)
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.CONSTRUCT,
+    signature="(filepath: str) -> Molecule",
+    deterministic=True,
+    doc="Load molecule from PDB file"
+)
 def load_pdb(filepath: str) -> Molecule:
     """Load molecule from PDB file.
 
@@ -237,6 +260,13 @@ def load_pdb(filepath: str) -> Molecule:
     return Molecule(atoms, bonds, positions)
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.TRANSFORM,
+    signature="(molecule: Molecule) -> str",
+    deterministic=True,
+    doc="Convert molecule to SMILES string"
+)
 def to_smiles(molecule: Molecule) -> str:
     """Convert molecule to SMILES string.
 
@@ -254,6 +284,13 @@ def to_smiles(molecule: Molecule) -> str:
     return "CCO"  # Placeholder
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.TRANSFORM,
+    signature="(molecule: Molecule) -> str",
+    deterministic=True,
+    doc="Convert molecule to XYZ format string"
+)
 def to_xyz(molecule: Molecule) -> str:
     """Convert molecule to XYZ format string.
 
@@ -274,6 +311,13 @@ def to_xyz(molecule: Molecule) -> str:
     return '\n'.join(lines)
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.TRANSFORM,
+    signature="(molecule: Molecule, force_field: str, seed: int) -> Molecule",
+    deterministic=True,
+    doc="Generate 3D coordinates from 2D/SMILES"
+)
 def generate_3d(
     molecule: Molecule,
     force_field: str = "uff",
@@ -316,6 +360,13 @@ def generate_3d(
 # Molecular Properties
 # ============================================================================
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule) -> float",
+    deterministic=True,
+    doc="Compute molecular weight"
+)
 def molecular_weight(molecule: Molecule) -> float:
     """Compute molecular weight.
 
@@ -330,6 +381,13 @@ def molecular_weight(molecule: Molecule) -> float:
     return np.sum(molecule.masses)
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule) -> str",
+    deterministic=True,
+    doc="Compute molecular formula"
+)
 def molecular_formula(molecule: Molecule) -> str:
     """Compute molecular formula.
 
@@ -359,6 +417,13 @@ def molecular_formula(molecule: Molecule) -> str:
     return ''.join(formula_parts)
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule) -> np.ndarray",
+    deterministic=True,
+    doc="Compute center of mass"
+)
 def center_of_mass(molecule: Molecule) -> np.ndarray:
     """Compute center of mass.
 
@@ -376,6 +441,13 @@ def center_of_mass(molecule: Molecule) -> np.ndarray:
     return com
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule) -> np.ndarray",
+    deterministic=True,
+    doc="Compute moment of inertia tensor"
+)
 def moment_of_inertia(molecule: Molecule) -> np.ndarray:
     """Compute moment of inertia tensor.
 
@@ -411,6 +483,13 @@ def moment_of_inertia(molecule: Molecule) -> np.ndarray:
     return I
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule) -> np.ndarray",
+    deterministic=True,
+    doc="Compute electric dipole moment"
+)
 def dipole_moment(molecule: Molecule) -> np.ndarray:
     """Compute electric dipole moment.
 
@@ -432,6 +511,13 @@ def dipole_moment(molecule: Molecule) -> np.ndarray:
     return dipole_debye
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule) -> List[List[int]]",
+    deterministic=True,
+    doc="Find ring systems in molecule"
+)
 def find_rings(molecule: Molecule) -> List[List[int]]:
     """Find ring systems in molecule.
 
@@ -531,6 +617,13 @@ def coulomb_energy(q1: float, q2: float, r: float) -> float:
     return k_e * q1 * q2 / r
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule, force_field: str, include_terms: List[str]) -> float",
+    deterministic=True,
+    doc="Compute molecular energy using force field"
+)
 def compute_energy(
     molecule: Molecule,
     force_field: str = "uff",
@@ -565,6 +658,13 @@ def compute_energy(
     return energy
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule, force_field: str) -> float",
+    deterministic=True,
+    doc="Compute bond stretching energy"
+)
 def bond_energy(molecule: Molecule, force_field: str = "uff") -> float:
     """Compute bond stretching energy.
 
@@ -597,6 +697,13 @@ def bond_energy(molecule: Molecule, force_field: str = "uff") -> float:
     return energy
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule, force_field: str) -> float",
+    deterministic=True,
+    doc="Compute angle bending energy"
+)
 def angle_energy(molecule: Molecule, force_field: str = "uff") -> float:
     """Compute angle bending energy.
 
@@ -644,6 +751,13 @@ def angle_energy(molecule: Molecule, force_field: str = "uff") -> float:
     return energy
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule, force_field: str) -> float",
+    deterministic=True,
+    doc="Compute van der Waals energy"
+)
 def vdw_energy(molecule: Molecule, force_field: str = "uff") -> float:
     """Compute van der Waals energy (Lennard-Jones).
 
@@ -689,6 +803,13 @@ def vdw_energy(molecule: Molecule, force_field: str = "uff") -> float:
     return energy
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule, force_field: str) -> float",
+    deterministic=True,
+    doc="Compute electrostatic energy"
+)
 def electrostatic_energy(molecule: Molecule, force_field: str = "uff") -> float:
     """Compute electrostatic energy (Coulomb).
 
@@ -719,6 +840,13 @@ def electrostatic_energy(molecule: Molecule, force_field: str = "uff") -> float:
     return energy
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule: Molecule, force_field: str) -> np.ndarray",
+    deterministic=True,
+    doc="Compute forces on all atoms"
+)
 def compute_forces(molecule: Molecule, force_field: str = "uff") -> np.ndarray:
     """Compute forces on all atoms.
 
@@ -758,6 +886,13 @@ def compute_forces(molecule: Molecule, force_field: str = "uff") -> np.ndarray:
 # Geometry Optimization
 # ============================================================================
 
+@operator(
+    domain="molecular",
+    category=OpCategory.TRANSFORM,
+    signature="(molecule: Molecule, force_field: str, method: str, max_iterations: int, convergence: float) -> Molecule",
+    deterministic=True,
+    doc="Minimize molecular energy"
+)
 def optimize_geometry(
     molecule: Molecule,
     force_field: str = "uff",
@@ -798,6 +933,13 @@ def optimize_geometry(
     return Molecule(molecule.atoms, molecule.bonds, positions)
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.TRANSFORM,
+    signature="(molecule: Molecule, force_field: str, constraints: List) -> Molecule",
+    deterministic=True,
+    doc="Optimize geometry with constraints"
+)
 def optimize_constrained(
     molecule: Molecule,
     force_field: str = "uff",
@@ -823,6 +965,13 @@ def optimize_constrained(
 # Conformer Generation
 # ============================================================================
 
+@operator(
+    domain="molecular",
+    category=OpCategory.TRANSFORM,
+    signature="(molecule: Molecule, n: int, method: str, energy_window: float, rms_threshold: float, seed: int) -> List[Molecule]",
+    deterministic=True,
+    doc="Generate conformers (different 3D structures)"
+)
 def generate_conformers(
     molecule: Molecule,
     n: int = 100,
@@ -874,6 +1023,13 @@ def generate_conformers(
     return conformers
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.TRANSFORM,
+    signature="(conformers: List[Molecule], method: str, threshold: float) -> List[List[int]]",
+    deterministic=True,
+    doc="Cluster conformers by similarity"
+)
 def cluster_conformers(
     conformers: List[Molecule],
     method: str = "rmsd",
@@ -938,6 +1094,13 @@ def cluster_conformers(
 # Molecular Dynamics
 # ============================================================================
 
+@operator(
+    domain="molecular",
+    category=OpCategory.INTEGRATE,
+    signature="(positions: np.ndarray, velocities: np.ndarray, forces: np.ndarray, masses: np.ndarray, dt: float) -> Tuple[np.ndarray, np.ndarray]",
+    deterministic=True,
+    doc="Velocity Verlet integration step"
+)
 def velocity_verlet(
     positions: np.ndarray,
     velocities: np.ndarray,
@@ -974,6 +1137,13 @@ def velocity_verlet(
     return positions_new, velocities_new
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.INTEGRATE,
+    signature="(positions: np.ndarray, velocities: np.ndarray, forces: np.ndarray, masses: np.ndarray, temp: float, friction: float, dt: float, seed: int) -> Tuple[np.ndarray, np.ndarray]",
+    deterministic=True,
+    doc="Langevin dynamics integration step"
+)
 def langevin_integrator(
     positions: np.ndarray,
     velocities: np.ndarray,
@@ -1024,6 +1194,13 @@ def langevin_integrator(
     return positions_new, velocities_new
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.INTEGRATE,
+    signature="(molecule: Molecule, force_field: str, temp: float, pressure: Optional[float], time: float, dt: float, ensemble: str, save_interval: int) -> Trajectory",
+    deterministic=False,
+    doc="Run molecular dynamics simulation"
+)
 def md_simulate(
     molecule: Molecule,
     force_field: str = "uff",
@@ -1101,6 +1278,13 @@ def md_simulate(
 # Trajectory Analysis
 # ============================================================================
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(molecule1: Molecule, molecule2: Molecule, align: bool) -> float",
+    deterministic=True,
+    doc="Compute root-mean-square deviation"
+)
 def rmsd(
     molecule1: Molecule,
     molecule2: Molecule,
@@ -1142,6 +1326,13 @@ def rmsd(
     return rmsd_value
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(trajectory: Trajectory) -> np.ndarray",
+    deterministic=True,
+    doc="Compute root-mean-square fluctuation per atom"
+)
 def rmsf(trajectory: Trajectory) -> np.ndarray:
     """Compute root-mean-square fluctuation per atom.
 
@@ -1173,6 +1364,13 @@ def rmsf(trajectory: Trajectory) -> np.ndarray:
     return rmsf_values
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(trajectory: Trajectory) -> float",
+    deterministic=True,
+    doc="Compute diffusion coefficient from MSD"
+)
 def diffusion_coefficient(trajectory: Trajectory) -> float:
     """Compute diffusion coefficient from mean squared displacement.
 
@@ -1208,6 +1406,13 @@ def diffusion_coefficient(trajectory: Trajectory) -> float:
         return 0.0
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(trajectory: Trajectory, atom_type_1: str, atom_type_2: str, r_max: float, n_bins: int) -> Tuple[np.ndarray, np.ndarray]",
+    deterministic=True,
+    doc="Compute radial distribution function"
+)
 def rdf(
     trajectory: Trajectory,
     atom_type_1: str = "O",
@@ -1267,6 +1472,13 @@ def rdf(
     return r, g_r
 
 
+@operator(
+    domain="molecular",
+    category=OpCategory.QUERY,
+    signature="(trajectory: Trajectory, donor_acceptor_distance: float, angle_cutoff: float) -> List[Tuple[int, int, int]]",
+    deterministic=True,
+    doc="Find hydrogen bonds in trajectory"
+)
 def hydrogen_bonds(
     trajectory: Trajectory,
     donor_acceptor_distance: float = 3.5,

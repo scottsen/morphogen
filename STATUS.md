@@ -1,8 +1,9 @@
 # Morphogen — Implementation Status & v1.0 Roadmap
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-12-06
 **Current Version:** v0.11.0 → v1.0 (2026-Q2)
-**Status:** Production-Ready - 40 Domains Implemented ✅ | [**v1.0 Release Plan →**](docs/planning/MORPHOGEN_RELEASE_PLAN.md)
+**Status:** 25 Active Domains + 15 Legacy (Migration v0.12.0) | [**v1.0 Release Plan →**](docs/planning/MORPHOGEN_RELEASE_PLAN.md)
+**Detailed Analysis:** [DOMAIN_STATUS_ANALYSIS.md](DOMAIN_STATUS_ANALYSIS.md) | **Migration Plan:** [docs/DOMAIN_MIGRATION_GUIDE.md](docs/DOMAIN_MIGRATION_GUIDE.md)
 
 ---
 
@@ -31,70 +32,80 @@
 
 ## Quick Summary
 
-### ✅ Production-Ready (Fully Implemented) - 40 Domains
+### ✅ Active Domains (Fully Integrated) - 25 Domains
+
+**Accessible via `use` statement** - 386 operators total
 
 **Core Infrastructure:**
 - **Language Frontend**: Complete lexer, parser, AST, type system
 - **Python Runtime**: Full interpreter with NumPy backend
 - **Visualization**: PNG/JPEG export, interactive display, video export (MP4/GIF)
 
-**Computational Domains** (40 total):
+**Active Domains** (25 fully integrated):
 
 **Physics & Simulation:**
-1. **Fields/Grids** (v0.2.2): PDE operations (diffuse, advect, project, Laplacian)
-2. **Agents/Particles** (v0.4.0): Sparse particle systems, forces, field coupling
-3. **RigidBody Physics** (v0.8.2): 2D rigid body dynamics, collision detection
-4. **Integrators** (v0.8.0): Euler, RK2, RK4, Verlet, adaptive methods
-5. **Acoustics** (v0.8.0): 1D waveguides, impedance, radiation
-6. **Thermal ODE**: Temperature dynamics, heat transfer equations
-7. **Fluid Network**: 1D network flow, pipes, junctions
-8. **Fluid Jet**: Jet dynamics, turbulence
+1. **field** (19 ops): PDE operations (diffuse, advect, project, Laplacian) ✅
+2. **agent** (13 ops): Sparse particle systems, forces, field coupling ✅
+3. **rigidbody** (12 ops): 2D rigid body dynamics, collision detection ✅
+4. **integrators** (9 ops): Euler, RK2, RK4, Verlet, adaptive methods ✅
+5. **acoustics** (9 ops): 1D waveguides, impedance, radiation ✅
 
 **Audio & Signal Processing:**
-9. **Audio/DSP** (v0.5.0): Synthesis, filters, envelopes, effects, physical modeling
-10. **Signal Processing** (v0.10.0): FFT, STFT, filtering, windowing, spectral analysis
-11. **Audio Analysis** (v0.11.0): Spectral analysis, onset detection, feature extraction
-12. **Instrument Modeling** (v0.11.0): Physical modeling synthesis, modal synthesis
+6. **audio** (60 ops): Synthesis, filters, envelopes, effects, physical modeling ✅
+7. **signal** (20 ops): FFT, STFT, filtering, windowing, spectral analysis ✅
+8. **temporal** (24 ops): Delays, timers, clocks, event sequences ✅
 
 **Visual & Graphics:**
-13. **Visual** (v0.6.0): Colorization, agent rendering, layer composition
-14. **Computer Vision** (v0.10.0): Edge detection, feature extraction, morphology
-15. **Terrain Generation** (v0.10.0): Perlin noise, erosion, biome classification
-16. **Color** (v0.8.1): RGB/HSV/HSL conversions, blend modes, temperature
-17. **Image Processing** (v0.8.1): Convolution, transforms, filtering, compositing
-18. **Noise** (v0.8.1): Perlin, simplex, Worley, fBm, ridged multifractal
-19. **Palette** (v0.8.1): Scientific colormaps, gradients, cosine palettes
-
-**Chemistry & Materials Science:**
-20. **Molecular Dynamics** (v0.11.0): Force fields, MD simulation, trajectory analysis
-21. **Quantum Chemistry** (v0.11.0): Electronic structure, basis sets, DFT
-22. **Thermodynamics** (v0.11.0): Equations of state, phase equilibria
-23. **Chemical Kinetics** (v0.11.0): Reaction rates, mechanism analysis
-24. **Electrochemistry** (v0.11.0): Electrode reactions, Nernst equation
-25. **Transport Properties** (v0.11.0): Diffusion, viscosity, conductivity
-26. **Catalysis** (v0.11.0): Catalytic cycles, kinetics, mechanisms
-27. **Multiphase Flow** (v0.11.0): Phase interactions, mass transfer
-28. **Combustion** (v0.11.0): Combustion kinetics, flame dynamics
+9. **visual** (11 ops): Colorization, agent rendering, layer composition ✅
+10. **vision** (13 ops): Edge detection, feature extraction, morphology ✅
+11. **terrain** (11 ops): Perlin noise, erosion, biome classification ✅
+12. **color** (20 ops): RGB/HSV/HSL conversions, blend modes ✅
+13. **image** (18 ops): Convolution, transforms, filtering, compositing ✅
+14. **noise** (11 ops): Perlin, simplex, Worley, fBm, ridged multifractal ✅
+15. **palette** (21 ops): Scientific colormaps, gradients, cosine palettes ✅
 
 **AI & Optimization:**
-29. **Optimization** (v0.9.0): Genetic algorithms, CMA-ES, particle swarm
-30. **Genetic Algorithms** (v0.9.0): Selection, crossover, mutation operators
-31. **Neural Networks** (v0.9.0): Layers, activations, backprop
+16. **optimization** (5 ops): Genetic algorithms, CMA-ES, particle swarm ✅
+17. **genetic** (17 ops): Selection, crossover, mutation operators ✅
+18. **neural** (16 ops): Layers, activations, backprop ✅
+19. **cellular** (18 ops): Conway's Life, custom rules, analysis ✅
+20. **statemachine** (15 ops): FSM, behavior trees, event-driven transitions ✅
 
-**Data & Analysis:**
-32. **Graph/Network** (v0.10.0): Dijkstra, centrality, community detection, max flow
-33. **Sparse Linear Algebra** (v0.8.0): Sparse matrices, iterative solvers
-34. **State Machines** (v0.10.0): FSM, behavior trees, event-driven transitions
-35. **I/O Storage** (v0.8.0): Image/audio/HDF5 I/O, checkpointing
+**Data & Infrastructure:**
+21. **graph** (19 ops): Dijkstra, centrality, community detection, max flow ✅
+22. **sparse_linalg** (13 ops): Sparse matrices, iterative solvers ✅
+23. **io_storage** (10 ops): Image/audio/HDF5 I/O, checkpointing ✅
+24. **geometry** (49 ops): 2D/3D spatial operations, transformations ✅
+25. **circuit** (15 ops): DC/AC/transient analysis, MNA solver (Phase 1) ✅
 
-**Specialized:**
-36. **Cellular Automata** (v0.9.1): Conway's Life, custom rules, analysis
-37. **Geometry** (v0.10.0): 50+ operators for 2D/3D spatial operations, transformations
-38. **Temporal** (v0.10.0): Delays, timers, clocks, event sequences (24 operators)
-39. **Circuit/Electrical** (v0.11.0): DC/AC/transient analysis, MNA solver (Phase 1)
-40. **Flappy Bird**: Complete game implementation (demo)
+**Testing**: 1,381 tests passing (251 MLIR tests skipped)
 
-**Testing**: 900+ comprehensive tests across all domains (55 test files)
+### ⏳ Legacy Domains (Not Yet Integrated) - 15 Domains
+
+**Implemented but not accessible via `use` statement** - Migration target: v0.12.0
+
+**Chemistry Suite** (9 domains):
+- molecular (33 functions) - Molecular dynamics, force fields
+- qchem (13 functions) - Quantum chemistry, electronic structure
+- thermo (12 functions) - Thermodynamics, equations of state
+- kinetics (11 functions) - Chemical kinetics, reaction rates
+- electrochem (13 functions) - Electrochemistry, Nernst equation
+- catalysis (11 functions) - Catalytic cycles, mechanisms
+- transport (17 functions) - Transport properties (diffusion, viscosity)
+- multiphase (8 functions) - Multiphase flow, mass transfer
+- combustion (8 functions) - Combustion kinetics, flame dynamics
+
+**Specialized Physics** (4 domains):
+- thermal_ode (4 functions) - 1D thermal modeling
+- fluid_network (4 functions) - 1D network flow, pipes
+- fluid_jet (8 functions) - Jet dynamics, turbulence
+
+**Audio Extensions** (2 domains):
+- audio_analysis (9 functions) - Spectral analysis, onset detection
+- instrument_model (10 functions) - Physical modeling synthesis
+
+**Status**: Code exists, functions work, but missing `@operator` decorators for integration
+**See**: [docs/DOMAIN_MIGRATION_GUIDE.md](docs/DOMAIN_MIGRATION_GUIDE.md) for migration plan
 
 ### ✅ COMPLETE (v0.7.0 - Real MLIR Integration)
 - **Phase 1 (Foundation)**: ✅ **COMPLETE** - MLIR context, compiler V2, proof-of-concept

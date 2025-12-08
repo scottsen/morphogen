@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from typing import Callable, Optional, Tuple
 from enum import Enum
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Core Types
@@ -59,6 +61,13 @@ class ThermalProfile:
 # Operators
 # ============================================================================
 
+@operator(
+    domain="thermal_ode",
+    category=OpCategory.CONSTRUCT,
+    signature="(T_hot: float, T_amb: float, length: float, model: str) -> WallTempModel",
+    deterministic=True,
+    doc="Create wall temperature profile model"
+)
 def wall_temp_model(
     T_hot: float,
     T_amb: float,
@@ -89,6 +98,13 @@ def wall_temp_model(
         raise ValueError(f"Unknown model: {model}")
 
 
+@operator(
+    domain="thermal_ode",
+    category=OpCategory.INTEGRATE,
+    signature="(segment: ThermalSegment, m_dot: float, T_in: float, wall_temp_model: WallTempModel, integrator: str, steps: int) -> float",
+    deterministic=True,
+    doc="Solve 1D heat transfer ODE"
+)
 def heat_transfer_1D(
     segment: ThermalSegment,
     m_dot: float,
@@ -185,6 +201,13 @@ def heat_transfer_1D(
     return T
 
 
+@operator(
+    domain="thermal_ode",
+    category=OpCategory.QUERY,
+    signature="(segment: ThermalSegment, m_dot: float, T_in: float, wall_temp_model: WallTempModel, integrator: str, steps: int) -> ThermalProfile",
+    deterministic=True,
+    doc="Solve 1D heat transfer and return full profile"
+)
 def heat_transfer_1D_profile(
     segment: ThermalSegment,
     m_dot: float,
@@ -269,6 +292,13 @@ def heat_transfer_1D_profile(
     return ThermalProfile(temperatures, positions)
 
 
+@operator(
+    domain="thermal_ode",
+    category=OpCategory.INTEGRATE,
+    signature="(mass: float, c_p: float, heat_input: float, h_conv: float, A_surface: float, T_amb: float, T_initial: float, time: float, dt: float) -> np.ndarray",
+    deterministic=True,
+    doc="Lumped thermal capacity model for transient heating"
+)
 def lumped_capacity(
     mass: float,
     c_p: float,

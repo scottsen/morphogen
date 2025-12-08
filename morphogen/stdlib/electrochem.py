@@ -11,6 +11,7 @@ import numpy as np
 from dataclasses import dataclass, field
 from typing import List, Tuple, Optional, Dict
 from enum import Enum
+from morphogen.core.operator import operator, OpCategory
 
 
 # ============================================================================
@@ -65,6 +66,13 @@ class BatteryCell:
 # Electrochemical Kinetics Operators
 # ============================================================================
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(overpotential: float, i0: float, alpha: float, n: int, temp: float) -> float",
+    deterministic=True,
+    doc="Compute current density from Butler-Volmer equation"
+)
 def butler_volmer(
     overpotential: float,
     i0: float,
@@ -97,6 +105,13 @@ def butler_volmer(
     return i
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(overpotential: float, i0: float, alpha: float, n: int, temp: float, anodic: bool) -> float",
+    deterministic=True,
+    doc="Compute current density from Tafel equation (high overpotential limit)"
+)
 def tafel_equation(
     overpotential: float,
     i0: float,
@@ -136,6 +151,13 @@ def tafel_equation(
     return i
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(E_standard: float, conc_oxidized: float, conc_reduced: float, n: int, temp: float) -> float",
+    deterministic=True,
+    doc="Compute electrode potential from Nernst equation"
+)
 def nernst(
     E_standard: float,
     conc_oxidized: float,
@@ -164,6 +186,13 @@ def nernst(
     return E
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(n: int, diffusivity: float, concentration: float, boundary_layer_thickness: float, area: float) -> float",
+    deterministic=True,
+    doc="Compute mass-transfer-limited current"
+)
 def limiting_current(
     n: int,
     diffusivity: float,
@@ -196,6 +225,13 @@ def limiting_current(
 # Battery Simulation Operators
 # ============================================================================
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(capacity: float, current: float, time: float, voltage_nominal: float, internal_resistance: float, model: str) -> Tuple[float, float]",
+    deterministic=True,
+    doc="Simulate battery discharge"
+)
 def battery_discharge(
     capacity: float,
     current: float,
@@ -255,6 +291,13 @@ def battery_discharge(
     return voltage, soc
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(capacity: float, current: float, time: float, soc_initial: float, voltage_nominal: float, voltage_max: float, internal_resistance: float) -> Tuple[float, float]",
+    deterministic=True,
+    doc="Simulate battery charging"
+)
 def battery_charge(
     capacity: float,
     current: float,
@@ -300,6 +343,13 @@ def battery_charge(
     return voltage, soc
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(n_cycles: int, depth_of_discharge: float, temp: float, chemistry: str) -> float",
+    deterministic=True,
+    doc="Estimate battery capacity fade after cycling"
+)
 def battery_cycle_life(
     n_cycles: int,
     depth_of_discharge: float,
@@ -350,6 +400,13 @@ def battery_cycle_life(
 # Fuel Cell Operators
 # ============================================================================
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(current_density: float, temp: float, P_H2: float, P_O2: float, cell_type: str) -> float",
+    deterministic=True,
+    doc="Compute fuel cell voltage"
+)
 def fuel_cell_voltage(
     current_density: float,
     temp: float = 353.15,
@@ -412,6 +469,13 @@ def fuel_cell_voltage(
     return voltage
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(voltage: float, temp: float) -> float",
+    deterministic=True,
+    doc="Compute fuel cell efficiency"
+)
 def fuel_cell_efficiency(
     voltage: float,
     temp: float = 353.15
@@ -449,6 +513,13 @@ def fuel_cell_efficiency(
 # Electrolysis Operators
 # ============================================================================
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(current_density: float, temp: float, pressure: float) -> float",
+    deterministic=True,
+    doc="Compute voltage required for water electrolysis"
+)
 def water_electrolysis_voltage(
     current_density: float,
     temp: float = 298.15,
@@ -493,6 +564,13 @@ def water_electrolysis_voltage(
     return voltage
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(charge_passed: float, moles_produced: float, n_electrons: int) -> float",
+    deterministic=True,
+    doc="Compute Faradaic efficiency"
+)
 def faraday_efficiency(
     charge_passed: float,
     moles_produced: float,
@@ -523,6 +601,13 @@ def faraday_efficiency(
 # Corrosion Operators
 # ============================================================================
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(E_corr: float, E_standard_anode: float, E_standard_cathode: float, i0_anode: float, i0_cathode: float, alpha: float) -> float",
+    deterministic=True,
+    doc="Compute corrosion current from mixed potential theory"
+)
 def corrosion_current(
     E_corr: float,
     E_standard_anode: float,
@@ -561,6 +646,13 @@ def corrosion_current(
     return i_corr
 
 
+@operator(
+    domain="electrochem",
+    category=OpCategory.QUERY,
+    signature="(i_corr: float, equivalent_weight: float, density: float, n: int) -> float",
+    deterministic=True,
+    doc="Convert corrosion current to corrosion rate"
+)
 def corrosion_rate(
     i_corr: float,
     equivalent_weight: float,

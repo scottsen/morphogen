@@ -10,7 +10,7 @@ Tests cover:
 
 import pytest
 from morphogen.core.domain_registry import DomainRegistry, DomainDescriptor, register_stdlib_domains
-from morphogen.core.operator import operator, OpCategory, get_operator_metadata
+from morphogen.core.operator import operator, OpCategory, get_operator_metadata, is_operator
 
 
 class TestOperatorDecorator:
@@ -73,6 +73,179 @@ class TestOperatorDecorator:
 
         metadata = get_operator_metadata(regular_function)
         assert metadata is None
+
+    def test_is_operator_helper(self):
+        """Test is_operator helper function."""
+        @operator(
+            domain="test",
+            category=OpCategory.QUERY,
+            signature="() -> bool",
+            deterministic=True
+        )
+        def decorated():
+            return True
+
+        def undecorated():
+            return False
+
+        assert is_operator(decorated) is True
+        assert is_operator(undecorated) is False
+
+    def test_all_op_categories(self):
+        """Test that all OpCategory values work with decorator."""
+        categories = [
+            OpCategory.CONSTRUCT,
+            OpCategory.TRANSFORM,
+            OpCategory.QUERY,
+            OpCategory.INTEGRATE,
+            OpCategory.COMPOSE,
+            OpCategory.MUTATE,
+            OpCategory.SAMPLE,
+            OpCategory.RENDER
+        ]
+
+        for category in categories:
+            @operator(
+                domain="test",
+                category=category,
+                signature="() -> int",
+                deterministic=True
+            )
+            def test_func():
+                return 42
+
+            metadata = get_operator_metadata(test_func)
+            assert metadata.category == category, f"Category {category.name} not working"
+
+    def test_optional_metadata_fields(self):
+        """Test optional metadata fields: pure, stateful, vectorized."""
+        @operator(
+            domain="test",
+            category=OpCategory.TRANSFORM,
+            signature="(x: int) -> int",
+            deterministic=False,
+            pure=False,
+            stateful=True,
+            vectorized=True
+        )
+        def stateful_op(x):
+            return x * 2
+
+        metadata = get_operator_metadata(stateful_op)
+        assert metadata.deterministic is False
+        assert metadata.pure is False
+        assert metadata.stateful is True
+        assert metadata.vectorized is True
+
+    def test_optional_metadata_defaults(self):
+        """Test that optional metadata fields have correct defaults."""
+        @operator(
+            domain="test",
+            category=OpCategory.QUERY,
+            signature="() -> bool"
+        )
+        def default_op():
+            return True
+
+        metadata = get_operator_metadata(default_op)
+        # Check defaults
+        assert metadata.deterministic is True  # default
+        assert metadata.pure is True  # default
+        assert metadata.stateful is False  # default
+        assert metadata.vectorized is False  # default
+
+    def test_doc_fallback_to_function_docstring(self):
+        """Test that doc falls back to function __doc__ if not provided."""
+        @operator(
+            domain="test",
+            category=OpCategory.QUERY,
+            signature="() -> str"
+        )
+        def documented_func():
+            """This is the docstring."""
+            return "result"
+
+        metadata = get_operator_metadata(documented_func)
+        assert metadata.doc == "This is the docstring."
+
+    def test_doc_explicit_overrides_docstring(self):
+        """Test that explicit doc parameter overrides function docstring."""
+        @operator(
+            domain="test",
+            category=OpCategory.QUERY,
+            signature="() -> str",
+            doc="Explicit documentation"
+        )
+        def documented_func():
+            """This is the docstring."""
+            return "result"
+
+        metadata = get_operator_metadata(documented_func)
+        assert metadata.doc == "Explicit documentation"
+
+    def test_doc_empty_fallback(self):
+        """Test that doc falls back to empty string if no doc provided."""
+        @operator(
+            domain="test",
+            category=OpCategory.QUERY,
+            signature="() -> str"
+        )
+        def undocumented_func():
+            return "result"
+
+        metadata = get_operator_metadata(undocumented_func)
+        assert metadata.doc == ""
+
+
+class TestOperatorMetadataValidation:
+    """Test validation and error handling for operator metadata."""
+
+    def test_empty_domain_name_still_works(self):
+        """Test that empty domain name is allowed (though not recommended)."""
+        # Note: Empty domain is technically allowed by current implementation
+        @operator(
+            domain="",
+            category=OpCategory.QUERY,
+            signature="() -> int"
+        )
+        def empty_domain_op():
+            return 42
+
+        metadata = get_operator_metadata(empty_domain_op)
+        assert metadata.domain == ""
+
+    def test_empty_signature_allowed(self):
+        """Test that empty signature is allowed."""
+        @operator(
+            domain="test",
+            category=OpCategory.QUERY,
+            signature=""
+        )
+        def empty_sig_op():
+            return 42
+
+        metadata = get_operator_metadata(empty_sig_op)
+        assert metadata.signature == ""
+
+    def test_operator_with_args_and_kwargs(self):
+        """Test that decorated functions work with *args and **kwargs."""
+        @operator(
+            domain="test",
+            category=OpCategory.TRANSFORM,
+            signature="(*args, **kwargs) -> Any",
+            deterministic=False
+        )
+        def flexible_op(*args, **kwargs):
+            return sum(args) + sum(kwargs.values())
+
+        # Test that function still works
+        result = flexible_op(1, 2, 3, x=4, y=5)
+        assert result == 15
+
+        # Test that metadata is attached
+        metadata = get_operator_metadata(flexible_op)
+        assert metadata is not None
+        assert metadata.domain == "test"
 
 
 class TestDomainDescriptor:
@@ -376,3 +549,123 @@ class TestStdlibRegistration:
         # Should be idempotent
         DomainRegistry.initialize()
         assert DomainRegistry._initialized
+
+
+class TestDomainIntegration:
+    """End-to-end integration tests for real domain usage."""
+
+    def setup_method(self):
+        """Clear registry before each test."""
+        DomainRegistry.clear()
+
+    def teardown_method(self):
+        """Clear registry after each test."""
+        DomainRegistry.clear()
+
+    def test_end_to_end_domain_workflow(self):
+        """Test complete workflow: register -> discover -> get metadata -> call operator."""
+        # Initialize with real domains
+        DomainRegistry.initialize()
+
+        # Verify field domain is registered (from Phase 1)
+        assert DomainRegistry.has_domain('field')
+
+        # Get domain
+        domain = DomainRegistry.get('field')
+        assert domain.name == 'field'
+
+        # List operators
+        operators = domain.list_operators()
+        assert len(operators) > 0
+        assert isinstance(operators, list)
+
+        # Get a specific operator
+        if 'create_empty' in operators:
+            op = domain.get_operator('create_empty')
+            assert callable(op)
+            assert is_operator(op)
+
+            # Get metadata
+            metadata = domain.get_operator_metadata('create_empty')
+            assert metadata.domain == 'field'
+            assert isinstance(metadata.category, OpCategory)
+
+    def test_cross_domain_operator_access(self):
+        """Test accessing operators from multiple domains."""
+        DomainRegistry.initialize()
+
+        # Get operators from different domains
+        domains_to_test = ['field', 'audio', 'kinetics']
+
+        for domain_name in domains_to_test:
+            if DomainRegistry.has_domain(domain_name):
+                domain = DomainRegistry.get(domain_name)
+                operators = domain.list_operators()
+
+                # Verify all operators have metadata
+                for op_name in operators:
+                    metadata = domain.get_operator_metadata(op_name)
+                    assert metadata.domain == domain_name
+
+    def test_get_operator_through_registry(self):
+        """Test the convenience method for getting operators."""
+        DomainRegistry.initialize()
+
+        if DomainRegistry.has_domain('kinetics'):
+            # Test DomainRegistry.get_operator shortcut
+            op = DomainRegistry.get_operator('kinetics', 'arrhenius')
+            assert callable(op)
+            assert is_operator(op)
+
+            # Verify it's the same as getting through domain
+            domain = DomainRegistry.get('kinetics')
+            op2 = domain.get_operator('arrhenius')
+            assert op is op2
+
+    def test_operator_metadata_consistency(self):
+        """Test that metadata is consistent across access methods."""
+        DomainRegistry.initialize()
+
+        if DomainRegistry.has_domain('field'):
+            domain = DomainRegistry.get('field')
+
+            for op_name in domain.list_operators():
+                # Get operator
+                op = domain.get_operator(op_name)
+
+                # Get metadata through domain
+                metadata1 = domain.get_operator_metadata(op_name)
+
+                # Get metadata directly from operator
+                metadata2 = get_operator_metadata(op)
+
+                # Should be the same object
+                assert metadata1 is metadata2
+
+    def test_domain_error_messages(self):
+        """Test that error messages are helpful."""
+        DomainRegistry.initialize()
+
+        # Test helpful error when domain doesn't exist
+        with pytest.raises(ValueError) as excinfo:
+            DomainRegistry.get('nonexistent_domain')
+
+        error_msg = str(excinfo.value)
+        assert 'nonexistent_domain' in error_msg
+        assert 'not registered' in error_msg
+        assert 'Available domains:' in error_msg
+
+    def test_domain_operator_not_found_error(self):
+        """Test error when operator doesn't exist in domain."""
+        DomainRegistry.initialize()
+
+        if DomainRegistry.has_domain('field'):
+            domain = DomainRegistry.get('field')
+
+            with pytest.raises(ValueError) as excinfo:
+                domain.get_operator('nonexistent_operator')
+
+            error_msg = str(excinfo.value)
+            assert 'nonexistent_operator' in error_msg
+            assert 'not found' in error_msg
+            assert 'field' in error_msg

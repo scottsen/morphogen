@@ -20,6 +20,8 @@ from .audio_analysis import (
     fit_exponential_decay, measure_inharmonicity, deconvolve, model_noise
 )
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Core Types
@@ -128,6 +130,13 @@ class InstrumentModel:
 # Operators
 # ============================================================================
 
+@operator(
+    domain="instrument_model",
+    category=OpCategory.QUERY,
+    signature="(signal_data: np.ndarray, sample_rate: float, instrument_id: str = 'instrument', instrument_type: InstrumentType = InstrumentType.MODAL_STRING, num_partials: int = 20, num_modes: int = 20) -> InstrumentModel",
+    deterministic=True,
+    doc="Full analysis pipeline: extract all timbre features from audio recording"
+)
 def analyze_instrument(
     signal_data: np.ndarray,
     sample_rate: float,
@@ -195,6 +204,13 @@ def analyze_instrument(
     return model
 
 
+@operator(
+    domain="instrument_model",
+    category=OpCategory.QUERY,
+    signature="(model: InstrumentModel, pitch: float, velocity: float = 1.0, duration: float = 2.0) -> np.ndarray",
+    deterministic=True,
+    doc="Generate new note from instrument model at specified pitch and velocity"
+)
 def synthesize_note(
     model: InstrumentModel,
     pitch: float,
@@ -310,6 +326,13 @@ def _apply_body_ir(audio: np.ndarray, body_ir: np.ndarray, coupling: float) -> n
     return audio_with_body
 
 
+@operator(
+    domain="instrument_model",
+    category=OpCategory.TRANSFORM,
+    signature="(model_a: InstrumentModel, model_b: InstrumentModel, blend: float) -> InstrumentModel",
+    deterministic=True,
+    doc="Morph between two instrument models with blend parameter [0,1]"
+)
 def morph_instruments(
     model_a: InstrumentModel,
     model_b: InstrumentModel,
@@ -394,6 +417,13 @@ def morph_instruments(
     return morphed
 
 
+@operator(
+    domain="instrument_model",
+    category=OpCategory.MUTATE,
+    signature="(model: InstrumentModel, path: str) -> None",
+    deterministic=False,
+    doc="Serialize instrument model to disk (.pkl or .npz)"
+)
 def save_instrument(model: InstrumentModel, path: str):
     """Serialize instrument model to disk.
 
@@ -415,6 +445,13 @@ def save_instrument(model: InstrumentModel, path: str):
         raise ValueError(f"Unsupported format: {path}. Use .pkl or .npz")
 
 
+@operator(
+    domain="instrument_model",
+    category=OpCategory.CONSTRUCT,
+    signature="(path: str) -> InstrumentModel",
+    deterministic=False,
+    doc="Load instrument model from disk (.pkl or .npz)"
+)
 def load_instrument(path: str) -> InstrumentModel:
     """Load instrument model from disk.
 

@@ -19,6 +19,8 @@ import subprocess
 import tempfile
 import os
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Core Types
@@ -58,6 +60,13 @@ except ImportError:
 # DFT Calculation Operators
 # ============================================================================
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, method: str, basis: str, code: str, charge: int, multiplicity: int) -> float",
+    deterministic=False,
+    doc="Compute single-point DFT energy"
+)
 def dft_energy(
     molecule,
     method: str = "B3LYP",
@@ -117,6 +126,13 @@ def dft_energy(
     return energy
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.TRANSFORM,
+    signature="(molecule, method: str, basis: str, code: str, max_iterations: int) -> Tuple",
+    deterministic=False,
+    doc="Optimize molecular geometry at DFT level"
+)
 def dft_optimize(
     molecule,
     method: str = "B3LYP",
@@ -148,6 +164,13 @@ def dft_optimize(
     return molecule_opt, energy
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, method: str, basis: str, code: str) -> np.ndarray",
+    deterministic=False,
+    doc="Compute forces (gradient) at DFT level"
+)
 def dft_forces(
     molecule,
     method: str = "B3LYP",
@@ -178,6 +201,13 @@ def dft_forces(
     return forces
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, method: str, basis: str, code: str) -> np.ndarray",
+    deterministic=False,
+    doc="Compute vibrational frequencies at DFT level"
+)
 def dft_frequencies(
     molecule,
     method: str = "B3LYP",
@@ -212,6 +242,13 @@ def dft_frequencies(
     return frequencies
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(reactant, product, method: str, basis: str, code: str) -> Tuple",
+    deterministic=False,
+    doc="Find transition state structure between reactant and product"
+)
 def find_transition_state(
     reactant,
     product,
@@ -258,6 +295,13 @@ def find_transition_state(
 # Semi-Empirical Methods
 # ============================================================================
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, method: str) -> float",
+    deterministic=False,
+    doc="Compute energy with semi-empirical method"
+)
 def semi_empirical(
     molecule,
     method: str = "PM7"
@@ -308,6 +352,13 @@ class MLModel:
     trained: bool = False
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, model: str, model_path: Optional[str]) -> float",
+    deterministic=True,
+    doc="Predict energy with ML potential energy surface"
+)
 def ml_pes(
     molecule,
     model: str = "SchNet",
@@ -349,6 +400,13 @@ def ml_pes(
     return energy
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, model: str, model_path: Optional[str]) -> np.ndarray",
+    deterministic=True,
+    doc="Predict forces with ML model"
+)
 def ml_forces(
     molecule,
     model: str = "SchNet",
@@ -377,6 +435,13 @@ def ml_forces(
     return forces
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.TRANSFORM,
+    signature="(training_data: List[Tuple], architecture: str, epochs: int, learning_rate: float, batch_size: int, validation_split: float) -> MLModel",
+    deterministic=False,
+    doc="Train ML potential energy surface from data"
+)
 def train_pes(
     training_data: List[Tuple],
     architecture: str = "SchNet",
@@ -424,6 +489,13 @@ def train_pes(
 # Utilities
 # ============================================================================
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, method: str, basis: str, calc_type: str, charge: int, multiplicity: int, filename: str) -> str",
+    deterministic=False,
+    doc="Write Gaussian input file"
+)
 def write_gaussian_input(
     molecule,
     method: str,
@@ -465,6 +537,13 @@ def write_gaussian_input(
     return filename
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(molecule, method: str, basis: str, calc_type: str, charge: int, multiplicity: int, filename: str) -> str",
+    deterministic=False,
+    doc="Write ORCA input file"
+)
 def write_orca_input(
     molecule,
     method: str,
@@ -511,6 +590,13 @@ def write_orca_input(
     return filename
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(filepath: str) -> QMResult",
+    deterministic=False,
+    doc="Parse Gaussian output file"
+)
 def parse_gaussian_output(filepath: str) -> QMResult:
     """Parse Gaussian output file.
 
@@ -534,6 +620,13 @@ def parse_gaussian_output(filepath: str) -> QMResult:
     return result
 
 
+@operator(
+    domain="qchem",
+    category=OpCategory.QUERY,
+    signature="(filepath: str) -> QMResult",
+    deterministic=False,
+    doc="Parse ORCA output file"
+)
 def parse_orca_output(filepath: str) -> QMResult:
     """Parse ORCA output file.
 

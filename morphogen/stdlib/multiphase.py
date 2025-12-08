@@ -11,6 +11,7 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, List, Optional, Dict
 from enum import Enum
+from morphogen.core.operator import operator, OpCategory
 
 
 # ============================================================================
@@ -49,6 +50,13 @@ class Component:
 # Vapor Pressure
 # ============================================================================
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(temp: float, A: float, B: float, C: float) -> float",
+    deterministic=True,
+    doc="Compute vapor pressure using Antoine equation"
+)
 def antoine_equation(
     temp: float,
     A: float,
@@ -83,6 +91,13 @@ def antoine_equation(
 # Vapor-Liquid Equilibrium Operators
 # ============================================================================
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(feed_composition: List[float], temp: float, pressure: float, components: Optional[List[Component]], thermo_model: str) -> Tuple[np.ndarray, np.ndarray, float]",
+    deterministic=True,
+    doc="Perform isothermal flash calculation"
+)
 def vle_flash(
     feed_composition: List[float],
     temp: float,
@@ -177,6 +192,13 @@ def vle_flash(
     return y_vapor, x_liquid, V
 
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(liquid_composition: List[float], pressure: float, components: Optional[List[Component]], thermo_model: str) -> float",
+    deterministic=True,
+    doc="Compute bubble point temperature"
+)
 def bubble_point(
     liquid_composition: List[float],
     pressure: float,
@@ -230,6 +252,13 @@ def bubble_point(
     return temp
 
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(vapor_composition: List[float], pressure: float, components: Optional[List[Component]], thermo_model: str) -> float",
+    deterministic=True,
+    doc="Compute dew point temperature"
+)
 def dew_point(
     vapor_composition: List[float],
     pressure: float,
@@ -286,6 +315,13 @@ def dew_point(
 # Gas-Liquid Reaction Operators
 # ============================================================================
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(bubble_diameter: float, gas_holdup: float, diffusivity: float, density_liquid: float, viscosity_liquid: float) -> float",
+    deterministic=True,
+    doc="Compute volumetric mass transfer coefficient k_L·a"
+)
 def volumetric_mass_transfer(
     bubble_diameter: float,
     gas_holdup: float,
@@ -326,6 +362,13 @@ def volumetric_mass_transfer(
     return k_L_a
 
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(conc_liquid: float, pressure_gas: float, k_L_a: float, k_rxn: float, henry_constant: float) -> float",
+    deterministic=True,
+    doc="Compute gas-liquid reaction rate"
+)
 def gas_liquid_reaction(
     conc_liquid: float,
     pressure_gas: float,
@@ -365,6 +408,13 @@ def gas_liquid_reaction(
     return rate
 
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(gas_flow: float, liquid_flow: float, gas_inlet_composition: float, pressure: float, temp: float, height: float, k_L_a: float, henry_constant: float) -> Tuple[float, float]",
+    deterministic=True,
+    doc="Simulate gas absorption column"
+)
 def gas_absorption(
     gas_flow: float,
     liquid_flow: float,
@@ -424,6 +474,13 @@ def gas_absorption(
 # Multiphase Flow
 # ============================================================================
 
+@operator(
+    domain="multiphase",
+    category=OpCategory.QUERY,
+    signature="(gas_velocity: float, liquid_velocity: float, density_gas: float, density_liquid: float, viscosity_gas: float, viscosity_liquid: float, diameter: float, length: float, roughness: float) -> float",
+    deterministic=True,
+    doc="Compute pressure drop in two-phase flow"
+)
 def two_phase_pressure_drop(
     gas_velocity: float,
     liquid_velocity: float,

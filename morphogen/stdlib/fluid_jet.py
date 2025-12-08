@@ -10,6 +10,8 @@ import numpy as np
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Core Types
@@ -54,6 +56,13 @@ class JetArray:
 # Operators
 # ============================================================================
 
+@operator(
+    domain="fluid_jet",
+    category=OpCategory.CONSTRUCT,
+    signature="(tube_diameter: float, tube_position: Tuple[float, float, float], tube_direction: Tuple[float, float, float], m_dot: float, T_out: float, rho: Optional[float] = None) -> Jet",
+    deterministic=True,
+    doc="Create jet from tube exit flow conditions"
+)
 def jet_from_tube(
     tube_diameter: float,
     tube_position: Tuple[float, float, float],
@@ -103,6 +112,13 @@ def jet_from_tube(
     )
 
 
+@operator(
+    domain="fluid_jet",
+    category=OpCategory.QUERY,
+    signature="(jet: Jet, mu: float = 1.8e-5) -> float",
+    deterministic=True,
+    doc="Compute jet Reynolds number"
+)
 def jet_reynolds(
     jet: Jet,
     mu: float = 1.8e-5
@@ -127,6 +143,13 @@ def jet_reynolds(
     return Re
 
 
+@operator(
+    domain="fluid_jet",
+    category=OpCategory.QUERY,
+    signature="(jet: Jet, plume_velocity: float, plume_density: float, model: str = 'empirical') -> float",
+    deterministic=True,
+    doc="Estimate jet entrainment and mixing with ambient flow"
+)
 def jet_entrainment(
     jet: Jet,
     plume_velocity: float,
@@ -167,6 +190,13 @@ def jet_entrainment(
     return mixing_factor
 
 
+@operator(
+    domain="fluid_jet",
+    category=OpCategory.QUERY,
+    signature="(jet_array: JetArray, grid_size: Tuple[int, int], grid_bounds: Tuple[float, float, float, float], decay: float = 0.1) -> np.ndarray",
+    deterministic=True,
+    doc="Generate 2D vector field visualization of jets (CFD-lite)"
+)
 def jet_field_2d(
     jet_array: JetArray,
     grid_size: Tuple[int, int],
@@ -220,6 +250,13 @@ def jet_field_2d(
     return field
 
 
+@operator(
+    domain="fluid_jet",
+    category=OpCategory.QUERY,
+    signature="(jet: Jet, distance: float) -> float",
+    deterministic=True,
+    doc="Compute jet centerline velocity at distance from nozzle"
+)
 def jet_centerline_velocity(
     jet: Jet,
     distance: float
@@ -250,6 +287,13 @@ def jet_centerline_velocity(
     return velocity
 
 
+@operator(
+    domain="fluid_jet",
+    category=OpCategory.QUERY,
+    signature="(jet: Jet, distance: float, spreading_rate: float = 0.1) -> float",
+    deterministic=True,
+    doc="Compute jet spreading width at distance from nozzle"
+)
 def jet_spreading_width(
     jet: Jet,
     distance: float,
@@ -275,6 +319,13 @@ def jet_spreading_width(
 # Convenience Functions
 # ============================================================================
 
+@operator(
+    domain="fluid_jet",
+    category=OpCategory.CONSTRUCT,
+    signature="(n_jets: int, radius: float, jet_diameter: float, m_dot_per_jet: float, temperature: float, height: float = 0.0, angle_inward: float = 0.0) -> JetArray",
+    deterministic=True,
+    doc="Create radial array of jets (e.g., fire pit secondary air)"
+)
 def create_jet_array_radial(
     n_jets: int,
     radius: float,

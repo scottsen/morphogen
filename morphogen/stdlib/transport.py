@@ -11,6 +11,7 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, Optional
 from enum import Enum
+from morphogen.core.operator import operator, OpCategory
 
 
 # ============================================================================
@@ -60,6 +61,13 @@ class FluidProperties:
 # Heat Transfer Operators
 # ============================================================================
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(temp_gradient: float, thermal_conductivity: float, area: float) -> float",
+    deterministic=True,
+    doc="Compute heat transfer by conduction (Fourier's law)"
+)
 def conduction(
     temp_gradient: float,
     thermal_conductivity: float,
@@ -83,6 +91,13 @@ def conduction(
     return q
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(temp_surface: float, temp_bulk: float, h: float, area: float) -> float",
+    deterministic=True,
+    doc="Compute heat transfer by convection (Newton's law of cooling)"
+)
 def convection(
     temp_surface: float,
     temp_bulk: float,
@@ -108,6 +123,13 @@ def convection(
     return q
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(temp_surface: float, temp_ambient: float, emissivity: float, area: float) -> float",
+    deterministic=True,
+    doc="Compute heat transfer by radiation (Stefan-Boltzmann law)"
+)
 def radiation(
     temp_surface: float,
     temp_ambient: float,
@@ -133,6 +155,13 @@ def radiation(
     return q
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(Re: float, Pr: float, geometry: str, L_over_D: Optional[float]) -> float",
+    deterministic=True,
+    doc="Compute Nusselt number from empirical correlations"
+)
 def nusselt_correlation(
     Re: float,
     Pr: float,
@@ -189,6 +218,13 @@ def nusselt_correlation(
     return Nu
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(Re: float, Pr: float, thermal_conductivity: float, length: float, geometry: str) -> float",
+    deterministic=True,
+    doc="Compute heat transfer coefficient from correlations"
+)
 def heat_transfer_coefficient(
     Re: float,
     Pr: float,
@@ -221,6 +257,13 @@ def heat_transfer_coefficient(
 # Mass Transfer Operators
 # ============================================================================
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(conc_gradient: float, diffusivity: float, area: float) -> float",
+    deterministic=True,
+    doc="Compute mass flux by Fickian diffusion"
+)
 def fickian_diffusion(
     conc_gradient: float,
     diffusivity: float,
@@ -244,6 +287,13 @@ def fickian_diffusion(
     return flux
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(pore_diameter: float, temp: float, molecular_weight: float) -> float",
+    deterministic=True,
+    doc="Compute Knudsen diffusion coefficient in pores"
+)
 def knudsen_diffusion(
     pore_diameter: float,
     temp: float,
@@ -268,6 +318,13 @@ def knudsen_diffusion(
     return D_K
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(conc_bulk: float, conc_surface: float, k_mass: float, area: float) -> float",
+    deterministic=True,
+    doc="Compute mass transfer by convection"
+)
 def convective_mass_transfer(
     conc_bulk: float,
     conc_surface: float,
@@ -293,6 +350,13 @@ def convective_mass_transfer(
     return flux
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(Re: float, Sc: float, geometry: str) -> float",
+    deterministic=True,
+    doc="Compute Sherwood number from empirical correlations"
+)
 def sherwood_correlation(
     Re: float,
     Sc: float,
@@ -341,6 +405,13 @@ def sherwood_correlation(
     return Sh
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(Re: float, Sc: float, diffusivity: float, length: float, geometry: str) -> float",
+    deterministic=True,
+    doc="Compute mass transfer coefficient from correlations"
+)
 def mass_transfer_coefficient(
     Re: float,
     Sc: float,
@@ -373,6 +444,13 @@ def mass_transfer_coefficient(
 # Porous Media Operators
 # ============================================================================
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(D_molecular: float, porosity: float, tortuosity: float) -> float",
+    deterministic=True,
+    doc="Compute effective diffusivity in porous media"
+)
 def effective_diffusivity(
     D_molecular: float,
     porosity: float,
@@ -396,6 +474,13 @@ def effective_diffusivity(
     return D_eff
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(pressure_gradient: float, permeability: float, viscosity: float) -> float",
+    deterministic=True,
+    doc="Compute flow velocity through porous media (Darcy's law)"
+)
 def darcy_flow(
     pressure_gradient: float,
     permeability: float,
@@ -419,6 +504,13 @@ def darcy_flow(
     return velocity
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(porosity: float, particle_diameter: float) -> float",
+    deterministic=True,
+    doc="Compute permeability from Carman-Kozeny equation"
+)
 def carman_kozeny(
     porosity: float,
     particle_diameter: float
@@ -444,6 +536,13 @@ def carman_kozeny(
 # Dimensionless Numbers
 # ============================================================================
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(density: float, velocity: float, length: float, viscosity: float) -> float",
+    deterministic=True,
+    doc="Compute Reynolds number"
+)
 def reynolds_number(
     density: float,
     velocity: float,
@@ -469,6 +568,13 @@ def reynolds_number(
     return Re
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(viscosity: float, specific_heat: float, thermal_conductivity: float) -> float",
+    deterministic=True,
+    doc="Compute Prandtl number"
+)
 def prandtl_number(
     viscosity: float,
     specific_heat: float,
@@ -492,6 +598,13 @@ def prandtl_number(
     return Pr
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(viscosity: float, density: float, diffusivity: float) -> float",
+    deterministic=True,
+    doc="Compute Schmidt number"
+)
 def schmidt_number(
     viscosity: float,
     density: float,
@@ -515,6 +628,13 @@ def schmidt_number(
     return Sc
 
 
+@operator(
+    domain="transport",
+    category=OpCategory.QUERY,
+    signature="(velocity: float, length: float, diffusivity: float) -> float",
+    deterministic=True,
+    doc="Compute Peclet number (ratio of convection to diffusion)"
+)
 def peclet_number(
     velocity: float,
     length: float,

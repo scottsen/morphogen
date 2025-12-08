@@ -13,6 +13,8 @@ from typing import Tuple, List, Optional, Callable
 from scipy import signal as scipy_signal
 from scipy.fft import fft, ifft, rfft, rfftfreq
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Core Types
@@ -51,6 +53,13 @@ class ExcitationModel:
 # Operators - Pitch Tracking
 # ============================================================================
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(signal_data: np.ndarray, sample_rate: float, method: str = 'autocorrelation', frame_size: int = 2048, hop_size: int = 512) -> np.ndarray",
+    deterministic=True,
+    doc="Track fundamental frequency (f0) over time using pitch detection"
+)
 def track_fundamental(
     signal_data: np.ndarray,
     sample_rate: float,
@@ -188,6 +197,13 @@ def _hps_pitch(frame: np.ndarray, sample_rate: float) -> float:
 # Operators - Harmonic Analysis
 # ============================================================================
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(signal_data: np.ndarray, sample_rate: float, f0_trajectory: np.ndarray, num_partials: int = 20, frame_size: int = 4096, hop_size: int = 512) -> np.ndarray",
+    deterministic=True,
+    doc="Track harmonic partials over time given f0 trajectory"
+)
 def track_partials(
     signal_data: np.ndarray,
     sample_rate: float,
@@ -240,6 +256,13 @@ def track_partials(
     return harmonics
 
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(stft_result: np.ndarray, smoothing_factor: float = 0.1) -> np.ndarray",
+    deterministic=True,
+    doc="Extract smooth spectral envelope from STFT"
+)
 def spectral_envelope(
     stft_result: np.ndarray,
     smoothing_factor: float = 0.1
@@ -273,6 +296,13 @@ def spectral_envelope(
 # Operators - Modal Analysis
 # ============================================================================
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(signal_data: np.ndarray, sample_rate: float, num_modes: int = 20, freq_range: Tuple[float, float] = (20.0, 8000.0)) -> ModalModel",
+    deterministic=True,
+    doc="Analyze signal into modal components (frequencies, decay rates, amplitudes)"
+)
 def analyze_modes(
     signal_data: np.ndarray,
     sample_rate: float,
@@ -342,6 +372,13 @@ def analyze_modes(
 # Operators - Decay Analysis
 # ============================================================================
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(harmonics: np.ndarray, sample_rate: float, hop_size: int = 512) -> np.ndarray",
+    deterministic=True,
+    doc="Fit exponential decay envelope to each harmonic partial"
+)
 def fit_exponential_decay(
     harmonics: np.ndarray,
     sample_rate: float,
@@ -390,6 +427,13 @@ def fit_exponential_decay(
     return decay_rates
 
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(decay_rate: float) -> float",
+    deterministic=True,
+    doc="Compute T60 (time to decay 60dB) from decay rate"
+)
 def measure_t60(decay_rate: float) -> float:
     """Compute T60 (time to decay 60dB) from decay rate.
 
@@ -415,6 +459,13 @@ def measure_t60(decay_rate: float) -> float:
     return t60
 
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(signal_data: np.ndarray, sample_rate: float, f0: float, num_partials: int = 10) -> float",
+    deterministic=True,
+    doc="Measure inharmonicity coefficient for string-like signals"
+)
 def measure_inharmonicity(
     signal_data: np.ndarray,
     sample_rate: float,
@@ -476,6 +527,13 @@ def measure_inharmonicity(
 # Operators - Deconvolution
 # ============================================================================
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(signal_data: np.ndarray, sample_rate: float, cepstral_lifter: int = 50) -> Tuple[np.ndarray, np.ndarray]",
+    deterministic=True,
+    doc="Separate excitation and resonator via homomorphic deconvolution"
+)
 def deconvolve(
     signal_data: np.ndarray,
     sample_rate: float,
@@ -533,6 +591,13 @@ def deconvolve(
 # Operators - Noise Modeling
 # ============================================================================
 
+@operator(
+    domain="audio_analysis",
+    category=OpCategory.QUERY,
+    signature="(signal_data: np.ndarray, sample_rate: float, num_bands: int = 32) -> NoiseModel",
+    deterministic=True,
+    doc="Capture broadband noise signature in frequency bands"
+)
 def model_noise(
     signal_data: np.ndarray,
     sample_rate: float,

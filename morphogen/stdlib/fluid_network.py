@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict
 from enum import Enum
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Core Types
@@ -90,6 +92,13 @@ class FlowNet:
 # Operators
 # ============================================================================
 
+@operator(
+    domain="fluid_network",
+    category=OpCategory.QUERY,
+    signature="(height: float, T_amb: float, T_hot: float, g: float) -> float",
+    deterministic=True,
+    doc="Compute draft pressure from stack effect"
+)
 def draft_pressure(
     height: float,
     T_amb: float,
@@ -117,6 +126,13 @@ def draft_pressure(
     return delta_p
 
 
+@operator(
+    domain="fluid_network",
+    category=OpCategory.QUERY,
+    signature="(tube: Tube, Re_guess: float) -> float",
+    deterministic=True,
+    doc="Compute flow resistance for a tube"
+)
 def tube_resistance(
     tube: Tube,
     Re_guess: float = 10000.0
@@ -154,6 +170,13 @@ def tube_resistance(
     return R
 
 
+@operator(
+    domain="fluid_network",
+    category=OpCategory.QUERY,
+    signature="(net: FlowNet, delta_p: float, solver: str, tolerance: float, max_iterations: int) -> Tuple[np.ndarray, np.ndarray]",
+    deterministic=True,
+    doc="Solve fluid network for flows and pressures"
+)
 def network_solve(
     net: FlowNet,
     delta_p: float,
@@ -260,6 +283,13 @@ def network_solve(
 # Convenience Functions
 # ============================================================================
 
+@operator(
+    domain="fluid_network",
+    category=OpCategory.CONSTRUCT,
+    signature="(tube_diameter: float, tube_length: float, n_tubes: int) -> FlowNet",
+    deterministic=True,
+    doc="Create a J-tube fire pit air supply network"
+)
 def create_j_tube_network(
     tube_diameter: float,
     tube_length: float,

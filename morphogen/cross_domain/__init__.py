@@ -76,6 +76,6 @@ __all__ = [
     'auto_compose',
 ]
 
-# Register cross-domain transforms
-CrossDomainRegistry.register('fluid', 'acoustics', FluidToAcousticsInterface)
-CrossDomainRegistry.register('acoustics', 'audio', AcousticsToAudioInterface)
+# Note: Cross-domain transforms are auto-registered via
+# registry.register_builtin_transforms() on module import.
+# No explicit registration needed here.

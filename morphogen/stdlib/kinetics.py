@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Callable, Optional, Tuple
 from scipy.integrate import ode, solve_ivp
 from enum import Enum
+from morphogen.core.operator import operator, OpCategory
 
 
 # ============================================================================
@@ -79,6 +80,13 @@ class Reactor:
 # Rate Law Operators
 # ============================================================================
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.QUERY,
+    signature="(temp: float, A: float, Ea: float) -> float",
+    deterministic=True,
+    doc="Compute Arrhenius rate constant"
+)
 def arrhenius(temp: float, A: float, Ea: float) -> float:
     """Compute Arrhenius rate constant.
 
@@ -98,6 +106,13 @@ def arrhenius(temp: float, A: float, Ea: float) -> float:
     return k
 
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.QUERY,
+    signature="(temp: float, A: float, n: float, Ea: float) -> float",
+    deterministic=True,
+    doc="Compute modified Arrhenius rate constant"
+)
 def modified_arrhenius(temp: float, A: float, n: float, Ea: float) -> float:
     """Compute modified Arrhenius rate constant.
 
@@ -118,6 +133,13 @@ def modified_arrhenius(temp: float, A: float, n: float, Ea: float) -> float:
     return k
 
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.QUERY,
+    signature="(temp: float, delta_H: float, delta_S: float, T_ref: float) -> float",
+    deterministic=True,
+    doc="Compute equilibrium constant from van't Hoff equation"
+)
 def vant_hoff(temp: float, delta_H: float, delta_S: float, T_ref: float = 298.15) -> float:
     """Compute equilibrium constant from van't Hoff equation.
 
@@ -142,6 +164,13 @@ def vant_hoff(temp: float, delta_H: float, delta_S: float, T_ref: float = 298.15
 # Reaction Network Operators
 # ============================================================================
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.QUERY,
+    signature="(conc: Dict[str, float], temp: float, reactions: List[Reaction]) -> Dict[str, float]",
+    deterministic=True,
+    doc="Compute reaction rates for all species"
+)
 def reaction_rates(
     conc: Dict[str, float],
     temp: float,
@@ -211,6 +240,13 @@ def reaction_rates(
     return rates
 
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.INTEGRATE,
+    signature="(conc_initial: Dict[str, float], reactions: List[Reaction], temp: float, time: float, method: str, time_points: Optional[np.ndarray]) -> Dict[str, np.ndarray]",
+    deterministic=True,
+    doc="Integrate reaction network ODEs over time"
+)
 def integrate_ode(
     conc_initial: Dict[str, float],
     reactions: List[Reaction],
@@ -307,6 +343,13 @@ def integrate_ode(
 # Ideal Reactor Operators
 # ============================================================================
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.INTEGRATE,
+    signature="(initial_conc: Dict[str, float], reactions: List[Reaction], temp: float, time: float, method: str) -> Dict[str, float]",
+    deterministic=True,
+    doc="Simulate batch reactor (closed, well-mixed)"
+)
 def batch_reactor(
     initial_conc: Dict[str, float],
     reactions: List[Reaction],
@@ -339,6 +382,13 @@ def batch_reactor(
     return final_conc
 
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.QUERY,
+    signature="(feed_conc: Dict[str, float], feed_flow: float, volume: float, reactions: List[Reaction], temp: float) -> Dict[str, float]",
+    deterministic=True,
+    doc="Solve CSTR (Continuous Stirred Tank Reactor) steady-state"
+)
 def cstr(
     feed_conc: Dict[str, float],
     feed_flow: float,
@@ -389,6 +439,13 @@ def cstr(
     return conc
 
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.INTEGRATE,
+    signature="(feed_conc: Dict[str, float], reactions: List[Reaction], length: float, area: float, flow_velocity: float, temp: float, n_points: int) -> Dict[str, np.ndarray]",
+    deterministic=True,
+    doc="Simulate Plug Flow Reactor (PFR) spatial profile"
+)
 def pfr(
     feed_conc: Dict[str, float],
     reactions: List[Reaction],
@@ -435,6 +492,13 @@ def pfr(
 # Non-Ideal Reactor Operators
 # ============================================================================
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.QUERY,
+    signature="(k_intrinsic: float, k_mass_transfer: float) -> float",
+    deterministic=True,
+    doc="Compute effective rate constant for mass-transfer-limited reaction"
+)
 def mass_transfer_limited(k_intrinsic: float, k_mass_transfer: float) -> float:
     """Compute effective rate constant for mass-transfer-limited reaction.
 
@@ -453,6 +517,13 @@ def mass_transfer_limited(k_intrinsic: float, k_mass_transfer: float) -> float:
     return k_eff
 
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.INTEGRATE,
+    signature="(feed_conc: Dict[str, float], reactions: List[Reaction], length: float, velocity: float, dispersion_coeff: float, temp: float, n_points: int) -> Dict[str, np.ndarray]",
+    deterministic=True,
+    doc="Simulate PFR with axial dispersion"
+)
 def pfr_with_dispersion(
     feed_conc: Dict[str, float],
     reactions: List[Reaction],
@@ -538,6 +609,13 @@ def pfr_with_dispersion(
 # Utility Functions
 # ============================================================================
 
+@operator(
+    domain="kinetics",
+    category=OpCategory.CONSTRUCT,
+    signature="(reactants: Dict[str, float], products: Dict[str, float], A: float, Ea: float, reversible: bool) -> Reaction",
+    deterministic=True,
+    doc="Create a simple Arrhenius reaction"
+)
 def create_reaction(
     reactants: Dict[str, float],
     products: Dict[str, float],

@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
 from enum import Enum
 
+from morphogen.core.operator import operator, OpCategory
+
 
 # ============================================================================
 # Constants
@@ -68,6 +70,13 @@ class ComponentData:
 # Equations of State
 # ============================================================================
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(temp: float, pressure: float, n_moles: float) -> float",
+    deterministic=True,
+    doc="Compute volume from ideal gas law"
+)
 def ideal_gas(
     temp: float,
     pressure: float,
@@ -91,6 +100,13 @@ def ideal_gas(
     return volume
 
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(temp: float, pressure: float, critical_temp: float, critical_pressure: float, acentric_factor: float) -> float",
+    deterministic=True,
+    doc="Solve Peng-Robinson equation of state for compressibility factor"
+)
 def peng_robinson(
     temp: float,
     pressure: float,
@@ -145,6 +161,13 @@ def peng_robinson(
     return Z
 
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(temp: float, pressure: float, critical_temp: float, critical_pressure: float, acentric_factor: float) -> float",
+    deterministic=True,
+    doc="Solve Soave-Redlich-Kwong EOS for compressibility factor"
+)
 def soave_redlich_kwong(
     temp: float,
     pressure: float,
@@ -191,6 +214,13 @@ def soave_redlich_kwong(
     return Z
 
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(temp: float, pressure: float, critical_temp: float, critical_pressure: float, acentric_factor: float, eos: str) -> float",
+    deterministic=True,
+    doc="Compute fugacity coefficient from EOS"
+)
 def fugacity_coefficient(
     temp: float,
     pressure: float,
@@ -232,6 +262,13 @@ def fugacity_coefficient(
 # Activity Coefficients
 # ============================================================================
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(composition: List[float], temp: float, model: str, parameters: Optional[Dict]) -> np.ndarray",
+    deterministic=True,
+    doc="Compute activity coefficients for liquid mixture"
+)
 def activity_coefficient(
     composition: List[float],
     temp: float,
@@ -312,6 +349,13 @@ def activity_coefficient(
 # Thermodynamic Properties
 # ============================================================================
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(species: str, temp: float, component_data: Optional[ComponentData]) -> float",
+    deterministic=True,
+    doc="Compute heat capacity at constant pressure"
+)
 def heat_capacity(
     species: str,
     temp: float,
@@ -353,6 +397,13 @@ def heat_capacity(
     return Cp
 
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(reactants: Dict[str, float], products: Dict[str, float], temp: float, component_data: Optional[Dict[str, ComponentData]]) -> float",
+    deterministic=True,
+    doc="Compute enthalpy of reaction"
+)
 def enthalpy_of_reaction(
     reactants: Dict[str, float],
     products: Dict[str, float],
@@ -411,6 +462,13 @@ def enthalpy_of_reaction(
     return delta_H
 
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(temp: float, enthalpy: float, entropy: float) -> float",
+    deterministic=True,
+    doc="Compute Gibbs free energy"
+)
 def gibbs_free_energy(
     temp: float,
     enthalpy: float,
@@ -434,6 +492,13 @@ def gibbs_free_energy(
     return G
 
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(delta_G: float, temp: float) -> float",
+    deterministic=True,
+    doc="Compute equilibrium constant from Gibbs free energy"
+)
 def equilibrium_constant(
     delta_G: float,
     temp: float
@@ -459,6 +524,13 @@ def equilibrium_constant(
 # Mixture Properties
 # ============================================================================
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(composition: List[float], pure_enthalpies: List[float], excess_enthalpy: float) -> float",
+    deterministic=True,
+    doc="Compute enthalpy of mixing"
+)
 def mixing_enthalpy(
     composition: List[float],
     pure_enthalpies: List[float],
@@ -486,6 +558,13 @@ def mixing_enthalpy(
     return H_mix
 
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(composition: List[float], pure_entropies: List[float]) -> float",
+    deterministic=True,
+    doc="Compute entropy of mixing (ideal solution)"
+)
 def mixing_entropy(
     composition: List[float],
     pure_entropies: List[float]
@@ -520,6 +599,13 @@ def mixing_entropy(
 # Phase Equilibrium
 # ============================================================================
 
+@operator(
+    domain="thermo",
+    category=OpCategory.QUERY,
+    signature="(composition_liquid: List[float], vapor_pressures: List[float], pressure: float) -> List[float]",
+    deterministic=True,
+    doc="Compute vapor composition from Raoult's law"
+)
 def raoult_law(
     composition_liquid: List[float],
     vapor_pressures: List[float],

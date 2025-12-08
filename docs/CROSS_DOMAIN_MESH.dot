@@ -1,0 +1,65 @@
+digraph MorphogenCrossDomainMesh {
+  // Graph settings
+  rankdir=LR;
+  node [shape=box, style=rounded, fontname="Arial"];
+  edge [fontname="Arial", fontsize=10];
+  graph [splines=ortho, nodesep=0.5, ranksep=1.5];
+
+  // Field/Spatial
+  "field" [fillcolor="#E3F2FD", style="rounded,filled"];
+  "spatial" [fillcolor="#E3F2FD", style="rounded,filled"];
+  "terrain" [fillcolor="#E3F2FD", style="rounded,filled"];
+
+  // Agents/Behavior
+  "agent" [fillcolor="#F3E5F5", style="rounded,filled"];
+
+  // Physics/Simulation
+  "acoustics" [fillcolor="#FFF3E0", style="rounded,filled"];
+  "fluid" [fillcolor="#FFF3E0", style="rounded,filled"];
+  "physics" [fillcolor="#FFF3E0", style="rounded,filled"];
+
+  // Audio/Sound
+  "audio" [fillcolor="#E8F5E9", style="rounded,filled"];
+  "cepstral" [fillcolor="#E8F5E9", style="rounded,filled"];
+  "time" [fillcolor="#E8F5E9", style="rounded,filled"];
+  "wavelet" [fillcolor="#E8F5E9", style="rounded,filled"];
+
+  // Visual/Graphics
+  "graph" [fillcolor="#FCE4EC", style="rounded,filled"];
+  "visual" [fillcolor="#FCE4EC", style="rounded,filled"];
+
+  // Biology
+  "cellular" [fillcolor="#FFF9C4", style="rounded,filled"];
+
+  // Geometry
+  "cartesian" [fillcolor="#E0F2F1", style="rounded,filled"];
+  "polar" [fillcolor="#E0F2F1", style="rounded,filled"];
+
+  // Perception
+  "vision" [fillcolor="#F1F8E9", style="rounded,filled"];
+
+  // Transforms
+  "acoustics" -> "audio" [color="#666666"];
+  "agent" -> "field" [dir=both, color="#2196F3", penwidth=2];
+  "audio" -> "visual" [color="#666666"];
+  "cartesian" -> "polar" [dir=both, color="#2196F3", penwidth=2];
+  "cellular" -> "field" [color="#666666"];
+  "cepstral" -> "time" [dir=both, color="#2196F3", penwidth=2];
+  "field" -> "audio" [color="#666666"];
+  "field" -> "terrain" [dir=both, color="#2196F3", penwidth=2];
+  "fluid" -> "acoustics" [color="#666666"];
+  "graph" -> "visual" [color="#666666"];
+  "physics" -> "audio" [color="#666666"];
+  "spatial" -> "spatial" [dir=both, color="#2196F3", penwidth=2];
+  "time" -> "wavelet" [color="#666666"];
+  "vision" -> "field" [color="#666666"];
+
+  // Legend
+  subgraph cluster_legend {
+    label="Legend";
+    style=dashed;
+    "Bidirectional" [shape=plaintext];
+    "Unidirectional" [shape=plaintext];
+    "Bidirectional" -> "Unidirectional" [style=invis];
+  }
+}

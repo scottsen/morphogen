@@ -11,6 +11,7 @@ import numpy as np
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
 from enum import Enum
+from morphogen.core.operator import operator, OpCategory
 
 
 # ============================================================================
@@ -53,6 +54,13 @@ class AdsorptionIsotherm:
 # Surface Kinetics Operators
 # ============================================================================
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(coverage_A: float, coverage_B: float, k_surface: float, activation_energy: float, temp: float) -> float",
+    deterministic=True,
+    doc="Compute reaction rate for Langmuir-Hinshelwood mechanism"
+)
 def langmuir_hinshelwood(
     coverage_A: float,
     coverage_B: float,
@@ -92,6 +100,13 @@ def langmuir_hinshelwood(
     return rate
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(coverage_A: float, pressure_B: float, k_surface: float, activation_energy: float, temp: float) -> float",
+    deterministic=True,
+    doc="Compute reaction rate for Eley-Rideal mechanism"
+)
 def eley_rideal(
     coverage_A: float,
     pressure_B: float,
@@ -130,6 +145,13 @@ def eley_rideal(
     return rate
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.INTEGRATE,
+    signature="(coverage: np.ndarray, r_adsorption: float, r_desorption: float, r_reaction: float, dt: float) -> np.ndarray",
+    deterministic=True,
+    doc="Update surface coverage with adsorption, desorption, and reaction"
+)
 def surface_coverage_step(
     coverage: np.ndarray,
     r_adsorption: float,
@@ -168,6 +190,13 @@ def surface_coverage_step(
     return coverage_new
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(pressure: float, K_ads: float, n_sites: int) -> float",
+    deterministic=True,
+    doc="Compute surface coverage from Langmuir isotherm"
+)
 def langmuir_adsorption(
     pressure: float,
     K_ads: float,
@@ -196,6 +225,13 @@ def langmuir_adsorption(
     return coverage
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(pressures: List[float], K_ads_values: List[float]) -> np.ndarray",
+    deterministic=True,
+    doc="Compute competitive adsorption of multiple species (Langmuir)"
+)
 def competitive_adsorption(
     pressures: List[float],
     K_ads_values: List[float]
@@ -226,6 +262,13 @@ def competitive_adsorption(
 # Catalyst Characterization Operators
 # ============================================================================
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(adsorption_isotherm: AdsorptionIsotherm, adsorbate: str, cross_sectional_area: Optional[float]) -> float",
+    deterministic=True,
+    doc="Compute BET surface area from adsorption isotherm"
+)
 def bet_surface_area(
     adsorption_isotherm: AdsorptionIsotherm,
     adsorbate: str = "N2",
@@ -285,6 +328,13 @@ def bet_surface_area(
     return surface_area
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(adsorption_isotherm: AdsorptionIsotherm, method: str) -> Tuple[np.ndarray, np.ndarray]",
+    deterministic=True,
+    doc="Compute pore size distribution from adsorption isotherm"
+)
 def pore_size_distribution(
     adsorption_isotherm: AdsorptionIsotherm,
     method: str = "bjh"
@@ -341,6 +391,13 @@ def pore_size_distribution(
     return pore_diameters, pore_volumes
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(reaction_rate: float, n_active_sites: float) -> float",
+    deterministic=True,
+    doc="Compute turnover frequency (TOF)"
+)
 def turnover_frequency(
     reaction_rate: float,
     n_active_sites: float
@@ -362,6 +419,13 @@ def turnover_frequency(
     return tof
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(rate_desired: float, rate_total: float) -> float",
+    deterministic=True,
+    doc="Compute catalyst selectivity"
+)
 def catalyst_selectivity(
     rate_desired: float,
     rate_total: float
@@ -383,6 +447,13 @@ def catalyst_selectivity(
     return selectivity
 
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(activity_initial: float, time: float, deactivation_rate: float, order: int) -> float",
+    deterministic=True,
+    doc="Model catalyst deactivation over time"
+)
 def catalyst_deactivation(
     activity_initial: float,
     time: float,
@@ -419,6 +490,13 @@ def catalyst_deactivation(
 # Microkinetic Modeling
 # ============================================================================
 
+@operator(
+    domain="catalysis",
+    category=OpCategory.QUERY,
+    signature="(rate_constants: Dict[str, float], partial_pressures: Dict[str, float], n_sites_total: float, max_iterations: int, tolerance: float) -> Dict[str, float]",
+    deterministic=True,
+    doc="Solve microkinetic model for steady-state surface coverages"
+)
 def microkinetic_steady_state(
     rate_constants: Dict[str, float],
     partial_pressures: Dict[str, float],

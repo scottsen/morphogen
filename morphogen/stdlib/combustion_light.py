@@ -9,6 +9,7 @@ Specification: docs/specifications/physics-domains.md
 import numpy as np
 from dataclasses import dataclass
 from typing import Optional
+from morphogen.core.operator import operator, OpCategory
 
 
 # ============================================================================
@@ -46,6 +47,13 @@ class SmokeIndex:
 # Operators
 # ============================================================================
 
+@operator(
+    domain="combustion",
+    category=OpCategory.QUERY,
+    signature="(fuel_rate: float, air_rate: float, stoichiometric_ratio: float) -> float",
+    deterministic=True,
+    doc="Compute equivalence ratio (φ = actual/stoichiometric)"
+)
 def equivalence_ratio(
     fuel_rate: float,
     air_rate: float,
@@ -76,6 +84,13 @@ def equivalence_ratio(
     return phi
 
 
+@operator(
+    domain="combustion",
+    category=OpCategory.QUERY,
+    signature="(phi: float, T_reactants: float, fuel_type: str) -> float",
+    deterministic=True,
+    doc="Estimate adiabatic flame temperature"
+)
 def adiabatic_flame_temperature(
     phi: float,
     T_reactants: float,
@@ -120,6 +135,13 @@ def adiabatic_flame_temperature(
     return T_flame
 
 
+@operator(
+    domain="combustion",
+    category=OpCategory.QUERY,
+    signature="(T_flame: float, secondary_air_flow: float, secondary_air_temp: float, primary_flow: float, mixing_factor: float, model: str) -> float",
+    deterministic=True,
+    doc="Estimate combustion zone temperature with secondary air"
+)
 def zone_temperature(
     T_flame: float,
     secondary_air_flow: float,
@@ -165,6 +187,13 @@ def zone_temperature(
     return T_zone
 
 
+@operator(
+    domain="combustion",
+    category=OpCategory.QUERY,
+    signature="(phi: float, T_zone: float, mixing_factor: float, residence_time: float, model: str) -> SmokeIndex",
+    deterministic=True,
+    doc="Estimate smoke reduction effectiveness from secondary air"
+)
 def smoke_reduction(
     phi: float,
     T_zone: float,
@@ -241,6 +270,13 @@ def smoke_reduction(
     return SmokeIndex(value=smoke_index, reduction_factor=reduction_factor)
 
 
+@operator(
+    domain="combustion",
+    category=OpCategory.QUERY,
+    signature="(phi: float, T_zone: float) -> float",
+    deterministic=True,
+    doc="Estimate combustion efficiency"
+)
 def combustion_efficiency(
     phi: float,
     T_zone: float
@@ -268,6 +304,13 @@ def combustion_efficiency(
     return efficiency
 
 
+@operator(
+    domain="combustion",
+    category=OpCategory.QUERY,
+    signature="(phi: float, T_zone: float, species: str) -> float",
+    deterministic=True,
+    doc="Estimate emissions index for specific species"
+)
 def emissions_index(
     phi: float,
     T_zone: float,
@@ -322,6 +365,13 @@ def emissions_index(
 # Convenience Functions
 # ============================================================================
 
+@operator(
+    domain="combustion",
+    category=OpCategory.QUERY,
+    signature="(fuel_rate: float, primary_air_rate: float, secondary_air_rate: float, secondary_air_temp: float, mixing_factor: float, residence_time: float) -> dict",
+    deterministic=True,
+    doc="Analyze fire pit combustion with secondary air injection"
+)
 def analyze_fire_pit_combustion(
     fuel_rate: float,
     primary_air_rate: float,
