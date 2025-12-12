@@ -28,7 +28,7 @@
 8. [Determinism and RNG](#8-determinism-and-rng)
 9. [Field Dialect](#9-field-dialect)
 10. [Agent Dialect](#10-agent-dialect)
-11. [Audio Dialect (Morphogen.Audio)](#11-audio-dialect-kairoaudio)
+11. [Audio Dialect (Morphogen.Audio)](#11-audio-dialect-morphogenaudio)
 12. [Visual Dialect](#12-visual-dialect)
 13. [Profile System](#13-profile-system)
 14. [Module System](#14-module-system)

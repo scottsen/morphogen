@@ -29,7 +29,7 @@ Welcome to Morphogen! This guide will help you get up and running in under 30 mi
 ```bash
 # Clone the repository
 git clone https://github.com/scottsen/morphogen.git
-cd kairo
+cd morphogen
 
 # Install the package
 pip install -e .
@@ -57,7 +57,7 @@ This adds:
 
 ```bash
 # Check version
-kairo --version
+morphogen --version
 
 # You should see:
 # Morphogen v0.6.0 (stable) / v0.7.0-dev (development)
@@ -433,7 +433,7 @@ morphogen run program.morph --steps 10000 --dt 0.001
 ### Interactive Mode (future)
 
 ```bash
-kairo repl
+morphogen repl
 ```
 
 ---
@@ -464,7 +464,7 @@ For implementors and advanced users:
 
 ### 4. Join the Community
 
-- **GitHub**: https://github.com/scottsen/kairo
+- **GitHub**: https://github.com/scottsen/morphogen
 - **Issues**: https://github.com/scottsen/morphogen/issues
 - **Discussions**: Share your creations and get help
 
@@ -510,7 +510,7 @@ For implementors and advanced users:
 
 ### Import Errors
 
-If you see `ModuleNotFoundError: No module named 'kairo'`:
+If you see `ModuleNotFoundError: No module named 'morphogen'`:
 
 ```bash
 # Reinstall with dependencies

@@ -1,6 +1,6 @@
-# Kairo Examples
+# Morphogen Examples
 
-This directory contains comprehensive examples demonstrating Kairo's capabilities across all dialects, versions, and development phases.
+This directory contains comprehensive examples demonstrating Morphogen's capabilities across all dialects, versions, and development phases.
 
 ---
 
@@ -21,7 +21,7 @@ This directory contains comprehensive examples demonstrating Kairo's capabilitie
 Perfect for getting started - simple, clear, and immediately rewarding!
 
 ### `01_hello_heat.morph` ⭐ **START HERE**
-Your first Kairo program! Watch heat diffuse from a hot center.
+Your first Morphogen program! Watch heat diffuse from a hot center.
 
 ```bash
 morphogen run examples/01_hello_heat.morph
@@ -71,7 +71,7 @@ morphogen run examples/03_wave_ripples.morph
 
 ## Tier 2: Intermediate Examples 🟡
 
-Real simulations demonstrating multiple Kairo features working together.
+Real simulations demonstrating multiple Morphogen features working together.
 
 ### `04_random_walk.morph`
 Watch random walkers create beautiful diffusion patterns from simple stochastic rules.
@@ -365,7 +365,7 @@ python examples/reaction_diffusion.py
 ```
 
 **Features:** Coral/maze patterns, self-organizing structures, stunning visuals
-**Use case:** Comparing Python vs Kairo implementations
+**Use case:** Comparing Python vs Morphogen implementations
 
 ---
 
@@ -443,13 +443,13 @@ python examples/visual_composition_demo.py
 ### Utility Examples
 
 #### `mvp_simple_test.py`
-Simple Python test of Kairo runtime fundamentals.
+Simple Python test of Morphogen runtime fundamentals.
 
 ```bash
 python examples/mvp_simple_test.py
 ```
 
-**Purpose:** Understanding Python-Kairo integration
+**Purpose:** Understanding Python-Morphogen integration
 **Use case:** Runtime testing and debugging
 
 ---
@@ -481,7 +481,7 @@ python examples/mlir_poc.py
 ```
 
 **Purpose:** Foundation for v0.7.0 MLIR work
-**Demonstrates:** Basic MLIR integration without Kairo dialects
+**Demonstrates:** Basic MLIR integration without Morphogen dialects
 **Status:** Historical reference
 
 ---
@@ -627,7 +627,7 @@ python examples/phase6_jit_aot_compilation.py
 
 ## Running Examples
 
-### Kairo Language Files (`.morph`)
+### Morphogen Language Files (`.morph`)
 
 ```bash
 # Basic execution
@@ -653,7 +653,7 @@ chmod +x examples/reaction_diffusion.py
 Some examples require optional dependencies:
 
 ```bash
-# Core Kairo (required)
+# Core Morphogen (required)
 pip install -e .
 
 # Audio I/O (for audio_io_demo.py, audio_dsp_spectral.py)
@@ -669,7 +669,7 @@ pip install mlir -f https://github.com/makslevental/mlir-wheels/releases/expande
 
 ### Path 1: Absolute Beginner → Intermediate
 
-**Goal:** Learn Kairo language and core concepts
+**Goal:** Learn Morphogen language and core concepts
 
 1. `01_hello_heat.morph` - Understand basic syntax
 2. `02_pulsing_circle.morph` - Temporal animation
@@ -695,7 +695,7 @@ pip install mlir -f https://github.com/makslevental/mlir-wheels/releases/expande
 5. `phase6_jit_aot_compilation.py` - LLVM backend and optimization
 
 **Expected time:** 4-8 hours
-**Outcome:** Deep understanding of Kairo's compilation pipeline
+**Outcome:** Deep understanding of Morphogen's compilation pipeline
 
 ---
 
@@ -726,8 +726,8 @@ pip install mlir -f https://github.com/makslevental/mlir-wheels/releases/expande
 
 ## Example Statistics
 
-- **Total files:** 26 (12 Kairo + 14 Python)
-- **Total Kairo lines:** 750 lines
+- **Total files:** 26 (12 Morphogen + 14 Python)
+- **Total Morphogen lines:** 750 lines
 - **Beginner examples:** 3 files
 - **Intermediate examples:** 4 files
 - **Advanced examples:** 5 files
@@ -772,8 +772,8 @@ If MLIR is unavailable, phase examples will gracefully skip or fall back to lega
 ### Import errors
 
 ```bash
-# Ensure you're in the Kairo directory
-cd /path/to/kairo
+# Ensure you're in the Morphogen directory
+cd /path/to/morphogen
 
 # Reinstall in development mode
 pip install -e .
@@ -785,7 +785,7 @@ pip install -e .
 
 Want to add your own example? Follow these guidelines:
 
-### Kairo Language Examples (`.morph`)
+### Morphogen Language Examples (`.morph`)
 
 1. **Naming:** Use descriptive verb-noun format (`heat_diffusion.morph`)
 2. **Comments:** Explain key concepts inline
@@ -824,7 +824,7 @@ For each new example, add to this README:
 
 **Happy coding!** 🎨🎵🔬
 
-Explore, experiment, and create amazing simulations, sounds, and visualizations with Kairo!
+Explore, experiment, and create amazing simulations, sounds, and visualizations with Morphogen!
 
 ---
 

@@ -843,7 +843,8 @@ class TestIntegrationWithRealFiles:
 
     def test_parse_real_example(self):
         """Test parsing a real example file."""
-        example_file = Path('/home/user/morphogen/examples/01_hello_heat.morph')
+        examples_dir = Path(__file__).parent.parent / "examples"
+        example_file = examples_dir / "01_hello_heat.morph"
 
         if not example_file.exists():
             pytest.skip("Example file not found")
@@ -867,7 +868,8 @@ class TestIntegrationWithRealFiles:
 
     def test_check_real_example(self):
         """Test type-checking a real example file."""
-        example_file = Path('/home/user/morphogen/examples/01_hello_heat.morph')
+        examples_dir = Path(__file__).parent.parent / "examples"
+        example_file = examples_dir / "01_hello_heat.morph"
 
         if not example_file.exists():
             pytest.skip("Example file not found")
