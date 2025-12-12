@@ -197,12 +197,12 @@ morphogen run hello.kairo
 ## 🚀 Project Status & v1.0 Roadmap
 
 **Current Status (v0.11.0):**
-- ✅ **25 active computational domains** (fully integrated with `use` statement)
-- ✅ **15 legacy domains** (implemented, migration to new system in progress)
-- ✅ **386 operators** accessible from Morphogen language
-- ✅ **1,381 tests passing** (251 MLIR tests skipped)
+- ✅ **39 production computational domains** (fully integrated with `use` statement)
+- ✅ **606 operators** accessible from Morphogen language
+- ✅ **1,705 tests passing** (251 MLIR tests skipped)
 - ✅ MLIR compilation pipeline complete (6 phases)
 - ✅ Python runtime with NumPy backend
+- ✅ All legacy domains migrated to modern `@operator` system
 
 **v1.0 Release Plan (24 weeks):**
 
@@ -304,9 +304,9 @@ x = dist + time                   # ERROR: m + s is invalid
 
 ---
 
-## 25 Active Computational Domains
+## 39 Production Computational Domains
 
-Morphogen provides **25 fully-integrated domains** accessible via the `use` statement, with **15 additional legacy domains** in migration. Each domain offers specialized operators optimized for its computational model.
+Morphogen provides **39 fully-integrated domains** accessible via the `use` statement. Each domain offers specialized operators optimized for its computational model.
 
 ### Core Domains (Fully Integrated ✅)
 
@@ -315,28 +315,25 @@ Morphogen provides **25 fully-integrated domains** accessible via the `use` stat
 **Audio Synthesis** (60 ops) - Oscillators, filters, effects, physical modeling
 **RigidBody Physics** (12 ops) - 2D dynamics, collisions, constraints
 
-### Active Domains (Fully Integrated ✅)
+### All Domains (Production Ready ✅)
 
-**Physics & Simulation** - field, agent, rigidbody, integrators, acoustics
-**Audio & Signal** - audio, signal, temporal
-**Graphics & Visual** - visual, color, image, noise, palette, terrain, vision
-**AI & Optimization** - neural, optimization, genetic, cellular, statemachine
-**Data & Infrastructure** - graph, sparse_linalg, io_storage, geometry
-**Circuit** - circuit (Phase 1: DC/AC/transient analysis)
+**Physics & Simulation** (8 domains) - field, agent, rigidbody, integrators, acoustics, thermal_ode, fluid_network, fluid_jet
 
-### Legacy Domains (Migration Pending ⏳)
+**Audio & Signal** (5 domains) - audio, signal, temporal, audio_analysis, instrument_model
 
-**Chemistry Suite** (9 domains) - molecular, qchem, thermo, kinetics, electrochem, catalysis, transport, multiphase, combustion
-**Specialized Physics** (4 domains) - thermal_ode, fluid_network, fluid_jet
-**Audio Extensions** (2 domains) - audio_analysis, instrument_model
+**Graphics & Visual** (7 domains) - visual, color, image, noise, palette, terrain, vision
+
+**AI & Optimization** (5 domains) - neural, optimization, genetic, cellular, statemachine
+
+**Data & Infrastructure** (4 domains) - graph, sparse_linalg, io_storage, geometry
+
+**Chemistry** (9 domains) - molecular, qchem, thermo, kinetics, electrochem, catalysis, transport, multiphase, combustion
+
+**Circuit** (1 domain) - circuit (DC/AC/transient analysis)
 
 ### Complete Domain Catalog
 
 **📋 [View Full Domain Catalog](docs/DOMAINS.md)** - Detailed descriptions, code examples, and feature lists
-
-**Status Analysis:** See [DOMAIN_STATUS_ANALYSIS.md](docs/meta/DOMAIN_STATUS_ANALYSIS.md) for detailed breakdown of active vs. legacy domains
-
-**Migration Plan:** Legacy domains will be integrated in v0.12.0 - see [Migration Guide](docs/guides/DOMAIN_MIGRATION_GUIDE.md)
 
 ---
 
