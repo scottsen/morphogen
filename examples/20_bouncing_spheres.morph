@@ -1,5 +1,5 @@
-# 20_bouncing_spheres.kairo
-# Kairo Example: Bouncing Spheres with Collision Detection
+# 20_bouncing_spheres.morph
+# Morphogen Example: Bouncing Spheres with Collision Detection
 #
 # Description: Demonstrates cross-domain integration between geometry
 # and rigidbody physics. Spheres bounce inside a box with realistic
@@ -21,7 +21,7 @@
 #   - ELASTICITY: Bounciness coefficient (try 0.5 to 0.95)
 #   - BOX_SIZE: Size of the containing box (try 20.0 to 50.0)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-18
 
 use geometry, rigidbody, visual

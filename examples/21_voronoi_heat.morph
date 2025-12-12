@@ -1,5 +1,5 @@
-# 21_voronoi_heat.kairo
-# Kairo Example: Voronoi Heat Diffusion
+# 21_voronoi_heat.morph
+# Morphogen Example: Voronoi Heat Diffusion
 #
 # Description: Demonstrates geometry + field cross-domain integration.
 # Creates a Voronoi diagram from random seed points, then simulates
@@ -21,7 +21,7 @@
 #   - DIFFUSION_RATE: Heat diffusion speed (try 0.05 to 0.3)
 #   - GRID_SIZE: Field resolution (try 128 to 512)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-18
 
 use geometry, field, visual

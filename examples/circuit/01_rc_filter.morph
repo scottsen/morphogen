@@ -84,5 +84,5 @@ circuit RC_LowPass {
     # Export
     export:
         - spice: "rc_filter.cir"
-        - yaml: "rc_filter.kairo.yaml"
+        - yaml: "rc_filter.morph.yaml"
 }

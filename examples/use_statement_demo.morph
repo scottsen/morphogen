@@ -1,5 +1,5 @@
 # Demonstration of the USE statement feature
-# This shows how to import and use domain operators in .kairo programs
+# This shows how to import and use domain operators in .morph programs
 
 use graph
 

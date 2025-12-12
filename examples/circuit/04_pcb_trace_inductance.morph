@@ -176,5 +176,5 @@ circuit PCB_TraceInductance {
         - spice: "pcb_trace.cir"
         - touchstone: "trace.s2p"  # S-parameters
         - kicad: "pcb_layout.kicad_pcb"
-        - yaml: "pcb_trace.kairo.yaml"
+        - yaml: "pcb_trace.morph.yaml"
 }

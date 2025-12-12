@@ -1,5 +1,5 @@
-# 25_convex_hull_art.kairo
-# Kairo Example: Animated Convex Hull Art
+# 25_convex_hull_art.morph
+# Morphogen Example: Animated Convex Hull Art
 #
 # Description: Demonstrates convex hull computation with dynamic point clouds.
 # Points move in circular patterns, and their convex hull is computed in
@@ -23,7 +23,7 @@
 #   - ORBIT_SPEED: Angular velocity (try 0.5 to 3.0)
 #   - ORBIT_RADIUS: Distance from center (try 40.0 to 80.0)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-18
 
 use geometry, field, visual

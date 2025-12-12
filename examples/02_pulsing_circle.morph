@@ -1,5 +1,5 @@
-# 02_pulsing_circle.kairo
-# Kairo Example: Pulsing Circle
+# 02_pulsing_circle.morph
+# Morphogen Example: Pulsing Circle
 #
 # Description: Animated visualization showing a circle that smoothly grows
 # and shrinks, demonstrating lambda expressions and time-based animation.
@@ -19,7 +19,7 @@
 #   - PULSE_SPEED: How fast it pulses (try 1.0 to 5.0)
 #   - GRID_SIZE: Resolution of the field (try 64 to 256)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-07
 
 use field, visual

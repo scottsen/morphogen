@@ -1,5 +1,5 @@
-# 23_geometry_patrol.kairo
-# Kairo Example: Geometric Patrol Routes
+# 23_geometry_patrol.morph
+# Morphogen Example: Geometric Patrol Routes
 #
 # Description: Demonstrates geometry + agent + field cross-domain integration.
 # Agents patrol along the vertices of a convex hull, using geometric
@@ -23,7 +23,7 @@
 #   - AGENT_SPEED: Movement speed (try 10.0 to 50.0)
 #   - INFLUENCE_RADIUS: Agent sensing range (try 20.0 to 60.0)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-18
 
 use geometry, field, visual

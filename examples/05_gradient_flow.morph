@@ -1,5 +1,5 @@
-# 05_gradient_flow.kairo
-# Kairo Example: Gradient Flow - Advection and Mixing
+# 05_gradient_flow.morph
+# Morphogen Example: Gradient Flow - Advection and Mixing
 #
 # Description: Watch color gradients flow and mix under the influence
 # of a swirling velocity field, creating mesmerizing fluid-like patterns.
@@ -18,7 +18,7 @@
 #   - dt: Time step size (try 0.05 to 0.2)
 #   - steps: Simulation duration (try 200 to 1000)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-07
 
 use field, visual

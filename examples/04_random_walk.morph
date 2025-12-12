@@ -1,5 +1,5 @@
-# 04_random_walk.kairo
-# Kairo Example: Random Walk - Brownian Motion Patterns
+# 04_random_walk.morph
+# Morphogen Example: Random Walk - Brownian Motion Patterns
 #
 # Description: Watch random walkers create beautiful diffusion patterns
 # as they accumulate in a density field, demonstrating emergent behavior
@@ -19,7 +19,7 @@
 #   - steps: Simulation duration (try 1000 to 5000)
 #   - Random walk step size (currently fixed at 1)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-07
 
 use field, visual

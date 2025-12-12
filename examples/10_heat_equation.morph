@@ -1,5 +1,5 @@
-# 10_heat_equation.kairo
-# Kairo Example: Heat Equation (Complete)
+# 10_heat_equation.morph
+# Morphogen Example: Heat Equation (Complete)
 #
 # Description: Full heat diffusion simulation with hot and cold regions,
 # demonstrating realistic thermal physics with sources and sinks.
@@ -23,7 +23,7 @@
 #   ∂T/∂t = κ ∇²T
 # where T is temperature, κ is thermal diffusivity, ∇² is the Laplacian
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-07
 
 use field, visual

@@ -189,5 +189,5 @@ circuit GuitarPedalOverdrive {
         - audio: "pedal_output.wav"
         - spice: "tube_screamer.cir"
         - schematic: "tube_screamer.svg"
-        - yaml: "tube_screamer.kairo.yaml"
+        - yaml: "tube_screamer.morph.yaml"
 }

@@ -1,5 +1,5 @@
-# 24_mesh_morphing.kairo
-# Kairo Example: Mesh Morphing and Subdivision
+# 24_mesh_morphing.morph
+# Morphogen Example: Mesh Morphing and Subdivision
 #
 # Description: Demonstrates advanced geometry domain features including
 # mesh operations, subdivision surfaces, and 3D transformations. A simple
@@ -23,7 +23,7 @@
 #   - MORPH_SPEED: Transition speed (try 0.5 to 2.0)
 #   - ROTATION_SPEED: Mesh rotation speed (try 0.5 to 3.0)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-18
 
 use geometry, visual

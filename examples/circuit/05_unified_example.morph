@@ -302,7 +302,7 @@ system GuitarAmpComplete {
         - audio: "guitar_amp_output.wav"
 
         # Simulation data
-        - yaml: "guitar_amp.kairo.yaml"
+        - yaml: "guitar_amp.morph.yaml"
         - csv: "simulation_results.csv"
 
         # Documentation

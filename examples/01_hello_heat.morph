@@ -1,5 +1,5 @@
-# 01_hello_heat.kairo
-# Kairo Example: Hello Heat - Your First Kairo Program
+# 01_hello_heat.morph
+# Morphogen Example: Hello Heat - Your First Morphogen Program
 #
 # Description: Watch heat diffuse from a hot center in this simple,
 # visually satisfying introduction to field-based computation.
@@ -18,7 +18,7 @@
 #   - steps: Number of simulation steps (try 100 to 500)
 #   - dt: Timestep size (try 0.05 to 0.2)
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-07
 
 use field, visual

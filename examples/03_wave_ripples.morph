@@ -1,5 +1,5 @@
-# 03_wave_ripples.kairo
-# Kairo Example: Wave Ripples
+# 03_wave_ripples.morph
+# Morphogen Example: Wave Ripples
 #
 # Description: Simple wave equation simulation - like dropping a stone in water.
 # Watch concentric circular waves spread outward with beautiful interference patterns.
@@ -22,7 +22,7 @@
 #   ∂²u/∂t² = c² ∇²u
 # where u is displacement, c is wave speed, ∇² is the Laplacian
 #
-# Author: Kairo Team
+# Author: Morphogen Team
 # Date: 2025-11-07
 
 use field, visual
