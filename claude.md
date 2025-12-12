@@ -28,7 +28,7 @@
 
 3. **Run an example**
    ```bash
-   morphogen run examples/01_hello_heat.kairo
+   morphogen run examples/01_hello_heat.morph
    # Or for Python examples:
    python examples/field_ops/heat_diffusion.py
    ```
@@ -110,7 +110,7 @@ morphogen/
 │   └── cli.py               # Command-line interface
 ├── tests/                   # 900+ tests across 63 files
 ├── examples/                # Working examples for all domains
-│   ├── *.kairo              # Language examples
+│   ├── *.morph              # Language examples
 │   ├── agents/              # Agent simulations
 │   ├── audio/               # Audio synthesis
 │   ├── field_ops/           # Field operations
@@ -167,16 +167,16 @@ pytest tests/ -m integration          # Only integration tests
 ### Language Development
 ```bash
 # Run a Morphogen program
-morphogen run examples/01_hello_heat.kairo
+morphogen run examples/01_hello_heat.morph
 
 # Parse and show AST
-morphogen parse examples/01_hello_heat.kairo
+morphogen parse examples/01_hello_heat.morph
 
 # Type check
-morphogen check examples/01_hello_heat.kairo
+morphogen check examples/01_hello_heat.morph
 
 # Generate MLIR IR (text-based)
-morphogen mlir examples/01_hello_heat.kairo
+morphogen mlir examples/01_hello_heat.morph
 ```
 
 ### Code Quality

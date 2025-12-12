@@ -21,7 +21,7 @@ This document specifies **Kairo 2.0**, a complete redesign of the Kairo language
 **Core Philosophy:** Domains, operators, and translations are first-class citizens with explicit semantics, algebraic composition, and compiler-verified properties.
 
 **What's Different from Kairo 1.x:**
-- Domains defined declaratively in `.kairo` files (not Python)
+- Domains defined declaratively in `.morph` files (not Python)
 - First-class translation objects with invariant preservation
 - Algebraic composition operators (`∘`, `:`, `~`)
 - Explicit continuous/discrete distinction
@@ -215,7 +215,7 @@ io_result: IO<String> = read_file("data.txt")
 
 ### 3.1 Basic Domain Syntax
 
-**Declarative domain definition in `.kairo` files:**
+**Declarative domain definition in `.morph` files:**
 
 ```kairo
 domain Audio {
@@ -1123,7 +1123,7 @@ derive HamiltonianMechanics {
 
 | Feature | Kairo 1.x | Kairo 2.0 |
 |---------|-----------|-----------|
-| **Domain Definition** | Python classes | Declarative `.kairo` |
+| **Domain Definition** | Python classes | Declarative `.morph` |
 | **Translations** | Procedural functions | First-class objects |
 | **Composition** | `\|>` pipe only | `∘`, `:`, `~`, `<:`, `:>` |
 | **Continuous/Discrete** | Implicit | Explicit tags |

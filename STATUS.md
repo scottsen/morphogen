@@ -155,11 +155,11 @@
 
 ### 🎉 NEW: v0.11.0 Release - Advanced Visualizations & Domain Transformations (November 20, 2025)
 
-**Major Milestone**: Chemistry suite (9 domains), Procedural graphics (4 domains), and specialized physics domains added. All 40 domains now accessible from `.kairo` source files with full type safety and cross-domain validation.
+**Major Milestone**: Chemistry suite (9 domains), Procedural graphics (4 domains), and specialized physics domains added. All 40 domains now accessible from `.morph` source files with full type safety and cross-domain validation.
 
 ### 🎉 v0.10.0 Release - Level 2 & 3 Integration Complete (November 17, 2025)
 
-**Major Milestone**: USE statement + Geometry domain + Level 3 type system complete. All domains accessible from `.kairo` source files with full type safety and cross-domain validation.
+**Major Milestone**: USE statement + Geometry domain + Level 3 type system complete. All domains accessible from `.morph` source files with full type safety and cross-domain validation.
 
 **Key Achievements:**
 
@@ -168,8 +168,8 @@
    - Import syntax: `use field, audio, rigidbody`
    - 16 comprehensive tests (all passing)
    - Runtime validation against DomainRegistry
-   - Unlocks all 423+ operators for `.kairo` programs
-   - Example: `examples/use_statement_demo.kairo`
+   - Unlocks all 423+ operators for `.morph` programs
+   - Example: `examples/use_statement_demo.morph`
 
 2. **Geometry Domain** ✅ (PR #100, #101, #102)
    - 50+ operators for 2D/3D spatial operations
@@ -205,7 +205,7 @@
 - Production-ready cross-domain composition
 
 **What This Enables:**
-- Write `.kairo` programs using any of 500+ operators
+- Write `.morph` programs using any of 500+ operators
 - Type-safe cross-domain connections (field → agent, geometry → audio, molecular → field, etc.)
 - Physical unit validation at runtime
 - Rate-aware composition for audio/visual/physics sync
@@ -732,7 +732,7 @@ pytest -v
 **Installation:**
 ```bash
 pip install -e .
-morphogen run examples/heat_diffusion.kairo
+morphogen run examples/heat_diffusion.morph
 ```
 
 ---
@@ -825,7 +825,7 @@ morphogen run examples/heat_diffusion.kairo
 
 **Level 2 Integration - All 25 Domains:**
 - ✅ USE statement fully implemented (lexer, parser, AST, runtime)
-- ✅ 374+ operators across 25 domains accessible from `.kairo` files
+- ✅ 374+ operators across 25 domains accessible from `.morph` files
 - ✅ 16 comprehensive USE statement tests (all passing)
 - ✅ Domain import syntax: `use field, audio, rigidbody`
 - ✅ Runtime validation against DomainRegistry

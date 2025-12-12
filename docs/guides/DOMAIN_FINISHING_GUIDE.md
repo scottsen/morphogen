@@ -59,12 +59,12 @@ network = graph.create_empty(directed=False)
 **What it means:**
 - Domain registered in language runtime
 - `use {domain}` statement works
-- Operators callable from `.kairo` source files
+- Operators callable from `.morph` source files
 - Type signatures defined
 
 **Example:**
 ```morphogen
-# main.kairo
+# main.morph
 use graph
 
 let network = graph.create_empty(directed=false)
@@ -144,7 +144,7 @@ flow control_flow(dt) {
 **Example:**
 ```bash
 # Compile to native code
-kairo compile main.kairo --output main.so --optimize
+kairo compile main.morph --output main.so --optimize
 
 # 5-10x faster than Python runtime
 ./main.so
@@ -174,7 +174,7 @@ kairo compile main.kairo --output main.so --optimize
 
 **Gap 1: Language Integration (CRITICAL)**
 - **Impact:** Domains are Python libraries, not language features
-- **User Pain:** Can't write `.kairo` programs using new domains
+- **User Pain:** Can't write `.morph` programs using new domains
 - **Blocker:** All 23 domains stuck at Level 1
 - **Fix:** Domain registry + parser enhancement (8 weeks)
 
@@ -230,7 +230,7 @@ M1  M2  M3  M4  M5  M6  M7  M8  M9  M10
 
 ### Level 2: Language Integration (Months 3-4)
 
-**Goal:** All 23 domains accessible from `.kairo` source files
+**Goal:** All 23 domains accessible from `.morph` source files
 
 #### Work Items
 
@@ -438,7 +438,7 @@ def infer_operator_signature(op_func: Callable) -> TypeSignature:
 # tests/test_language_integration.py
 
 def test_use_graph_in_kairo_program():
-    """Test that graph domain works in .kairo files."""
+    """Test that graph domain works in .morph files."""
     program = """
     use graph
 
@@ -464,7 +464,7 @@ def test_all_domains_loadable():
         runtime.execute(program)  # Should not raise
 ```
 
-**Deliverable:** ✅ All 23 domains loadable from .kairo files
+**Deliverable:** ✅ All 23 domains loadable from .morph files
 
 ---
 
@@ -475,7 +475,7 @@ def test_all_domains_loadable():
 - [x] All 23 domains registered
 - [x] Type signatures defined for all operators
 - [x] Integration tests pass for all domains
-- [x] Can write `.kairo` programs using all domains
+- [x] Can write `.morph` programs using all domains
 - [x] Documentation updated
 
 **Timeline:** 8 weeks
@@ -1017,7 +1017,7 @@ Use this checklist for each domain:
 - [ ] Type signatures defined
 - [ ] `use {domain}` statement works
 - [ ] Integration test passes
-- [ ] Can write `.kairo` programs using this domain
+- [ ] Can write `.morph` programs using this domain
 
 **Level 3: Type System** (Incremental as type system is built)
 - [ ] Operators have correct input/output types
@@ -1058,7 +1058,7 @@ Use this checklist for each domain:
 
 ### By End of Month 4 (Language Integration)
 - [ ] 23/23 domains at Level 2
-- [ ] Can write `.kairo` programs using all domains
+- [ ] Can write `.morph` programs using all domains
 - [ ] Integration tests pass for all domains
 - [ ] Documentation updated
 
@@ -1109,13 +1109,13 @@ Use this checklist for each domain:
 kairo domains list
 
 # Verify domain can be used
-morphogen check main.kairo --domain graph
+morphogen check main.morph --domain graph
 
 # Run type checker
-kairo typecheck main.kairo
+kairo typecheck main.morph
 
 # Compile to MLIR
-kairo compile main.kairo --emit-mlir
+kairo compile main.morph --emit-mlir
 
 # Benchmark domain performance
 kairo benchmark --domain rigidbody --python-vs-mlir
@@ -1152,7 +1152,7 @@ A: Fix them! Level 1 (Python runtime) is the foundation. All higher levels depen
 **Q: What about testing?**
 A: Testing happens at every level:
 - Level 1: Unit tests (operators work)
-- Level 2: Integration tests (.kairo programs run)
+- Level 2: Integration tests (.morph programs run)
 - Level 3: Type tests (errors caught)
 - Level 4: Multirate tests (scheduling works)
 - Level 5: Performance tests (speedup verified)

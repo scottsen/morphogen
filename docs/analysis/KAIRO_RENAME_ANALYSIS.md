@@ -345,16 +345,16 @@ examples/procedural_graphics/demo_all_domains.py (from morphogen.stdlib.*)
 benchmarks/field_operations_benchmark.py         (from morphogen.mlir.*)
 ```
 
-### .kairo Language Files (Domain-Specific Language)
+### .morph Language Files (Domain-Specific Language)
 
 ```
-Total .kairo files: 24 files with 51 occurrences
+Total .morph files: 24 files with 51 occurrences
 
 Examples:
-  examples/10_heat_equation.kairo
-  examples/11_gray_scott.kairo
-  examples/20_bouncing_spheres.kairo
-  examples/circuit/01_rc_filter.kairo
+  examples/10_heat_equation.morph
+  examples/11_gray_scott.morph
+  examples/20_bouncing_spheres.morph
+  examples/circuit/01_rc_filter.morph
   [+19 more files]
 ```
 
@@ -697,7 +697,7 @@ Test Files (62 files):
 Example Scripts (68 files):
   68 Python example scripts
   130+ import statements to update
-  24 .kairo language files (minimal impact)
+  24 .morph language files (minimal impact)
 ```
 
 ### LOW PRIORITY FILES (Documentation)

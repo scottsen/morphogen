@@ -545,7 +545,7 @@ operator differentiate {
 - [ ] Add `domain` keyword to lexer/parser
 - [ ] Extend AST with DomainDeclaration node
 - [ ] Implement domain type checking
-- [ ] Allow users to define domains in .kairo files
+- [ ] Allow users to define domains in .morph files
 - [ ] Generate Python domain classes from Kairo domains
 
 **Deliverable:** Users can write `domain MyDomain { ... }` in Kairo
@@ -625,7 +625,7 @@ class CustomDomain:
 
 **Future (v0.12.0+):**
 ```kairo
-// In examples/custom_domain.kairo
+// In examples/custom_domain.morph
 domain Custom {
     entity signal: Stream<f32, custom, 1kHz>
 

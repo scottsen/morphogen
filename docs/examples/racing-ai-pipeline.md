@@ -116,7 +116,7 @@ A single unified computation graph with all domains composed together.
 ### Complete Pipeline Specification (YAML)
 
 ```yaml
-# racing_ai_pipeline.kairo
+# racing_ai_pipeline.morph
 
 simulation:
   physics: race_car

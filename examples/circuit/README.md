@@ -10,7 +10,7 @@ Kairo.Circuit enables **unified circuit simulation, PCB layout, analog audio mod
 
 ## Examples
 
-### 01. RC Low-Pass Filter (`01_rc_filter.kairo`)
+### 01. RC Low-Pass Filter (`01_rc_filter.morph`)
 
 **Demonstrates:**
 - Basic passive circuit simulation (R, L, C)
@@ -27,12 +27,12 @@ Kairo.Circuit enables **unified circuit simulation, PCB layout, analog audio mod
 
 **Run:**
 ```bash
-kairo simulate 01_rc_filter.kairo
+kairo simulate 01_rc_filter.morph
 ```
 
 ---
 
-### 02. Op-Amp Inverting Amplifier (`02_opamp_amplifier.kairo`)
+### 02. Op-Amp Inverting Amplifier (`02_opamp_amplifier.morph`)
 
 **Demonstrates:**
 - Nonlinear component modeling (op-amp)
@@ -49,12 +49,12 @@ kairo simulate 01_rc_filter.kairo
 
 **Run:**
 ```bash
-kairo simulate 02_opamp_amplifier.kairo
+kairo simulate 02_opamp_amplifier.morph
 ```
 
 ---
 
-### 03. Guitar Pedal (Tube Screamer) (`03_guitar_pedal.kairo`)
+### 03. Guitar Pedal (Tube Screamer) (`03_guitar_pedal.morph`)
 
 **Demonstrates:**
 - **Circuit → Audio domain integration** (unique to Kairo!)
@@ -73,7 +73,7 @@ kairo simulate 02_opamp_amplifier.kairo
 
 **Run:**
 ```bash
-kairo simulate 03_guitar_pedal.kairo --audio-input guitar_riff.wav
+kairo simulate 03_guitar_pedal.morph --audio-input guitar_riff.wav
 ```
 
 **Output:**
@@ -83,7 +83,7 @@ kairo simulate 03_guitar_pedal.kairo --audio-input guitar_riff.wav
 
 ---
 
-### 04. PCB Trace Inductance (`04_pcb_trace_inductance.kairo`)
+### 04. PCB Trace Inductance (`04_pcb_trace_inductance.morph`)
 
 **Demonstrates:**
 - **Circuit + Geometry domain integration** (unique to Kairo!)
@@ -102,7 +102,7 @@ kairo simulate 03_guitar_pedal.kairo --audio-input guitar_riff.wav
 
 **Run:**
 ```bash
-kairo simulate 04_pcb_trace_inductance.kairo
+kairo simulate 04_pcb_trace_inductance.morph
 ```
 
 **Output:**
@@ -112,7 +112,7 @@ kairo simulate 04_pcb_trace_inductance.kairo
 
 ---
 
-### 05. Unified Multi-Domain Example (`05_unified_example.kairo`)
+### 05. Unified Multi-Domain Example (`05_unified_example.morph`)
 
 **Demonstrates:**
 - **ALL domains integrated** (Circuit + PCB + Audio + EM + Thermal + Pattern)
@@ -138,7 +138,7 @@ kairo simulate 04_pcb_trace_inductance.kairo
 
 **Run:**
 ```bash
-kairo simulate 05_unified_example.kairo --audio-input guitar_solo.wav --multi-domain
+kairo simulate 05_unified_example.morph --audio-input guitar_solo.wav --multi-domain
 ```
 
 **Output:**
@@ -180,32 +180,32 @@ kairo --version
 
 ```bash
 # Basic simulation
-kairo simulate 01_rc_filter.kairo
+kairo simulate 01_rc_filter.morph
 
 # With audio input
-kairo simulate 03_guitar_pedal.kairo --audio-input guitar.wav
+kairo simulate 03_guitar_pedal.morph --audio-input guitar.wav
 
 # Multi-domain simulation
-kairo simulate 05_unified_example.kairo --multi-domain
+kairo simulate 05_unified_example.morph --multi-domain
 
 # With visualization
-kairo simulate 01_rc_filter.kairo --plot
+kairo simulate 01_rc_filter.morph --plot
 ```
 
 ### Export Formats
 
 ```bash
 # SPICE netlist
-kairo export 01_rc_filter.kairo --format spice
+kairo export 01_rc_filter.morph --format spice
 
 # KiCad PCB
-kairo export 04_pcb_trace_inductance.kairo --format kicad
+kairo export 04_pcb_trace_inductance.morph --format kicad
 
 # Audio (WAV)
-kairo export 03_guitar_pedal.kairo --format wav
+kairo export 03_guitar_pedal.morph --format wav
 
 # All formats
-kairo export 05_unified_example.kairo --format all
+kairo export 05_unified_example.morph --format all
 ```
 
 ---
@@ -245,7 +245,7 @@ circuit MyFilter {
 ### Step 4: Run Simulation
 
 ```bash
-kairo simulate my_filter.kairo --plot
+kairo simulate my_filter.morph --plot
 ```
 
 ---
@@ -302,7 +302,7 @@ thermal_analysis:
 
 ## Next Steps
 
-1. **Study the examples** - Start with `01_rc_filter.kairo` and work up
+1. **Study the examples** - Start with `01_rc_filter.morph` and work up
 2. **Modify parameters** - Change component values, see how results change
 3. **Add your own circuits** - Use examples as templates
 4. **Combine domains** - Circuit + Audio, Circuit + PCB, Circuit + Thermal
@@ -323,6 +323,6 @@ thermal_analysis:
 
 - **GitHub:** https://github.com/kairo-lang/kairo
 - **Discord:** https://discord.gg/kairo
-- **Forum:** https://forum.kairo.dev
+- **Forum:** https://forum.morph.dev
 
 **Questions? Ask in the #circuit-modeling channel on Discord!**

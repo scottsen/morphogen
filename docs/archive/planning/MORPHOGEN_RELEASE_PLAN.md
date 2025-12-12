@@ -58,7 +58,7 @@
 - `morphogen/stdlib/circuit.py` (~2,500 lines)
 - 100+ tests
 - 5+ examples (RC filter, oscillator, analog synth)
-- Cross-domain demo: `circuit_to_audio.kairo`
+- Cross-domain demo: `circuit_to_audio.morph`
 
 #### Track 3 - Adoption
 **PyPI Release Infrastructure**

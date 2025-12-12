@@ -949,11 +949,11 @@ When implemented, this should include:
 - `docs/examples/2stroke-expansion-chamber.md` — Walkthrough
 
 ### Examples
-- `examples/acoustics/01_pipe_resonance.kairo` — Simple resonance
-- `examples/acoustics/02_helmholtz_resonator.kairo` — Resonator tuning
-- `examples/acoustics/03_expansion_chamber.kairo` — 2-stroke chamber
-- `examples/acoustics/04_full_exhaust_system.kairo` — Complete system
-- `examples/acoustics/05_inverse_design.kairo` — Optimization
+- `examples/acoustics/01_pipe_resonance.morph` — Simple resonance
+- `examples/acoustics/02_helmholtz_resonator.morph` — Resonator tuning
+- `examples/acoustics/03_expansion_chamber.morph` — 2-stroke chamber
+- `examples/acoustics/04_full_exhaust_system.morph` — Complete system
+- `examples/acoustics/05_inverse_design.morph` — Optimization
 
 ### Tests
 - Reflection coefficient accuracy

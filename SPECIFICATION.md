@@ -131,7 +131,7 @@ Morphogen has evolved from Creative Computation DSL v0.2.2 through several itera
 ### 3.1 Hello, World
 
 ```morphogen
-# hello.kairo - Your first Morphogen program
+# hello.morph - Your first Morphogen program
 
 use visual
 
@@ -143,7 +143,7 @@ flow(dt=1.0, steps=1) {
 ### 3.2 Simple Diffusion
 
 ```morphogen
-# diffusion.kairo - Heat spreading over time
+# diffusion.morph - Heat spreading over time
 
 use field, visual
 
@@ -158,7 +158,7 @@ flow(dt=0.1, steps=100) {
 ### 3.3 Particle System
 
 ```morphogen
-# particles.kairo - Simple particle physics
+# particles.morph - Simple particle physics
 
 use agent, visual
 
@@ -1788,7 +1788,7 @@ Native code
 ### 18.1 Heat Diffusion
 
 ```morphogen
-# diffusion.kairo - Simple heat diffusion
+# diffusion.morph - Simple heat diffusion
 
 use field, visual
 
@@ -1810,7 +1810,7 @@ flow(dt=0.01, steps=500) {
 ### 18.2 Smoke Simulation
 
 ```morphogen
-# smoke.kairo - Incompressible fluid with density
+# smoke.morph - Incompressible fluid with density
 
 use field, visual
 
@@ -1871,7 +1871,7 @@ fn add_source(field: Field2D<f32>, pos: (f32, f32), radius: f32, amount: f32) ->
 ### 18.3 Reaction-Diffusion (Gray-Scott)
 
 ```morphogen
-# gray_scott.kairo - Pattern formation
+# gray_scott.morph - Pattern formation
 
 use field, visual
 
@@ -1918,7 +1918,7 @@ fn add_circle(field: Field2D<f32>, center: (f32, f32), radius: f32, value: f32) 
 ### 18.4 Flocking (Boids)
 
 ```morphogen
-# boids.kairo - Flocking behavior
+# boids.morph - Flocking behavior
 
 use agent, visual
 

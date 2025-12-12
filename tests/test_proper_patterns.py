@@ -9,7 +9,7 @@ print("Testing Kairo with Proper Physics Patterns")
 print("=" * 60)
 print()
 
-# Test 1: Heat diffusion from hot spot (like 01_hello_heat.kairo)
+# Test 1: Heat diffusion from hot spot (like 01_hello_heat.morph)
 print("Test 1: Heat diffusion from center hot spot...")
 temp = field.alloc((128, 128), fill_value=0.0)
 
@@ -41,7 +41,7 @@ vis = visual.colorize(temp, palette="fire", vmin=0.0, vmax=100.0)
 visual.output(vis, path="test_heat_diffusion.png")
 print("  Saved: test_heat_diffusion.png")
 
-# Test 2: Wave ripples (like 03_wave_ripples.kairo)
+# Test 2: Wave ripples (like 03_wave_ripples.morph)
 print("\nTest 2: Wave ripples simulation...")
 
 u = field.alloc((128, 128), fill_value=0.0)
@@ -78,7 +78,7 @@ vis_wave = visual.colorize(u, palette="coolwarm", vmin=-1.0, vmax=1.0)
 visual.output(vis_wave, path="test_wave_ripples.png")
 print("  Saved: test_wave_ripples.png")
 
-# Test 3: Gray-Scott reaction-diffusion (like 11_gray_scott.kairo)
+# Test 3: Gray-Scott reaction-diffusion (like 11_gray_scott.morph)
 print("\nTest 3: Gray-Scott reaction-diffusion patterns...")
 
 u_gs = field.alloc((128, 128), fill_value=1.0)

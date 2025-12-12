@@ -172,8 +172,8 @@ docs/
 │   └── 003-physics-domain-design.md  # Design decisions
 └── examples/
     └── physics/
-        ├── n_body_solar_system.kairo
-        └── rigid_body_collision.kairo
+        ├── n_body_solar_system.morph
+        └── rigid_body_collision.morph
 ```
 
 ---
@@ -188,7 +188,7 @@ Implement in this order (dependencies flow downward):
 4. **morphogen/mlir/lowering/physics_to_scf.py** - Lowering to MLIR
 5. **morphogen/mlir/passes/physics/*.py** - Optimization passes
 6. **tests/test_physics_*.py** - Tests (continuous validation)
-7. **docs/examples/physics/*.kairo** - Example programs
+7. **docs/examples/physics/*.morph** - Example programs
 
 ---
 

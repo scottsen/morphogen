@@ -199,7 +199,7 @@ let processed = audio_chain(input_signal)
 - Runtime support: `morphogen/runtime/composition.py` (~500 lines)
 - Audio DSL updates: ~300 lines
 - Tests: 40+ tests
-- Examples: `examples/audio/composition_chains.kairo`
+- Examples: `examples/audio/composition_chains.morph`
 - Docs: `docs/specifications/algebraic-composition.md`
 
 **Value Proposition:**

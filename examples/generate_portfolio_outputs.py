@@ -16,8 +16,8 @@ from morphogen.stdlib.visual import visual
 
 
 def generate_hello_heat():
-    """Generate output for 01_hello_heat.kairo."""
-    print("Generating 01_hello_heat.kairo output...")
+    """Generate output for 01_hello_heat.morph."""
+    print("Generating 01_hello_heat.morph output...")
 
     # Allocate temperature field
     temp = field.alloc((128, 128), fill_value=0.0)
@@ -51,8 +51,8 @@ def generate_hello_heat():
 
 
 def generate_pulsing_circle():
-    """Generate output for 02_pulsing_circle.kairo."""
-    print("Generating 02_pulsing_circle.kairo output...")
+    """Generate output for 02_pulsing_circle.morph."""
+    print("Generating 02_pulsing_circle.morph output...")
 
     BASE_RADIUS = 20.0
     PULSE_AMPLITUDE = 10.0
@@ -98,8 +98,8 @@ def generate_pulsing_circle():
 
 
 def generate_wave_ripples():
-    """Generate output for 03_wave_ripples.kairo."""
-    print("Generating 03_wave_ripples.kairo output...")
+    """Generate output for 03_wave_ripples.morph."""
+    print("Generating 03_wave_ripples.morph output...")
 
     # Wave equation parameters
     WAVE_SPEED = 0.5
@@ -144,8 +144,8 @@ def generate_wave_ripples():
 
 
 def generate_heat_equation():
-    """Generate output for 10_heat_equation.kairo."""
-    print("Generating 10_heat_equation.kairo output...")
+    """Generate output for 10_heat_equation.morph."""
+    print("Generating 10_heat_equation.morph output...")
 
     KAPPA = 0.1
     HOT_TEMP = 350.0
@@ -181,8 +181,8 @@ def generate_heat_equation():
 
 
 def generate_gray_scott():
-    """Generate output for 11_gray_scott.kairo."""
-    print("Generating 11_gray_scott.kairo output...")
+    """Generate output for 11_gray_scott.morph."""
+    print("Generating 11_gray_scott.morph output...")
 
     Du = 0.16
     Dv = 0.08

@@ -414,7 +414,7 @@ This represents a **massive milestone**: all 23 stdlib domains are now fully int
 ```
 ✓ 23/23 domains registered and discoverable
 ✓ 374 total operators across all domains
-✓ All operators callable from .kairo source files
+✓ All operators callable from .morph source files
 ✓ Full metadata: domain, category, signature, determinism, docs
 ```
 
@@ -1654,11 +1654,11 @@ This release includes preparation for the project's upcoming rename from Morphog
     - `docs/ADR/003-circuit-modeling-domain.md`: Complete design rationale for circuit modeling domain
     - `docs/SPEC-CIRCUIT.md`: Full circuit domain specification with 4-layer operator hierarchy
   - **Example Circuits**:
-    - `examples/circuit/01_rc_filter.kairo`: RC filter with frequency response
-    - `examples/circuit/02_opamp_amplifier.kairo`: Nonlinear op-amp modeling
-    - `examples/circuit/03_guitar_pedal.kairo`: Circuit → Audio integration (Tube Screamer)
-    - `examples/circuit/04_pcb_trace_inductance.kairo`: Geometry → Circuit parasitic extraction
-    - `examples/circuit/05_unified_example.kairo`: Complete multi-domain integration
+    - `examples/circuit/01_rc_filter.morph`: RC filter with frequency response
+    - `examples/circuit/02_opamp_amplifier.morph`: Nonlinear op-amp modeling
+    - `examples/circuit/03_guitar_pedal.morph`: Circuit → Audio integration (Tube Screamer)
+    - `examples/circuit/04_pcb_trace_inductance.morph`: Geometry → Circuit parasitic extraction
+    - `examples/circuit/05_unified_example.morph`: Complete multi-domain integration
     - `examples/circuit/README.md`: Comprehensive circuit examples documentation
   - **Key Capabilities**: Typed operator graphs (R → C → Op-Amp), multi-domain integration (Circuit ↔ Audio, Geometry, Physics), reference-based composition, type + unit safety
   - **Domain Position**: Core domain 1.8 in DOMAIN_ARCHITECTURE.md

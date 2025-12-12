@@ -461,7 +461,7 @@ Unknown fields are **ignored** (not errors):
 ### Graph Export
 
 ```bash
-$ kairo graph export scene.kairo --format json > scene_graph.json
+$ kairo graph export scene.morph --format json > scene_graph.json
 ```
 
 ### Visualization

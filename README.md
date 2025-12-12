@@ -159,10 +159,10 @@ pip install -e .
 
 ### Your First Program
 
-Create `hello.kairo` (Morphogen source files use `.kairo` extension):
+Create `hello.morph` (Morphogen source files use `.morph` extension):
 
 ```morphogen
-# hello.kairo - Heat diffusion
+# hello.morph - Heat diffusion
 
 use field, visual
 
@@ -184,7 +184,7 @@ flow(dt=0.01, steps=500) {
 Run it:
 
 ```bash
-morphogen run hello.kairo
+morphogen run hello.morph
 ```
 
 **Next steps:**

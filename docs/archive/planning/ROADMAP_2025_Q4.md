@@ -119,7 +119,7 @@
 - `/morphogen/stdlib/circuit.py` (2,000-2,500 lines)
 - `/tests/test_circuit*.py` (1,000+ lines, 100+ tests)
 - `/examples/circuit/` (5+ examples: RC filter, oscillator, analog synth)
-- `/examples/cross_domain/circuit_to_audio.kairo` (showcase demo)
+- `/examples/cross_domain/circuit_to_audio.morph` (showcase demo)
 - Domain registry updates, documentation
 
 **Success Metric:** Demo video showing "design circuit → simulate → synthesize audio" workflow

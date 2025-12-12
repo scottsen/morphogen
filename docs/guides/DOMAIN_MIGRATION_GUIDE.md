@@ -12,7 +12,7 @@ Morphogen has **40 implemented domains**, but only **25 are currently accessible
 
 ### Active Domains (25) ✅
 These domains are fully integrated:
-- Accessible via `use domain_name` in `.kairo` files
+- Accessible via `use domain_name` in `.morph` files
 - Operators discoverable via `DomainRegistry`
 - Full type safety and validation
 
@@ -20,7 +20,7 @@ These domains are fully integrated:
 These domains are implemented but not integrated:
 - Code exists in `morphogen/stdlib/`
 - Functions work when called from Python
-- **Cannot** be used in `.kairo` programs
+- **Cannot** be used in `.morph` programs
 - Missing `@operator` decorators
 
 ## Why Migration is Needed
@@ -179,7 +179,7 @@ Complete chemistry integration:
 
 6. **Integration Test**
    ```python
-   # Test in .kairo file
+   # Test in .morph file
    use molecular
 
    @state atoms : Atoms = create_water_molecule()
@@ -272,7 +272,7 @@ A domain is successfully migrated when:
 2. ✅ Domain is registered in `domain_registry.py`
 3. ✅ `DomainRegistry.get("domain_name")` returns descriptor
 4. ✅ All operators listed in descriptor
-5. ✅ `use domain_name` works in `.kairo` files
+5. ✅ `use domain_name` works in `.morph` files
 6. ✅ Test file exists with >80% coverage
 7. ✅ All tests passing
 8. ✅ Documentation updated

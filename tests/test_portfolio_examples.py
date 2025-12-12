@@ -30,14 +30,14 @@ class TestPortfolioExamples:
 
     def test_01_hello_heat_parses(self, examples_dir):
         """Test that 01_hello_heat.morphogen parses correctly."""
-        example_path = examples_dir / "01_hello_heat.kairo"
+        example_path = examples_dir / "01_hello_heat.morph"
         source = example_path.read_text()
         program = parse(source)
         assert program is not None
 
     def test_01_hello_heat_executes(self, examples_dir):
-        """Test that 01_hello_heat.kairo executes without errors."""
-        example_path = examples_dir / "01_hello_heat.kairo"
+        """Test that 01_hello_heat.morph executes without errors."""
+        example_path = examples_dir / "01_hello_heat.morph"
         source = example_path.read_text()
         program = parse(source)
 
@@ -52,14 +52,14 @@ class TestPortfolioExamples:
 
     def test_02_pulsing_circle_parses(self, examples_dir):
         """Test that 02_pulsing_circle.morphogen parses correctly."""
-        example_path = examples_dir / "02_pulsing_circle.kairo"
+        example_path = examples_dir / "02_pulsing_circle.morph"
         source = example_path.read_text()
         program = parse(source)
         assert program is not None
 
     def test_02_pulsing_circle_executes(self, examples_dir):
-        """Test that 02_pulsing_circle.kairo executes without errors."""
-        example_path = examples_dir / "02_pulsing_circle.kairo"
+        """Test that 02_pulsing_circle.morph executes without errors."""
+        example_path = examples_dir / "02_pulsing_circle.morph"
         source = example_path.read_text()
         program = parse(source)
 
@@ -73,14 +73,14 @@ class TestPortfolioExamples:
 
     def test_03_wave_ripples_parses(self, examples_dir):
         """Test that 03_wave_ripples.morphogen parses correctly."""
-        example_path = examples_dir / "03_wave_ripples.kairo"
+        example_path = examples_dir / "03_wave_ripples.morph"
         source = example_path.read_text()
         program = parse(source)
         assert program is not None
 
     def test_03_wave_ripples_executes(self, examples_dir):
-        """Test that 03_wave_ripples.kairo executes without errors."""
-        example_path = examples_dir / "03_wave_ripples.kairo"
+        """Test that 03_wave_ripples.morph executes without errors."""
+        example_path = examples_dir / "03_wave_ripples.morph"
         source = example_path.read_text()
         program = parse(source)
 
@@ -97,14 +97,14 @@ class TestPortfolioExamples:
 
     def test_10_heat_equation_parses(self, examples_dir):
         """Test that 10_heat_equation.morphogen parses correctly."""
-        example_path = examples_dir / "10_heat_equation.kairo"
+        example_path = examples_dir / "10_heat_equation.morph"
         source = example_path.read_text()
         program = parse(source)
         assert program is not None
 
     def test_10_heat_equation_executes(self, examples_dir):
-        """Test that 10_heat_equation.kairo executes without errors."""
-        example_path = examples_dir / "10_heat_equation.kairo"
+        """Test that 10_heat_equation.morph executes without errors."""
+        example_path = examples_dir / "10_heat_equation.morph"
         source = example_path.read_text()
         program = parse(source)
 
@@ -118,14 +118,14 @@ class TestPortfolioExamples:
 
     def test_11_gray_scott_parses(self, examples_dir):
         """Test that 11_gray_scott.morphogen parses correctly."""
-        example_path = examples_dir / "11_gray_scott.kairo"
+        example_path = examples_dir / "11_gray_scott.morph"
         source = example_path.read_text()
         program = parse(source)
         assert program is not None
 
     def test_11_gray_scott_executes(self, examples_dir):
-        """Test that 11_gray_scott.kairo executes without errors."""
-        example_path = examples_dir / "11_gray_scott.kairo"
+        """Test that 11_gray_scott.morph executes without errors."""
+        example_path = examples_dir / "11_gray_scott.morph"
         source = example_path.read_text()
         program = parse(source)
 
@@ -265,7 +265,7 @@ class TestPortfolioDeterminism:
 
     def test_hello_heat_deterministic(self, examples_dir):
         """Test that hello heat example is deterministic."""
-        example_path = examples_dir / "01_hello_heat.kairo"
+        example_path = examples_dir / "01_hello_heat.morph"
         source = example_path.read_text()
 
         # Run twice with same seed

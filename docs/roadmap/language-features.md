@@ -151,7 +151,7 @@ import physics as phys        // Aliasing
 **Impact:** MEDIUM — Developer productivity
 
 ```bash
-morphogen run --watch simulation.kairo  # Auto-reload on changes
+morphogen run --watch simulation.morph  # Auto-reload on changes
 ```
 
 #### 6. **Geometry Domain Integration** (v0.18)

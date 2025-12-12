@@ -118,7 +118,7 @@ Located: `/examples/showcase/` (4 portfolio-quality demos)
 
 ### Total Example Count
 - **34+ Python examples** across 8 example directories
-- **10+ .kairo language files** for reference
+- **10+ .morph language files** for reference
 - **580+ comprehensive tests** (unit, integration, determinism)
 
 ---

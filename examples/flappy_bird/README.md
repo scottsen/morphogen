@@ -470,8 +470,8 @@ This is **exactly what Kairo was designed for.**
 
 ### Related Examples
 - `examples/integrators/` – Physics integrators (RK4, Verlet, etc.)
-- `examples/01_hello_heat.kairo` – Field operations and visualization
-- `examples/v0_3_1_struct_physics.kairo` – Structured physics simulation
+- `examples/01_hello_heat.morph` – Field operations and visualization
+- `examples/v0_3_1_struct_physics.morph` – Structured physics simulation
 
 ### External References
 - [Neuroevolution](https://en.wikipedia.org/wiki/Neuroevolution)
@@ -486,7 +486,7 @@ Want to extend this demo? Ideas:
 
 1. **Add more game features** (powerups, obstacles, score multipliers)
 2. **Implement NEAT** (topology-evolving networks)
-3. **Port to Kairo DSL** (`.kairo` file instead of Python)
+3. **Port to Kairo DSL** (`.morph` file instead of Python)
 4. **Benchmark on GPU** (compile to MLIR dialect)
 5. **Create interactive GUI** (pygame/pyglet integration)
 

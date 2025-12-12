@@ -14,7 +14,7 @@ print()
 # ============================================================================
 
 def generate_random_walk():
-    """Generate output for 04_random_walk.kairo."""
+    """Generate output for 04_random_walk.morph."""
     print("Example 04: Random Walk - Brownian Motion Patterns")
     print("-" * 60)
 
@@ -80,7 +80,7 @@ def generate_random_walk():
 # ============================================================================
 
 def generate_gradient_flow():
-    """Generate output for 05_gradient_flow.kairo."""
+    """Generate output for 05_gradient_flow.morph."""
     print("Example 05: Gradient Flow - Advection and Mixing")
     print("-" * 60)
 

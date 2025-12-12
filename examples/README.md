@@ -20,11 +20,11 @@ This directory contains comprehensive examples demonstrating Kairo's capabilitie
 
 Perfect for getting started - simple, clear, and immediately rewarding!
 
-### `01_hello_heat.kairo` ⭐ **START HERE**
+### `01_hello_heat.morph` ⭐ **START HERE**
 Your first Kairo program! Watch heat diffuse from a hot center.
 
 ```bash
-morphogen run examples/01_hello_heat.kairo
+morphogen run examples/01_hello_heat.morph
 ```
 
 **Demonstrates:** Field initialization, diffusion operation, visual output
@@ -41,11 +41,11 @@ morphogen run examples/01_hello_heat.kairo
 
 ---
 
-### `02_pulsing_circle.kairo`
+### `02_pulsing_circle.morph`
 Hypnotic animation of a circle that smoothly grows and shrinks.
 
 ```bash
-morphogen run examples/02_pulsing_circle.kairo
+morphogen run examples/02_pulsing_circle.morph
 ```
 
 **Demonstrates:** Lambda expressions, coordinate math, time-based animation
@@ -55,11 +55,11 @@ morphogen run examples/02_pulsing_circle.kairo
 
 ---
 
-### `03_wave_ripples.kairo`
+### `03_wave_ripples.morph`
 Drop a stone in water - watch realistic wave ripples spread outward.
 
 ```bash
-morphogen run examples/03_wave_ripples.kairo
+morphogen run examples/03_wave_ripples.morph
 ```
 
 **Demonstrates:** Wave equation (2 fields), Laplacian operator, physics simulation
@@ -73,11 +73,11 @@ morphogen run examples/03_wave_ripples.kairo
 
 Real simulations demonstrating multiple Kairo features working together.
 
-### `04_random_walk.kairo`
+### `04_random_walk.morph`
 Watch random walkers create beautiful diffusion patterns from simple stochastic rules.
 
 ```bash
-morphogen run examples/04_random_walk.kairo
+morphogen run examples/04_random_walk.morph
 ```
 
 **Demonstrates:** Random number generation, state accumulation, emergent behavior
@@ -88,11 +88,11 @@ morphogen run examples/04_random_walk.kairo
 
 ---
 
-### `05_gradient_flow.kairo`
+### `05_gradient_flow.morph`
 Mesmerizing color gradients swirl and mix under a rotating velocity field.
 
 ```bash
-morphogen run examples/05_gradient_flow.kairo
+morphogen run examples/05_gradient_flow.morph
 ```
 
 **Demonstrates:** Advection operation, vector fields, multi-channel visualization
@@ -103,11 +103,11 @@ morphogen run examples/05_gradient_flow.kairo
 
 ---
 
-### `10_heat_equation.kairo`
+### `10_heat_equation.morph`
 Complete heat diffusion with hot sources and cold sinks.
 
 ```bash
-morphogen run examples/10_heat_equation.kairo
+morphogen run examples/10_heat_equation.morph
 ```
 
 **Demonstrates:** Boundary conditions, physical units, thermal physics
@@ -117,11 +117,11 @@ morphogen run examples/10_heat_equation.kairo
 
 ---
 
-### `11_gray_scott.kairo` ⭐ **MUST SEE**
+### `11_gray_scott.morph` ⭐ **MUST SEE**
 Stunning organic patterns from reaction-diffusion chemistry.
 
 ```bash
-morphogen run examples/11_gray_scott.kairo
+morphogen run examples/11_gray_scott.morph
 ```
 
 **Demonstrates:** Coupled PDEs, Laplacian operator, emergent complexity
@@ -141,11 +141,11 @@ morphogen run examples/11_gray_scott.kairo
 
 Showcasing v0.3.1 language features and complex simulations.
 
-### `v0_3_1_complete_demo.kairo`
+### `v0_3_1_complete_demo.morph`
 Complete showcase of all v0.3.1 language features.
 
 ```bash
-morphogen run examples/v0_3_1_complete_demo.kairo
+morphogen run examples/v0_3_1_complete_demo.morph
 ```
 
 **Demonstrates:** Functions, lambdas, structs, recursion, flow blocks
@@ -153,11 +153,11 @@ morphogen run examples/v0_3_1_complete_demo.kairo
 
 ---
 
-### `v0_3_1_lambdas_and_flow.kairo`
+### `v0_3_1_lambdas_and_flow.morph`
 Lambda expressions and flow block integration.
 
 ```bash
-morphogen run examples/v0_3_1_lambdas_and_flow.kairo
+morphogen run examples/v0_3_1_lambdas_and_flow.morph
 ```
 
 **Demonstrates:** Higher-order functions, closures, temporal evolution
@@ -165,11 +165,11 @@ morphogen run examples/v0_3_1_lambdas_and_flow.kairo
 
 ---
 
-### `v0_3_1_recursive_factorial.kairo`
+### `v0_3_1_recursive_factorial.morph`
 Classic recursion example computing factorial.
 
 ```bash
-morphogen run examples/v0_3_1_recursive_factorial.kairo
+morphogen run examples/v0_3_1_recursive_factorial.morph
 ```
 
 **Demonstrates:** Function definitions, recursion, return statements
@@ -177,11 +177,11 @@ morphogen run examples/v0_3_1_recursive_factorial.kairo
 
 ---
 
-### `v0_3_1_struct_physics.kairo`
+### `v0_3_1_struct_physics.morph`
 Struct-based physics simulation with vector operations.
 
 ```bash
-morphogen run examples/v0_3_1_struct_physics.kairo
+morphogen run examples/v0_3_1_struct_physics.morph
 ```
 
 **Demonstrates:** Struct definitions, methods, physics integration
@@ -189,11 +189,11 @@ morphogen run examples/v0_3_1_struct_physics.kairo
 
 ---
 
-### `v0_3_1_velocity_calculation.kairo`
+### `v0_3_1_velocity_calculation.morph`
 Velocity field calculations and gradient computations.
 
 ```bash
-morphogen run examples/v0_3_1_velocity_calculation.kairo
+morphogen run examples/v0_3_1_velocity_calculation.morph
 ```
 
 **Demonstrates:** Vector fields, gradient operators
@@ -205,11 +205,11 @@ morphogen run examples/v0_3_1_velocity_calculation.kairo
 
 Showcasing the new geometry domain with cross-domain integration. These examples demonstrate how geometry operations combine with physics, fields, agents, and procedural generation.
 
-### `20_bouncing_spheres.kairo`
+### `20_bouncing_spheres.morph`
 Physics simulation with 3D geometry collision detection.
 
 ```bash
-morphogen run examples/20_bouncing_spheres.kairo
+morphogen run examples/20_bouncing_spheres.morph
 ```
 
 **Demonstrates:** geometry + rigidbody integration, 3D primitives (sphere, box3d), bounding boxes, collision detection
@@ -225,11 +225,11 @@ morphogen run examples/20_bouncing_spheres.kairo
 
 ---
 
-### `21_voronoi_heat.kairo`
+### `21_voronoi_heat.morph`
 Heat diffusion across Voronoi cells with geometric field sampling.
 
 ```bash
-morphogen run examples/21_voronoi_heat.kairo
+morphogen run examples/21_voronoi_heat.morph
 ```
 
 **Demonstrates:** geometry + field integration, Voronoi diagrams, spatial field queries, distance calculations
@@ -244,11 +244,11 @@ morphogen run examples/21_voronoi_heat.kairo
 
 ---
 
-### `22_delaunay_terrain.kairo`
+### `22_delaunay_terrain.morph`
 Procedural terrain generation using Delaunay triangulation and Perlin noise.
 
 ```bash
-morphogen run examples/22_delaunay_terrain.kairo
+morphogen run examples/22_delaunay_terrain.morph
 ```
 
 **Demonstrates:** geometry + noise + field integration, Delaunay triangulation, mesh generation, noise sampling
@@ -264,11 +264,11 @@ morphogen run examples/22_delaunay_terrain.kairo
 
 ---
 
-### `23_geometry_patrol.kairo`
+### `23_geometry_patrol.morph`
 Agent navigation with convex hull patrol routes and obstacle avoidance.
 
 ```bash
-morphogen run examples/23_geometry_patrol.kairo
+morphogen run examples/23_geometry_patrol.morph
 ```
 
 **Demonstrates:** geometry + agent + field integration, convex hull, spatial queries, collision detection
@@ -285,11 +285,11 @@ morphogen run examples/23_geometry_patrol.kairo
 
 ---
 
-### `24_mesh_morphing.kairo`
+### `24_mesh_morphing.morph`
 Advanced 3D mesh operations with subdivision and shape interpolation.
 
 ```bash
-morphogen run examples/24_mesh_morphing.kairo
+morphogen run examples/24_mesh_morphing.morph
 ```
 
 **Demonstrates:** 3D mesh operations, subdivision surfaces, collision meshes, volume calculations, transformations
@@ -306,11 +306,11 @@ morphogen run examples/24_mesh_morphing.kairo
 
 ---
 
-### `25_convex_hull_art.kairo`
+### `25_convex_hull_art.morph`
 Real-time convex hull computation with dynamic point clouds.
 
 ```bash
-morphogen run examples/25_convex_hull_art.kairo
+morphogen run examples/25_convex_hull_art.morph
 ```
 
 **Demonstrates:** convex hull algorithm, dynamic geometry, point containment, coordinate transformations
@@ -627,11 +627,11 @@ python examples/phase6_jit_aot_compilation.py
 
 ## Running Examples
 
-### Kairo Language Files (`.kairo`)
+### Kairo Language Files (`.morph`)
 
 ```bash
 # Basic execution
-morphogen run examples/01_hello_heat.kairo
+morphogen run examples/01_hello_heat.morph
 
 # View available options
 morphogen run --help
@@ -671,11 +671,11 @@ pip install mlir -f https://github.com/makslevental/mlir-wheels/releases/expande
 
 **Goal:** Learn Kairo language and core concepts
 
-1. `01_hello_heat.kairo` - Understand basic syntax
-2. `02_pulsing_circle.kairo` - Temporal animation
-3. `10_heat_equation.kairo` - PDE simulation
-4. `04_random_walk.kairo` - Agent basics
-5. `11_gray_scott.kairo` - Complex patterns
+1. `01_hello_heat.morph` - Understand basic syntax
+2. `02_pulsing_circle.morph` - Temporal animation
+3. `10_heat_equation.morph` - PDE simulation
+4. `04_random_walk.morph` - Agent basics
+5. `11_gray_scott.morph` - Complex patterns
 6. `audio_io_demo.py` - Audio synthesis
 7. `visual_composition_demo.py` - Multi-layer visuals
 
@@ -704,19 +704,19 @@ pip install mlir -f https://github.com/makslevental/mlir-wheels/releases/expande
 ### By Dialect
 
 - **Field:** `01`, `02`, `03`, `05`, `10`, `11`, `phase2`, `smoke_simulation.py`
-- **Agent:** `04`, `phase4`, `v0_3_1_struct_physics.kairo`
+- **Agent:** `04`, `phase4`, `v0_3_1_struct_physics.morph`
 - **Audio:** `audio_io_demo.py`, `audio_dsp_spectral.py`, `phase5`
-- **Visual:** `visual_composition_demo.py`, all `.kairo` files with `output`
+- **Visual:** `visual_composition_demo.py`, all `.morph` files with `output`
 
 ### By Complexity
 
 - **Beginner (🟢):** `01`, `02`, `03` (< 100 lines, single dialect)
 - **Intermediate (🟡):** `04`, `05`, `10`, `11` (100-150 lines, multiple features)
-- **Advanced (🔴):** `v0_3_1_*.kairo`, all `phase*.py` (200+ lines, compiler internals)
+- **Advanced (🔴):** `v0_3_1_*.morph`, all `phase*.py` (200+ lines, compiler internals)
 
 ### By Version
 
-- **v0.3.1 Language:** `01`-`11`, `v0_3_1_*.kairo`
+- **v0.3.1 Language:** `01`-`11`, `v0_3_1_*.morph`
 - **v0.4.0 Agents:** `04`, `phase4_agent_operations.py`
 - **v0.5.0 Audio:** `audio_io_demo.py`, `phase5_audio_operations.py`
 - **v0.6.0 I/O:** `audio_io_demo.py`, `visual_composition_demo.py`
@@ -785,9 +785,9 @@ pip install -e .
 
 Want to add your own example? Follow these guidelines:
 
-### Kairo Language Examples (`.kairo`)
+### Kairo Language Examples (`.morph`)
 
-1. **Naming:** Use descriptive verb-noun format (`heat_diffusion.kairo`)
+1. **Naming:** Use descriptive verb-noun format (`heat_diffusion.morph`)
 2. **Comments:** Explain key concepts inline
 3. **Length:** Keep beginner examples < 100 lines
 4. **Style:** Use consistent formatting (4-space indents)

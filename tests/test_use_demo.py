@@ -7,7 +7,7 @@ from morphogen.runtime.runtime import Runtime, ExecutionContext
 from morphogen.ast.nodes import Use
 
 # Read the demo file
-with open('examples/use_statement_demo.kairo', 'r') as f:
+with open('examples/use_statement_demo.morph', 'r') as f:
     source = f.read()
 
 print("=" * 70)
@@ -57,7 +57,7 @@ print("USE statement implementation is working correctly!")
 print("=" * 70)
 print()
 print("The USE statement enables:")
-print("  • Importing domain operators into .kairo programs")
+print("  • Importing domain operators into .morph programs")
 print("  • Validation that domains exist at runtime")
 print("  • Clear documentation of program dependencies")
 print("  • All 23 domains with 374 operators are now accessible!")

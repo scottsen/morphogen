@@ -454,7 +454,7 @@ Given your constraints (no timeline pressure, willing to break things, want best
 
 **After (2.0):**
 ```kairo
-// Define domains in .kairo files
+// Define domains in .morph files
 domain MyPhysics { ... }
 ```
 

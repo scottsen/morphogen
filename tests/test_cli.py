@@ -31,7 +31,7 @@ class TestArgumentParsing:
     def test_run_command_parsing(self):
         """Test parsing run command with various options."""
         test_args = [
-            'morphogen', 'run', 'test.kairo',
+            'morphogen', 'run', 'test.morph',
             '--profile', 'high',
             '--seed', '123',
             '--steps', '100',
@@ -48,7 +48,7 @@ class TestArgumentParsing:
                 args = mock_cmd.call_args[0][0]
 
                 # Verify arguments were parsed correctly
-                assert args.file == Path('test.kairo')
+                assert args.file == Path('test.morph')
                 assert args.profile == 'high'
                 assert args.seed == 123
                 assert args.steps == 100
@@ -56,40 +56,40 @@ class TestArgumentParsing:
 
     def test_check_command_parsing(self):
         """Test parsing check command."""
-        test_args = ['morphogen', 'check', 'test.kairo', '--strict']
+        test_args = ['morphogen', 'check', 'test.morph', '--strict']
 
         with patch('sys.argv', test_args):
             with patch('morphogen.cli.cmd_check') as mock_cmd:
                 main()
 
                 args = mock_cmd.call_args[0][0]
-                assert args.file == Path('test.kairo')
+                assert args.file == Path('test.morph')
                 assert args.strict is True
 
     def test_parse_command_parsing(self):
         """Test parsing parse command with format options."""
         for fmt in ['tree', 'json', 'graphviz']:
-            test_args = ['morphogen', 'parse', 'test.kairo', '--format', fmt]
+            test_args = ['morphogen', 'parse', 'test.morph', '--format', fmt]
 
             with patch('sys.argv', test_args):
                 with patch('morphogen.cli.cmd_parse') as mock_cmd:
                     main()
 
                     args = mock_cmd.call_args[0][0]
-                    assert args.file == Path('test.kairo')
+                    assert args.file == Path('test.morph')
                     assert args.format == fmt
 
     def test_mlir_command_parsing(self):
         """Test parsing mlir command with dialect options."""
         for dialect in ['all', 'linalg', 'scf', 'arith']:
-            test_args = ['morphogen', 'mlir', 'test.kairo', '--dialect', dialect]
+            test_args = ['morphogen', 'mlir', 'test.morph', '--dialect', dialect]
 
             with patch('sys.argv', test_args):
                 with patch('morphogen.cli.cmd_mlir') as mock_cmd:
                     main()
 
                     args = mock_cmd.call_args[0][0]
-                    assert args.file == Path('test.kairo')
+                    assert args.file == Path('test.morph')
                     assert args.dialect == dialect
 
     def test_version_command_parsing(self):
@@ -103,7 +103,7 @@ class TestArgumentParsing:
 
     def test_default_values(self):
         """Test that default values are set correctly."""
-        test_args = ['morphogen', 'run', 'test.kairo']
+        test_args = ['morphogen', 'run', 'test.morph']
 
         with patch('sys.argv', test_args):
             with patch('morphogen.cli.cmd_run') as mock_cmd:
@@ -122,7 +122,7 @@ class TestCmdRun:
     def test_run_file_not_found(self, capsys):
         """Test running with non-existent file."""
         args = Mock()
-        args.file = Path('/nonexistent/file.kairo')
+        args.file = Path('/nonexistent/file.morph')
 
         with pytest.raises(SystemExit) as exc_info:
             cmd_run(args)
@@ -134,7 +134,7 @@ class TestCmdRun:
     def test_run_simple_program(self, tmp_path, capsys):
         """Test running a simple program."""
         # Create a minimal test program
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -171,7 +171,7 @@ class TestCmdRun:
 
     def test_run_with_type_errors_continues(self, tmp_path, capsys):
         """Test that run continues even with type errors."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -204,7 +204,7 @@ class TestCmdRun:
 
     def test_run_with_parameters(self, tmp_path):
         """Test running with parameter overrides."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -243,7 +243,7 @@ class TestCmdRun:
         """Test running program with step blocks."""
         from morphogen.ast.nodes import Step
 
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("step { x = 42 }")
 
         args = Mock()
@@ -280,7 +280,7 @@ class TestCmdRun:
         """Test that infinite loops without output cause error."""
         from morphogen.ast.nodes import Step
 
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("step { x = x + 1 }")
 
         args = Mock()
@@ -315,7 +315,7 @@ class TestCmdRun:
         """Test graceful handling of keyboard interrupt."""
         from morphogen.ast.nodes import Step
 
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("step { x = x + 1 }")
 
         args = Mock()
@@ -351,7 +351,7 @@ class TestCmdRun:
 
     def test_run_runtime_error(self, tmp_path, capsys):
         """Test handling of runtime errors."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -380,7 +380,7 @@ class TestCmdCheck:
     def test_check_file_not_found(self, capsys):
         """Test check with non-existent file."""
         args = Mock()
-        args.file = Path('/nonexistent/file.kairo')
+        args.file = Path('/nonexistent/file.morph')
 
         with pytest.raises(SystemExit) as exc_info:
             cmd_check(args)
@@ -391,7 +391,7 @@ class TestCmdCheck:
 
     def test_check_no_errors(self, tmp_path, capsys):
         """Test successful type checking."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -415,7 +415,7 @@ class TestCmdCheck:
 
     def test_check_with_errors(self, tmp_path, capsys):
         """Test type checking with errors."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x : i32 = 'string'")
 
         args = Mock()
@@ -442,7 +442,7 @@ class TestCmdCheck:
 
     def test_check_parse_error(self, tmp_path, capsys):
         """Test handling of parse errors during checking."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("invalid syntax @#$")
 
         args = Mock()
@@ -466,7 +466,7 @@ class TestCmdParse:
     def test_parse_file_not_found(self, capsys):
         """Test parse with non-existent file."""
         args = Mock()
-        args.file = Path('/nonexistent/file.kairo')
+        args.file = Path('/nonexistent/file.morph')
         args.format = 'tree'
 
         with pytest.raises(SystemExit) as exc_info:
@@ -478,7 +478,7 @@ class TestCmdParse:
 
     def test_parse_tree_format(self, tmp_path, capsys):
         """Test parsing with tree format."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -502,7 +502,7 @@ class TestCmdParse:
 
     def test_parse_json_format(self, tmp_path, capsys):
         """Test parsing with JSON format (not yet implemented)."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -520,7 +520,7 @@ class TestCmdParse:
 
     def test_parse_graphviz_format(self, tmp_path, capsys):
         """Test parsing with Graphviz format (not yet implemented)."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -538,7 +538,7 @@ class TestCmdParse:
 
     def test_parse_error(self, tmp_path, capsys):
         """Test handling of parse errors."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("invalid @#$")
 
         args = Mock()
@@ -562,7 +562,7 @@ class TestCmdMlir:
     def test_mlir_file_not_found(self, capsys):
         """Test MLIR with non-existent file."""
         args = Mock()
-        args.file = Path('/nonexistent/file.kairo')
+        args.file = Path('/nonexistent/file.morph')
         args.dialect = 'all'
 
         with pytest.raises(SystemExit) as exc_info:
@@ -574,7 +574,7 @@ class TestCmdMlir:
 
     def test_mlir_compilation_success(self, tmp_path, capsys):
         """Test successful MLIR compilation."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -608,7 +608,7 @@ class TestCmdMlir:
 
     def test_mlir_verification_warning(self, tmp_path, capsys):
         """Test MLIR compilation with verification warning."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -641,7 +641,7 @@ class TestCmdMlir:
 
     def test_mlir_compilation_error(self, tmp_path, capsys):
         """Test handling of MLIR compilation errors."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -692,7 +692,7 @@ class TestEdgeCases:
 
     def test_parameter_parsing_integer(self, tmp_path):
         """Test that integer parameters are parsed correctly."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -730,7 +730,7 @@ class TestEdgeCases:
 
     def test_parameter_parsing_float(self, tmp_path):
         """Test that float parameters are parsed correctly."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -766,7 +766,7 @@ class TestEdgeCases:
 
     def test_parameter_parsing_string(self, tmp_path):
         """Test that string parameters remain as strings."""
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("x = 42")
 
         args = Mock()
@@ -804,7 +804,7 @@ class TestEdgeCases:
         """Test warning when multiple step blocks are present."""
         from morphogen.ast.nodes import Step
 
-        test_file = tmp_path / "test.kairo"
+        test_file = tmp_path / "test.morph"
         test_file.write_text("step { } step { }")
 
         args = Mock()
@@ -843,7 +843,7 @@ class TestIntegrationWithRealFiles:
 
     def test_parse_real_example(self):
         """Test parsing a real example file."""
-        example_file = Path('/home/user/morphogen/examples/01_hello_heat.kairo')
+        example_file = Path('/home/user/morphogen/examples/01_hello_heat.morph')
 
         if not example_file.exists():
             pytest.skip("Example file not found")
@@ -867,7 +867,7 @@ class TestIntegrationWithRealFiles:
 
     def test_check_real_example(self):
         """Test type-checking a real example file."""
-        example_file = Path('/home/user/morphogen/examples/01_hello_heat.kairo')
+        example_file = Path('/home/user/morphogen/examples/01_hello_heat.morph')
 
         if not example_file.exists():
             pytest.skip("Example file not found")

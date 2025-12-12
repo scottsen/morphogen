@@ -71,10 +71,10 @@ Let's create a simple heat diffusion simulation to understand the basics.
 
 ### Example: Heat Diffusion
 
-Create a new file called `hello.kairo`:
+Create a new file called `hello.morph`:
 
 ```morphogen
-# hello.kairo - Heat diffusion simulation
+# hello.morph - Heat diffusion simulation
 
 use field, visual
 
@@ -96,7 +96,7 @@ flow(dt=0.01, steps=100) {
 Run it:
 
 ```bash
-morphogen run hello.kairo
+morphogen run hello.morph
 ```
 
 You should see a visualization of heat spreading across the field, smoothing out over 100 timesteps.
@@ -301,7 +301,7 @@ output combined
 
 ### Example 1: Reaction-Diffusion (Gray-Scott)
 
-Create `grayscott.kairo`:
+Create `grayscott.morph`:
 
 ```morphogen
 use field, visual
@@ -329,12 +329,12 @@ flow(dt=1.0, steps=10000) {
 
 Run with:
 ```bash
-morphogen run grayscott.kairo
+morphogen run grayscott.morph
 ```
 
 ### Example 2: Particle System with Gravity
 
-Create `particles.kairo`:
+Create `particles.morph`:
 
 ```morphogen
 use agent, visual
@@ -377,7 +377,7 @@ flow(dt=0.01, steps=1000) {
 
 ### Example 3: Simple Audio Synthesis
 
-Create `synth.kairo`:
+Create `synth.morph`:
 
 ```morphogen
 use audio
@@ -402,13 +402,13 @@ A typical Morphogen project:
 
 ```
 my-project/
-├── main.kairo           # Main program
+├── main.morph           # Main program
 ├── lib/
-│   ├── forces.kairo     # Custom force functions
-│   └── visuals.kairo    # Custom visualizations
+│   ├── forces.morph     # Custom force functions
+│   └── visuals.morph    # Custom visualizations
 ├── examples/
-│   ├── 01_simple.kairo
-│   └── 02_advanced.kairo
+│   ├── 01_simple.morph
+│   └── 02_advanced.morph
 └── output/
     ├── frames/          # Rendered frames
     └── audio/           # Exported audio
@@ -421,13 +421,13 @@ my-project/
 ### Basic Execution
 
 ```bash
-morphogen run program.kairo
+morphogen run program.morph
 ```
 
 ### With Arguments (future)
 
 ```bash
-morphogen run program.kairo --steps 10000 --dt 0.001
+morphogen run program.morph --steps 10000 --dt 0.001
 ```
 
 ### Interactive Mode (future)
@@ -443,9 +443,9 @@ kairo repl
 ### 1. Explore Examples
 
 Check out the `examples/` directory for:
-- **Beginner**: `01_hello_heat.kairo`, `02_pulsing_circle.kairo`
-- **Intermediate**: `10_heat_equation.kairo`, `11_gray_scott.kairo`
-- **Advanced**: `v0_3_1_complete_demo.kairo`, MLIR phase examples
+- **Beginner**: `01_hello_heat.morph`, `02_pulsing_circle.morph`
+- **Intermediate**: `10_heat_equation.morph`, `11_gray_scott.morph`
+- **Advanced**: `v0_3_1_complete_demo.morph`, MLIR phase examples
 
 See `examples/README.md` for a complete guide.
 

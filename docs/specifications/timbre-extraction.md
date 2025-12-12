@@ -282,7 +282,7 @@ scene AnalyzeGuitar {
   }
 
   // Save model
-  instrument.save(model, "models/guitar_e3.kairo")
+  instrument.save(model, "models/guitar_e3.morph")
 }
 ```
 
@@ -293,7 +293,7 @@ scene AnalyzeGuitar {
 ```morphogen
 scene SynthesizeFromModel {
   // Load model
-  let guitar = instrument.load("models/guitar_e3.kairo")
+  let guitar = instrument.load("models/guitar_e3.morph")
 
   // Generate a new note (A3, same timbre as original E3)
   let note_a3 = instrument.synthesize(
@@ -325,8 +325,8 @@ scene SynthesizeFromModel {
 
 ```morphogen
 scene MorphInstruments {
-  let guitar = instrument.load("models/guitar_e3.kairo")
-  let violin = instrument.load("models/violin_a4.kairo")
+  let guitar = instrument.load("models/guitar_e3.morph")
+  let violin = instrument.load("models/violin_a4.morph")
 
   // Morph between guitar and violin (50/50 blend)
   let hybrid = instrument.morph(guitar, violin, blend=0.5)
@@ -632,8 +632,8 @@ assert(harmonics_match(note_a3, note_a4, ratio=2.0))
 **Test:** Morph between two instruments, verify interpolation
 
 ```morphogen
-let guitar = instrument.load("guitar.kairo")
-let violin = instrument.load("violin.kairo")
+let guitar = instrument.load("guitar.morph")
+let violin = instrument.load("violin.morph")
 
 let morph_50 = instrument.morph(guitar, violin, blend=0.5)
 let note = instrument.synthesize(morph_50, pitch=440Hz, velocity=1.0)

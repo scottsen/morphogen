@@ -2068,9 +2068,9 @@ assert energy_before ≈ energy_after  # (if no absorption)
 
 - **`docs/domains/ACOUSTICS.md`** — Full acoustics domain specification
 - **`docs/USE_CASES/2-stroke-muffler-modeling.md`** — Complete multi-domain example
-- **`examples/acoustics/pipe_resonance.kairo`** — Simple resonance demo
-- **`examples/acoustics/helmholtz_resonator.kairo`** — Resonator tuning
-- **`examples/acoustics/expansion_chamber.kairo`** — 2-stroke chamber
+- **`examples/acoustics/pipe_resonance.morph`** — Simple resonance demo
+- **`examples/acoustics/helmholtz_resonator.morph`** — Resonator tuning
+- **`examples/acoustics/expansion_chamber.morph`** — 2-stroke chamber
 
 ---
 
