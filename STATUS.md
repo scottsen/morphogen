@@ -1,15 +1,41 @@
 # Morphogen — Implementation Status & v1.0 Roadmap
 
-**Last Updated:** 2025-12-06
-**Current Version:** v0.11.0 → v1.0 (2026-Q2)
-**Status:** 25 Active Domains + 15 Legacy (Migration v0.12.0) | [**v1.0 Release Plan →**](docs/planning/MORPHOGEN_RELEASE_PLAN.md)
-**Detailed Analysis:** [DOMAIN_STATUS_ANALYSIS.md](DOMAIN_STATUS_ANALYSIS.md) | **Migration Plan:** [docs/DOMAIN_MIGRATION_GUIDE.md](docs/DOMAIN_MIGRATION_GUIDE.md)
+**Last Updated:** 2025-12-12
+**Current Version:** v0.12.0 (December 2025) → v1.0 (2026-Q2)
+**Status:** 39 Production Domains | 606 Operators | Migration Complete ✅ | [**v1.0 Release Plan →**](docs/planning/MORPHOGEN_RELEASE_PLAN.md)
+**Detailed Analysis:** [DOMAIN_STATUS_ANALYSIS.md](DOMAIN_STATUS_ANALYSIS.md) | **Migration History:** [docs/guides/DOMAIN_MIGRATION_GUIDE.md](docs/guides/DOMAIN_MIGRATION_GUIDE.md)
 
 ---
 
-## Recent Updates (2025-11-23)
+## Recent Updates
 
-### ✅ Audio Domain - Filter State Management Fix
+### 🎉 v0.12.0 - Domain Migration Complete (2025-12-12)
+
+**Achievement**: All 39 domains now production-ready with full `@operator` decorator integration
+
+**Impact:**
+- ✅ **39 production domains** (up from 25 in v0.11.0)
+- ✅ **606 operators total** (up from 386)
+- ✅ **1,705 comprehensive tests** (1,454 passing, 251 MLIR skipped)
+- ✅ **Migration complete**: All legacy domains integrated
+
+**New Domains Available** (Phase 3-5):
+- **Chemistry Suite** (9 domains): molecular, qchem, thermo, kinetics, electrochem, catalysis, transport, multiphase, combustion
+- **Specialized Physics** (4 domains): thermal_ode, fluid_network, fluid_jet
+- **Audio Extensions** (2 domains): audio_analysis, instrument_model
+
+**Documentation:**
+- Updated README, ROADMAP, CHANGELOG to reflect v0.12.0
+- Created first Phase 3 integration example (fluid_jet domain)
+- Test coverage: 25 new tests for Phase 3 domains
+
+**Next Steps:** Integration examples for audio_analysis and instrument_model, then v1.0 preparation
+
+**See:** [CHANGELOG.md](CHANGELOG.md) for detailed migration summary
+
+---
+
+### ✅ Audio Domain - Filter State Management Fix (2025-11-23)
 **Commit:** `8ab2496` - fix: Export constant operator for registry discovery
 
 **Problem:** Constant operator was implemented but missing module-level export, causing registry discovery to fail. OperatorExecutor returned zeros for the operator, breaking filter state tests.
@@ -32,16 +58,16 @@
 
 ## Quick Summary
 
-### ✅ Active Domains (Fully Integrated) - 25 Domains
+### ✅ Production Domains (All Integrated) - 39 Domains
 
-**Accessible via `use` statement** - 386 operators total
+**All accessible via `use` statement** - 606 operators total
 
 **Core Infrastructure:**
 - **Language Frontend**: Complete lexer, parser, AST, type system
 - **Python Runtime**: Full interpreter with NumPy backend
 - **Visualization**: PNG/JPEG export, interactive display, video export (MP4/GIF)
 
-**Active Domains** (25 fully integrated):
+**All Production Domains** (39 fully integrated):
 
 **Physics & Simulation:**
 1. **field** (19 ops): PDE operations (diffuse, advect, project, Laplacian) ✅
@@ -78,34 +104,41 @@
 24. **geometry** (49 ops): 2D/3D spatial operations, transformations ✅
 25. **circuit** (15 ops): DC/AC/transient analysis, MNA solver (Phase 1) ✅
 
-**Testing**: 1,381 tests passing (251 MLIR tests skipped)
-
-### ⏳ Legacy Domains (Not Yet Integrated) - 15 Domains
-
-**Implemented but not accessible via `use` statement** - Migration target: v0.12.0
-
 **Chemistry Suite** (9 domains):
-- molecular (33 functions) - Molecular dynamics, force fields
-- qchem (13 functions) - Quantum chemistry, electronic structure
-- thermo (12 functions) - Thermodynamics, equations of state
-- kinetics (11 functions) - Chemical kinetics, reaction rates
-- electrochem (13 functions) - Electrochemistry, Nernst equation
-- catalysis (11 functions) - Catalytic cycles, mechanisms
-- transport (17 functions) - Transport properties (diffusion, viscosity)
-- multiphase (8 functions) - Multiphase flow, mass transfer
-- combustion (8 functions) - Combustion kinetics, flame dynamics
+26. **molecular** (33 ops): Molecular dynamics, force fields, simulations ✅
+27. **qchem** (13 ops): Quantum chemistry, electronic structure calculations ✅
+28. **thermo** (12 ops): Thermodynamics, equations of state, phase equilibria ✅
+29. **kinetics** (11 ops): Chemical kinetics, reaction rates, mechanisms ✅
+30. **electrochem** (13 ops): Electrochemistry, Nernst equation, batteries ✅
+31. **catalysis** (11 ops): Catalytic cycles, mechanisms, turnover ✅
+32. **transport** (17 ops): Transport properties (diffusion, viscosity, conductivity) ✅
+33. **multiphase** (8 ops): Multiphase flow, mass transfer, separation ✅
+34. **combustion** (8 ops): Combustion kinetics, flame dynamics, ignition ✅
 
 **Specialized Physics** (4 domains):
-- thermal_ode (4 functions) - 1D thermal modeling
-- fluid_network (4 functions) - 1D network flow, pipes
-- fluid_jet (8 functions) - Jet dynamics, turbulence
+35. **thermal_ode** (4 ops): 1D thermal modeling, heat transfer ✅
+36. **fluid_network** (4 ops): 1D network flow, pipes, hydraulics ✅
+37. **fluid_jet** (8 ops): Jet dynamics, turbulence, entrainment ✅
 
 **Audio Extensions** (2 domains):
-- audio_analysis (9 functions) - Spectral analysis, onset detection
-- instrument_model (10 functions) - Physical modeling synthesis
+38. **audio_analysis** (9 ops): Spectral analysis, onset detection, pitch tracking ✅
+39. **instrument_model** (10 ops): Physical modeling synthesis, instruments ✅
 
-**Status**: Code exists, functions work, but missing `@operator` decorators for integration
-**See**: [docs/DOMAIN_MIGRATION_GUIDE.md](docs/DOMAIN_MIGRATION_GUIDE.md) for migration plan
+**Testing**: 1,705 tests total (1,454 passing, 251 MLIR skipped)
+
+### ✅ Migration Complete (v0.12.0)
+
+**All 39 domains now production-ready** with full `@operator` decorator integration.
+
+**Migration History** (v0.11.0 → v0.12.0):
+- **Phase 1-2**: 25 domains integrated (completed v0.11.0)
+- **Phase 3**: Chemistry suite (9 domains) migrated
+- **Phase 4**: Specialized physics (4 domains) migrated
+- **Phase 5**: Audio extensions (2 domains) migrated
+
+**Result**: All legacy function-based domains converted to modern `@operator` system, accessible via `use` statement.
+
+**See**: [docs/guides/DOMAIN_MIGRATION_GUIDE.md](docs/guides/DOMAIN_MIGRATION_GUIDE.md) for migration history and patterns
 
 ### ✅ COMPLETE (v0.7.0 - Real MLIR Integration)
 - **Phase 1 (Foundation)**: ✅ **COMPLETE** - MLIR context, compiler V2, proof-of-concept
