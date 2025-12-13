@@ -89,7 +89,6 @@ class TestPhysicsOperations:
         # Velocity should be negative (downward)
         assert state.bird_velocity[0] < 0
 
-    @pytest.mark.skip(reason="Floating point precision issue - exact comparison fails intermittently")
     def test_flap(self):
         """Test flap impulse"""
         state = flappy.alloc_game(n_birds=3, n_pipes=3)
@@ -98,9 +97,9 @@ class TestPhysicsOperations:
         flap_mask = np.array([True, False, True])
         state = flappy.flap(state, flap_mask, flap_strength=0.35)
 
-        assert state.bird_velocity[0] == 0.35
-        assert state.bird_velocity[1] == 0.0
-        assert state.bird_velocity[2] == 0.35
+        assert state.bird_velocity[0] == pytest.approx(0.35)
+        assert state.bird_velocity[1] == pytest.approx(0.0)
+        assert state.bird_velocity[2] == pytest.approx(0.35)
 
     def test_move_pipes(self):
         """Test pipe movement"""
