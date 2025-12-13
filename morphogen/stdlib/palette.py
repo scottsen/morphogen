@@ -102,21 +102,32 @@ class PaletteOperations:
         deterministic=True,
         doc="Create palette from list of RGB colors"
     )
-    def from_colors(colors: List[Tuple[float, float, float]], name: str = "custom") -> Palette:
+    def from_colors(colors: List[Tuple[float, float, float]], resolution: int = 256, name: str = "custom") -> Palette:
         """Create palette from list of RGB colors.
 
         Args:
             colors: List of (r, g, b) tuples, values in [0, 1]
+            resolution: Number of colors in final palette (interpolated)
             name: Palette name
 
         Returns:
-            Palette object
+            Palette object with interpolated colors
 
         Example:
             >>> pal = palette.from_colors([(0, 0, 0), (1, 0, 0), (1, 1, 1)])
         """
         colors_array = np.array(colors, dtype=np.float32)
-        return Palette(colors_array, name)
+
+        # If only one color provided, just replicate it
+        if len(colors_array) == 1:
+            return Palette(np.repeat(colors_array, resolution, axis=0), name)
+
+        # Create gradient stops from colors (evenly spaced)
+        num_colors = len(colors_array)
+        stops = [(i / (num_colors - 1), tuple(colors_array[i])) for i in range(num_colors)]
+
+        # Use from_gradient to interpolate
+        return PaletteOperations.from_gradient(stops, resolution, name)
 
     @staticmethod
     @operator(

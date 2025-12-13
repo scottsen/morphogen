@@ -87,7 +87,6 @@ class TestNoiseDomain:
 class TestPaletteDomain:
     """Test color palette functions."""
 
-    @pytest.mark.skip(reason="Palette API mismatch - implementation returns different shape than expected")
     def test_from_colors(self):
         """Test creating palette from color list."""
         colors = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])  # RGB
@@ -98,11 +97,10 @@ class TestPaletteDomain:
         # First color should be close to red
         assert pal.colors[0, 0] > 0.9
 
-    @pytest.mark.skip(reason="Palette API mismatch - implementation returns different shape than expected")
     def test_from_gradient(self):
         """Test creating palette from gradient stops."""
         stops = [(0.0, [1, 0, 0]), (0.5, [0, 1, 0]), (1.0, [0, 0, 1])]
-        pal = palette.from_gradient(stops, num_colors=256)
+        pal = palette.from_gradient(stops, resolution=256)
 
         assert pal.colors.shape == (256, 3)
         # Check interpolation at stops
@@ -151,7 +149,6 @@ class TestPaletteDomain:
 
         assert pal.colors.shape == (256, 3)
 
-    @pytest.mark.skip(reason="Palette API mismatch - implementation returns different shape than expected")
     def test_cosine_palette(self):
         """Test procedural cosine palette (IQ-style)."""
         a = np.array([0.5, 0.5, 0.5])
@@ -159,44 +156,41 @@ class TestPaletteDomain:
         c = np.array([1.0, 1.0, 1.0])
         d = np.array([0.0, 0.33, 0.67])
 
-        pal = palette.cosine(a, b, c, d, num_colors=256)
+        pal = palette.cosine(a, b, c, d, resolution=256)
 
         assert pal.colors.shape == (256, 3)
         assert np.all(pal.colors >= 0.0)
         assert np.all(pal.colors <= 1.0)
 
-    @pytest.mark.skip(reason="Palette API mismatch - implementation returns different shape than expected")
     def test_palette_map(self):
         """Test mapping scalar values to colors using palette."""
         pal = palette.viridis()
         values = np.linspace(0.0, 1.0, 100)
 
-        colored = palette.map(values, pal.colors, min_val=0.0, max_val=1.0)
+        colored = palette.map(pal, values, vmin=0.0, vmax=1.0)
 
         assert colored.shape == (100, 3)
         assert np.all(colored >= 0.0)
         assert np.all(colored <= 1.0)
 
-    @pytest.mark.skip(reason="Palette API mismatch - implementation returns different shape than expected")
     def test_palette_shift(self):
         """Test palette shifting."""
         pal = palette.viridis()
-        shifted = palette.shift(pal.colors, amount=0.5)
+        shifted = palette.shift(pal, 0.5)
 
-        assert shifted.shape == pal.colors.shape
+        assert shifted.colors.shape == pal.colors.shape
         # Shifted palette should be different
-        assert not np.allclose(shifted, pal.colors)
+        assert not np.allclose(shifted.colors, pal.colors)
 
-    @pytest.mark.skip(reason="Palette API mismatch - implementation returns different shape than expected")
     def test_palette_flip(self):
         """Test palette flipping/reversal."""
         pal = palette.viridis()
-        flipped = palette.flip(pal.colors)
+        flipped = palette.flip(pal)
 
-        assert flipped.shape == pal.colors.shape
+        assert flipped.colors.shape == pal.colors.shape
         # First color should match last color of original
-        assert np.allclose(flipped[0], pal.colors[-1], atol=0.01)
-        assert np.allclose(flipped[-1], pal.colors[0], atol=0.01)
+        assert np.allclose(flipped.colors[0], pal.colors[-1], atol=0.01)
+        assert np.allclose(flipped.colors[-1], pal.colors[0], atol=0.01)
 
 
 class TestColorDomain:
