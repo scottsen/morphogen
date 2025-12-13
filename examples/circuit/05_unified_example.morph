@@ -1,5 +1,5 @@
 # Example 5: Unified Circuit + PCB + Audio + EM Simulation
-# Demonstrates the unique capability Kairo provides: multi-domain integration
+# Demonstrates the unique capability Morphogen provides: multi-domain integration
 
 system GuitarAmpComplete {
     description: "Complete guitar amplifier: PCB + circuit + audio + EM + thermal"

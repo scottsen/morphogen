@@ -1,4 +1,4 @@
-# Kairo v0.3.1 Example: Recursive Functions
+# Morphogen v0.3.1 Example: Recursive Functions
 # Demonstrates: recursive function definitions, if/else expressions
 
 fn factorial(n: f32) -> f32 {

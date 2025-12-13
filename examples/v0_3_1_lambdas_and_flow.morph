@@ -1,4 +1,4 @@
-# Kairo v0.3.1 Example: Lambdas with Closures and Flow
+# Morphogen v0.3.1 Example: Lambdas with Closures and Flow
 # Demonstrates: lambda expressions, closures, higher-order functions, substeps
 
 fn apply_twice(f, x) {

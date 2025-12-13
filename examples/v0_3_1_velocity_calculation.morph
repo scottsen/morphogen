@@ -1,4 +1,4 @@
-# Kairo v0.3.1 Example: Velocity Calculation with Functions
+# Morphogen v0.3.1 Example: Velocity Calculation with Functions
 # Demonstrates: functions with physical units, if/else expressions
 
 fn calculate_velocity(distance: f32[m], time: f32[s]) -> f32[m/s] {

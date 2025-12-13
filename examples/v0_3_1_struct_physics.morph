@@ -1,4 +1,4 @@
-# Kairo v0.3.1 Example: Structs in Physics Simulation
+# Morphogen v0.3.1 Example: Structs in Physics Simulation
 # Demonstrates: struct definitions, literals, field access, functions, and temporal flow
 
 # Define a 2D vector struct
