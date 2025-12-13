@@ -1413,6 +1413,38 @@ def contains_rectangle_point(rect: Rectangle, point: Point2D) -> bool:
 @operator(
     domain="geometry",
     category=OpCategory.QUERY,
+    signature="(shape: Union[Circle, Rectangle, Polygon], point: Point2D) -> bool",
+    deterministic=True,
+    doc="Check if shape contains point (generic dispatch)",
+)
+def contains(shape: Union[Circle, Rectangle, Polygon], point: Point2D) -> bool:
+    """Check if a geometric shape contains a point.
+
+    Args:
+        shape: Circle, Rectangle, or Polygon
+        point: Point to test
+
+    Returns:
+        True if point is inside shape
+
+    Example:
+        >>> circ = circle(point2d(0, 0), 5)
+        >>> contains(circ, point2d(1, 1))
+        True
+    """
+    if isinstance(shape, Circle):
+        return contains_circle_point(shape, point)
+    elif isinstance(shape, Rectangle):
+        return contains_rectangle_point(shape, point)
+    elif isinstance(shape, Polygon):
+        return contains_polygon_point(shape, point)
+    else:
+        raise TypeError(f"contains() not implemented for type {type(shape)}")
+
+
+@operator(
+    domain="geometry",
+    category=OpCategory.QUERY,
     signature="(point: Point2D, circle: Circle) -> Point2D",
     deterministic=True,
     doc="Find closest point on circle to given point",
@@ -2346,6 +2378,7 @@ __all__ = [
     "distance_point_line",
     "distance_point_circle",
     "intersect_circle_circle",
+    "contains",
     "contains_circle_point",
     "contains_polygon_point",
     "contains_rectangle_point",

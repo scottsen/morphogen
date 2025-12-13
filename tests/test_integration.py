@@ -366,7 +366,7 @@ class TestGeometryFieldIntegration:
         """Test sampling field values along a geometric path."""
         try:
             from morphogen.stdlib.geometry import (
-                point2d, line_segment, sample_field_at_point
+                point2d, sample_field_at_point
             )
         except ImportError:
             pytest.skip("Geometry domain not available")
@@ -385,8 +385,8 @@ class TestGeometryFieldIntegration:
         samples = []
         for i in range(num_samples):
             t = i / (num_samples - 1)
-            x = start['x'] + t * (end['x'] - start['x'])
-            y = start['y'] + t * (end['y'] - start['y'])
+            x = start.x + t * (end.x - start.x)
+            y = start.y + t * (end.y - start.y)
             pt = point2d(x, y)
             value = sample_field_at_point(temp, pt)
             samples.append(value)
@@ -400,7 +400,7 @@ class TestGeometryFieldIntegration:
         """Test generating geometric shapes based on field values."""
         try:
             from morphogen.stdlib.geometry import (
-                point2d, circle, query_field_in_region, sample_field_at_point
+                point2d, circle, sample_field_at_point
             )
         except ImportError:
             pytest.skip("Geometry domain not available")
@@ -790,14 +790,13 @@ class TestCrossTripleDomainIntegration:
 
         # Rasterize geometric shapes
         for shape in shapes:
-            if 'radius' in shape:  # circle
-                center = shape['center']
+            if hasattr(shape, 'radius'):  # circle
                 for i in range(64):
                     for j in range(64):
                         pt = point2d(float(i), float(j))
                         if contains(shape, pt):
                             data[i, j] = 1.0
-            elif 'width' in shape:  # rectangle
+            elif hasattr(shape, 'width'):  # rectangle
                 for i in range(64):
                     for j in range(64):
                         pt = point2d(float(i), float(j))
